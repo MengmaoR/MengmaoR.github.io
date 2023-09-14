@@ -86,17 +86,6 @@
         	</li>
 			
             
-            <li>
-                <a class="sb-toggle-submenu">Links<span class="sb-caret"></span></a>
-                <ul class="sb-submenu">
-                    
-                    <li><a target="_blank" rel="noopener" href="http://go.kieran.top/" class="animsition-link">Kieran</a></li>
-                    
-                    <li><a target="_blank" rel="noopener" href="http://domain.com/" class="animsition-link">Name</a></li>
-                    
-                </ul>
-            </li>
-            
         </ul>
         <!-- Lists in Slidebars -->
         <ul class="sb-menu secondary">
@@ -136,16 +125,8 @@
                             <li><a href="https://github.com/MengmaoR" title="Github" target="_blank"><i class="icon-github"></i></a></li>
                             
                             
-                            <li><a href="https://twitter.com/" title="Twitter" target="_blank"><i class="icon-twitter"></i></a></li>
                             
                             
-                            <li><a href="https://www.facebook.com/" title="Facebook" target="_blank"><i class="icon-facebook"></i></a></li>
-                            
-                            
-                            <li><a href="https://google.com/" title="Google-Plus" target="_blank"><i class="icon-google-plus"></i></a></li>
-                            
-                            
-                            <li><a href="http://weibo.com/" title="Sina-Weibo" target="_blank"><i class="icon-sina-weibo"></i></a></li>
                             
                             <li class="nolink"><span>Welcome!</span></li>
                         </ul>
@@ -258,16 +239,8 @@ here's about page
                     <li><a href="https://github.com/MengmaoR" title="Github" target="_blank"><i class="icon-github"></i></a>&nbsp;</li>
                     
                     
-                    <li><a href="https://twitter.com/" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>&nbsp;</li>
                     
                     
-                    <li><a href="https://www.facebook.com/" title="Facebook" target="_blank"><i class="icon-facebook"></i></a>&nbsp;</li>
-                    
-                    
-                    <li><a href="https://google.com/" title="Google-Plus" target="_blank"><i class="icon-google-plus"></i></a>&nbsp;</li>
-                    
-                    
-                    <li><a href="http://weibo.com/" title="Sina-Weibo" target="_blank"><i class="icon-sina-weibo"></i></a>&nbsp;</li>
                     
                 </ul>
             </div>
@@ -434,7 +407,7 @@ $('#intro').find('img').each(function(){
     var isfetched = false;
     var isXml = true;
     // Search DB path;
-    var search_path = "/source/_posts";
+    var search_path = "search.xml";
     if (search_path.length === 0) {
       search_path = "search.xml";
     } else if (/json$/i.test(search_path)) {
@@ -470,7 +443,7 @@ $('#intro').find('img').each(function(){
       initLoad(['/'], {
         loadOptions: {
           success: function(obj) {
-            localStorage.setItem('searchJson', obj['/source/_posts'])
+            localStorage.setItem('searchJson', obj['search.xml'])
           },
           error: function(e) {
             return console.log(e)
@@ -634,7 +607,7 @@ $('#intro').find('img').each(function(){
 
               // select top N slices in content
 
-              var upperBound = parseInt('-1');
+              var upperBound = parseInt('10');
               if (upperBound >= 0) {
                 slicesOfContent = slicesOfContent.slice(0, upperBound);
               }
