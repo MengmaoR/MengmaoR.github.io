@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Hello World</title>
+    <url>/2023/09/13/Hello/</url>
+    <content><![CDATA[<p>Here’s my first BLOG<br>So let’s say</p>
+<p><strong>Hello World!</strong></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>TJUOJ 4441: 合并果子（堆）</title>
+    <url>/2023/09/15/tjuoj-4441-%E5%90%88%E5%B9%B6%E6%9E%9C%E5%AD%90%EF%BC%88%E5%A0%86%EF%BC%89/</url>
+    <content><![CDATA[<p>补程设课，没什么事干，就在学校OJ上找了道<a href="http://tjuacm.chaosheng.top/problem.php?id=4441">简单题</a>做<br>算法复健一下，顺便试一试代码块插入</p>
+<p>题目给了提示，应该是道堆排序的题<br>由于每次体力增加值为当前已合并果子的总数，因此我们只需保证每次合并的两个堆都是当前果子数量最少的两个堆即可<br>思路有些像霍夫曼编码，但题目只要求求最终的体力消耗，所以没有构建霍夫曼树的必要<br>准备直接做一个最小堆，每次合并操作都取两次堆顶元素，将求出的和累加至totalCost变量中，并放回堆里<br>循环至只剩一个元素时，totalCost中值即是所求答案</p>
+<p><strong>理论存在，实践开始</strong></p>
+<p>首先进行数据读入和建堆操作<br>使用scanf读入数据增加速度<br>然后偷个懒，用 <code>#include &lt;algorithem&gt;</code> 的make_heap函数建堆<br><strong>需要注意，题中给出的数据最大可能为n&#x3D;30000，且每项均为20000</strong><br><strong>因此结果最大可能为2e4至6e8的等差求和，即9e12左右</strong><br><strong>考虑到我们会将中间结果存在堆中，因此需要一个64位的堆和totalCost</strong></p>
+<h2 id="Input-Init"><a href="#Input-Init" class="headerlink" title="Input &amp;&amp; Init"></a>Input &amp;&amp; Init</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="type">uint64_t</span> *heap;</span><br><span class="line"><span class="type">int</span> N;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;N);</span><br><span class="line">heap = <span class="keyword">new</span> <span class="type">uint64_t</span>[N];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%lld&quot;</span>, heap + i);</span><br><span class="line"></span><br><span class="line"><span class="built_in">make_heap</span>(heap, heap + N, greater&lt;&gt;());</span><br></pre></td></tr></table></figure>
+
+<p>现在编写主算法<br>每次从堆顶取两个数进行加和，随后将结果存入堆中，并累加totalCost，直至堆中只剩一个元素</p>
+<h2 id="Main-Algorithem"><a href="#Main-Algorithem" class="headerlink" title="Main Algorithem"></a>Main Algorithem</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="type">uint64_t</span> totalCost = <span class="number">0</span>, currentCost;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> mergeTimes = N - <span class="number">1</span>; mergeTimes &gt; <span class="number">0</span>; mergeTimes--) &#123;</span><br><span class="line">    currentCost = heap[<span class="number">0</span>];</span><br><span class="line">    heap[<span class="number">0</span>] = heap[mergeTimes];</span><br><span class="line">    <span class="built_in">maintainHeap</span>(heap, mergeTimes);</span><br><span class="line"></span><br><span class="line">    currentCost += heap[<span class="number">0</span>];</span><br><span class="line">    heap[<span class="number">0</span>] = currentCost;</span><br><span class="line">    <span class="built_in">maintainHeap</span>(heap, mergeTimes);</span><br><span class="line">    </span><br><span class="line">    totalCost += currentCost;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后实现用于维护堆的<code>maintainHeap</code>函数<br>我们只需跟踪堆顶元素，并循环判断判断它和它最小孩子的大小关系，若大于则与之交换并继续循环，否则返回</p>
+<h2 id="Quoting-Function"><a href="#Quoting-Function" class="headerlink" title="Quoting Function"></a>Quoting Function</h2><figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">//Find the minimum element in heap[i]&#x27;s children</span></span><br><span class="line"><span class="comment">//Return it&#x27;s index</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">findMinChild</span><span class="params">(<span class="type">uint64_t</span>* heap, <span class="type">int</span> parentIndex, <span class="type">int</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>((parentIndex * <span class="number">2</span>) + <span class="number">2</span> &lt; length)</span><br><span class="line">        <span class="keyword">return</span> heap[(parentIndex * <span class="number">2</span>) + <span class="number">1</span>] &lt; heap[(parentIndex * <span class="number">2</span>) + <span class="number">2</span>] ? (parentIndex * <span class="number">2</span>) + <span class="number">1</span> : (parentIndex * <span class="number">2</span>) + <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>((parentIndex * <span class="number">2</span>) + <span class="number">1</span> &lt; length)</span><br><span class="line">        <span class="built_in">return</span> (parentIndex * <span class="number">2</span>) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//maintain the heap as a minimum heap after changing the top</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">maintainHeap</span><span class="params">(<span class="type">uint64_t</span>* heap, <span class="type">int</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> parentIndex = <span class="number">0</span>, minChildIndex;</span><br><span class="line">    </span><br><span class="line">    minChildIndex = <span class="built_in">findMinChild</span>(heap, parentIndex, length);</span><br><span class="line">    <span class="keyword">while</span> (heap[parentIndex] &gt; heap[minChildIndex] &amp;&amp; minChildIndex != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="type">long</span> <span class="type">long</span> temp = heap[parentIndex];</span><br><span class="line">        heap[parentIndex] = heap[minChildIndex];</span><br><span class="line">        heap[minChildIndex] = temp;</span><br><span class="line">        </span><br><span class="line">        parentIndex = minChildIndex;</span><br><span class="line">        minChildIndex = <span class="built_in">findMinChild</span>(heap, parentIndex, length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>至此编程结束，成功AC</strong></p>
+]]></content>
+      <categories>
+        <category>算法笔记</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Image test</title>
+    <url>/2023/09/14/Image-test/</url>
+    <content><![CDATA[<p>Try to post a pic</p>
+<img src="/2023/09/14/Image-test/test-pic.png" class="" title="test1">
+
+<p><img src="/2023/09/14/Image-test/test2.jpeg" alt="test-pic2" title="test2"></p>
+<p>Test end</p>
+]]></content>
+      <categories>
+        <category>Function Test</category>
+      </categories>
+      <tags>
+        <tag>test</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>about</title>
+    <url>/about.html</url>
+    <content><![CDATA[
+here's about page]]></content>
+  </entry>
+</search>

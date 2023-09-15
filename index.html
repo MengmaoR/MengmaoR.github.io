@@ -82,6 +82,8 @@
 				  	
 				    <li><a href="/categories/Function-Test/" class="animsition-link">Function Test<small>(1)</small></a></li>
 				    
+				    <li><a href="/categories/算法笔记/" class="animsition-link">算法笔记<small>(1)</small></a></li>
+				    
 				</ul>
         	</li>
 			
@@ -182,6 +184,37 @@
 
 <section id="intro">
     <div class="container">
+        
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2 opening-statement">
+                <div class="col-md-4">
+                    <h3><a href="/2023/09/15/tjuoj-4441-合并果子（堆）/">TJUOJ 4441: 合并果子（堆）</a></h3>
+                    <span>
+                        <span class="post-meta">
+      <time datetime="2023-09-15T02:37:16.000Z" itemprop="datePublished">
+          2023-09-15
+      </time>
+    
+</span>
+                    </span>
+                </div>
+                <div class="col-md-8">
+                    <p>
+                      
+                        补程设课，没什么事干，就在学校OJ上找了道简单题做算法复健一下，顺便试一试代码块插入
+题目给了提示，应该是道堆排序的题由于每次体力增加值为当前已合并果子的总数，因此我们只需保证每次合并的两个堆都是当前果子数量最少的两个堆即可思路有些像霍夫曼编码，但题目只要求求最终的体力消耗，所以没有构建霍夫曼树的必要准备直接做一个最小堆，每次合并操作都取两次堆顶元素，将求出的和累加至totalCost变量中，并放回堆里循环至只剩一个元素时，totalC
+                      
+                    </p>
+                    
+                    <p class="pull-right readMore">
+                        <a href="/2023/09/15/tjuoj-4441-合并果子（堆）/">Read More...</a>
+                    </p>
+                    
+                </div>
+                <div class="clearfix"></div>
+                <hr class="nogutter">
+            </div>
+        </div>
         
         <div class="row">
             <div class="col-md-8 col-md-offset-2 opening-statement">
@@ -655,7 +688,7 @@ $('#intro').find('img').each(function(){
 
               // select top N slices in content
 
-              var upperBound = parseInt('10');
+              var upperBound = parseInt('2');
               if (upperBound >= 0) {
                 slicesOfContent = slicesOfContent.slice(0, upperBound);
               }
@@ -722,7 +755,7 @@ $('#intro').find('img').each(function(){
         }
       }
 
-      if ('auto' === 'auto') {
+      if ('auto' === 'manual') {
         input.addEventListener('input', inputEventFunction);
       } else {
         $('.search-icon').click(inputEventFunction);

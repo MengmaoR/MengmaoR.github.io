@@ -82,6 +82,8 @@
 				  	
 				    <li><a href="/categories/Function-Test/" class="animsition-link">Function Test<small>(1)</small></a></li>
 				    
+				    <li><a href="/categories/算法笔记/" class="animsition-link">算法笔记<small>(1)</small></a></li>
+				    
 				</ul>
         	</li>
 			
@@ -178,6 +180,10 @@
             <hr class="nogutter">
         </div>
         <nav class="m-pagination col-md-8 col-md-offset-2 col-sm-24" role="pagination">
+    
+    <a class="pull-left" href="/2023/09/15/tjuoj-4441-%E5%90%88%E5%B9%B6%E6%9E%9C%E5%AD%90%EF%BC%88%E5%A0%86%EF%BC%89/" style="float: left;">
+        ← TJUOJ 4441: 合并果子（堆）
+    </a>
     
     
     <a class="pull-right" href="/2023/09/13/Hello/">
@@ -625,7 +631,7 @@ $('#intro').find('img').each(function(){
 
               // select top N slices in content
 
-              var upperBound = parseInt('10');
+              var upperBound = parseInt('2');
               if (upperBound >= 0) {
                 slicesOfContent = slicesOfContent.slice(0, upperBound);
               }
@@ -692,7 +698,7 @@ $('#intro').find('img').each(function(){
         }
       }
 
-      if ('auto' === 'auto') {
+      if ('auto' === 'manual') {
         input.addEventListener('input', inputEventFunction);
       } else {
         $('.search-icon').click(inputEventFunction);

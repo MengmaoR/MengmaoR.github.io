@@ -17,7 +17,7 @@
 <!--<![endif]-->
 
 <head>
-  <title>Archives | MENGMAO&#39;S BLOG</title>
+  <title>TJUOJ 4441: 合并果子（堆） | MENGMAO&#39;S BLOG</title>
   <!-- Meta data -->
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -59,7 +59,7 @@
 </head>
 
 <!--
-<body class="home-template">
+<body class="post-template">
 -->
 <body id="index" class="lightnav animsition">
 
@@ -150,87 +150,101 @@
         <!-- ============================ Header & Logo bar =========================== -->
 
 
-      <!-- ============================ Hero Image =========================== -->
-
-<section id="hero" class="scrollme">
-    <div class="container-fluid element-img" style="background: url(/img/bg_1.png) no-repeat center center fixed;background-size: cover">
-        <div class="row">
-            <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 vertical-align cover boost text-center">
-                <div class="center-me animateme" data-when="exit" data-from="0" data-to="0.6" data-opacity="0" data-translatey="100">
-                    <div>
-                        
-                        <h2>WHAT A <span>NICE</span> DANCE, WELCOME.</h2>
-                        <p></p>
-                        
-                        <h2></h2>
-                        <p><b><span>每一个不曾起舞的日子都是对生命的辜负。</span></b></p>
-                        
-
-                    </div>
-                </div>
-            </div>
-            <!-- // .col-md-12 -->
-        </div>
-        <div class="herofade beige-dk"></div>
-    </div>
-</section>
-
-<!-- Height spacing helper -->
-<div class="heightblock"></div>
-<!-- // End height spacing helper -->
-
-<!-- ============================ END Hero Image =========================== -->
-
-
-
-
-<section id="services">
+      
+<section id="intro">
     <div class="container">
-        <div class="row">
-            <div class="col-md-10 col-md-offset-1">
-                <div class="row boxes">
-                    
-                    
-                        
-                        
-                        <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
-                            
-                              <h4 class="title"><a href="/2023/09/15/tjuoj-4441-合并果子（堆）/">TJUOJ 4441: 合并果子（堆）</a></h4>
-                            
-                            <p><time datetime="2023-09-15T02:37:16.000Z"><a href="/2023/09/15/tjuoj-4441-合并果子（堆）/">2023-09-15</a></time></p>
-                        </div>
-                    
-                        
-                        
-                        <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
-                            
-                              <h4 class="title"><a href="/2023/09/14/Image-test/">Image test</a></h4>
-                            
-                            <p><time datetime="2023-09-14T02:55:12.000Z"><a href="/2023/09/14/Image-test/">2023-09-14</a></time></p>
-                        </div>
-                    
-                        
-                        
-                        <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
-                            
-                              <h4 class="title"><a href="/2023/09/13/Hello/">Hello World</a></h4>
-                            
-                            <p><time datetime="2023-09-13T07:51:42.000Z"><a href="/2023/09/13/Hello/">2023-09-13</a></time></p>
-                        </div>
-                    
-                </div>
-            </div>    
+        <div class="row col-md-offset-2">
+            <div class="col-md-8">
+    			<span class="post-meta">
+      <time datetime="2023-09-15T02:37:16.000Z" itemprop="datePublished">
+          2023-09-15
+      </time>
+    
+</span>
+                <h1>TJUOJ 4441: 合并果子（堆）</h1>
+            </div>
         </div>
-    </div>
-</section> 
+        <div class="col-md-8 col-md-offset-2">
+      		<p>补程设课，没什么事干，就在学校OJ上找了道<a target="_blank" rel="noopener" href="http://tjuacm.chaosheng.top/problem.php?id=4441">简单题</a>做<br>算法复健一下，顺便试一试代码块插入</p>
+<p>题目给了提示，应该是道堆排序的题<br>由于每次体力增加值为当前已合并果子的总数，因此我们只需保证每次合并的两个堆都是当前果子数量最少的两个堆即可<br>思路有些像霍夫曼编码，但题目只要求求最终的体力消耗，所以没有构建霍夫曼树的必要<br>准备直接做一个最小堆，每次合并操作都取两次堆顶元素，将求出的和累加至totalCost变量中，并放回堆里<br>循环至只剩一个元素时，totalCost中值即是所求答案</p>
+<p><strong>理论存在，实践开始</strong></p>
+<p>首先进行数据读入和建堆操作<br>使用scanf读入数据增加速度<br>然后偷个懒，用 <code>#include &lt;algorithem&gt;</code> 的make_heap函数建堆<br><strong>需要注意，题中给出的数据最大可能为n&#x3D;30000，且每项均为20000</strong><br><strong>因此结果最大可能为2e4至6e8的等差求和，即9e12左右</strong><br><strong>考虑到我们会将中间结果存在堆中，因此需要一个64位的堆和totalCost</strong></p>
+<h2 id="Input-Init"><a href="#Input-Init" class="headerlink" title="Input &amp;&amp; Init"></a>Input &amp;&amp; Init</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint64_t</span> *heap;</span><br><span class="line"><span class="type">int</span> N;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;N);</span><br><span class="line">heap = <span class="keyword">new</span> <span class="type">uint64_t</span>[N];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%lld&quot;</span>, heap + i);</span><br><span class="line"></span><br><span class="line"><span class="built_in">make_heap</span>(heap, heap + N, greater&lt;&gt;());</span><br></pre></td></tr></table></figure>
 
-<section id="statement">
-    <div class="container text-center wow fadeInUp" data-wow-delay="0.5s">
-        <div class="row">
-            <p>活得绚烂，死得安然</p>
+<p>现在编写主算法<br>每次从堆顶取两个数进行加和，随后将结果存入堆中，并累加totalCost，直至堆中只剩一个元素</p>
+<h2 id="Main-Algorithem"><a href="#Main-Algorithem" class="headerlink" title="Main Algorithem"></a>Main Algorithem</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint64_t</span> totalCost = <span class="number">0</span>, currentCost;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> mergeTimes = N - <span class="number">1</span>; mergeTimes &gt; <span class="number">0</span>; mergeTimes--) &#123;</span><br><span class="line">    currentCost = heap[<span class="number">0</span>];</span><br><span class="line">    heap[<span class="number">0</span>] = heap[mergeTimes];</span><br><span class="line">    <span class="built_in">maintainHeap</span>(heap, mergeTimes);</span><br><span class="line"></span><br><span class="line">    currentCost += heap[<span class="number">0</span>];</span><br><span class="line">    heap[<span class="number">0</span>] = currentCost;</span><br><span class="line">    <span class="built_in">maintainHeap</span>(heap, mergeTimes);</span><br><span class="line">    </span><br><span class="line">    totalCost += currentCost;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后实现用于维护堆的<code>maintainHeap</code>函数<br>我们只需跟踪堆顶元素，并循环判断判断它和它最小孩子的大小关系，若大于则与之交换并继续循环，否则返回</p>
+<h2 id="Quoting-Function"><a href="#Quoting-Function" class="headerlink" title="Quoting Function"></a>Quoting Function</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Find the minimum element in heap[i]&#x27;s children</span></span><br><span class="line"><span class="comment">//Return it&#x27;s index</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">findMinChild</span><span class="params">(<span class="type">uint64_t</span>* heap, <span class="type">int</span> parentIndex, <span class="type">int</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>((parentIndex * <span class="number">2</span>) + <span class="number">2</span> &lt; length)</span><br><span class="line">        <span class="keyword">return</span> heap[(parentIndex * <span class="number">2</span>) + <span class="number">1</span>] &lt; heap[(parentIndex * <span class="number">2</span>) + <span class="number">2</span>] ? (parentIndex * <span class="number">2</span>) + <span class="number">1</span> : (parentIndex * <span class="number">2</span>) + <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>((parentIndex * <span class="number">2</span>) + <span class="number">1</span> &lt; length)</span><br><span class="line">        <span class="built_in">return</span> (parentIndex * <span class="number">2</span>) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//maintain the heap as a minimum heap after changing the top</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">maintainHeap</span><span class="params">(<span class="type">uint64_t</span>* heap, <span class="type">int</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> parentIndex = <span class="number">0</span>, minChildIndex;</span><br><span class="line">    </span><br><span class="line">    minChildIndex = <span class="built_in">findMinChild</span>(heap, parentIndex, length);</span><br><span class="line">    <span class="keyword">while</span> (heap[parentIndex] &gt; heap[minChildIndex] &amp;&amp; minChildIndex != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="type">long</span> <span class="type">long</span> temp = heap[parentIndex];</span><br><span class="line">        heap[parentIndex] = heap[minChildIndex];</span><br><span class="line">        heap[minChildIndex] = temp;</span><br><span class="line">        </span><br><span class="line">        parentIndex = minChildIndex;</span><br><span class="line">        minChildIndex = <span class="built_in">findMinChild</span>(heap, parentIndex, length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>至此编程结束，成功AC</strong></p>
+
+            <div class="clearfix"></div>
+            <hr class="nogutter">
         </div>
+        <nav class="m-pagination col-md-8 col-md-offset-2 col-sm-24" role="pagination">
+    
+    
+    <a class="pull-right" href="/2023/09/14/Image-test/">
+        Image test →
+    </a>
+    
+</nav>
+
+        <div class="col-md-8 col-md-offset-2 col-sm-24"><script type="text/javascript">
+  /**
+   * 搜狐畅言
+   */
+
+  /*
+  document.write('<div id="SOHUCS" sid="' + window.location.pathname.slice(1) + '" ></div>');
+
+  window.onload = function () {
+    (function () {
+      var appid = 'cytXXXX';
+      var conf = 'prod_xxxxxxxxxxxxxxxxx';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      var loadJs = function (d, a, id) {
+        var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
+        var b = document.createElement("script");
+        b.setAttribute("type", "text/javascript");
+        b.setAttribute("charset", "UTF-8");
+        b.setAttribute("src", d);
+        if (id) {
+          b.setAttribute("id", id);
+        }
+        if (typeof a === "function") {
+          if (window.attachEvent) {
+            b.onreadystatechange = function () {
+              var e = b.readyState;
+              if (e === "loaded" || e === "complete") {
+                b.onreadystatechange = null;
+                a()
+              }
+            }
+          } else {
+            b.onload = a
+          }
+        }
+        c.appendChild(b)
+      };
+
+      loadJs("https://changyan.sohu.com/upload/changyan.js", function () {
+        window.changyan.api.config({
+          appid: appid,
+          conf: conf
+        })
+      });
+    })();
+  }
+  */
+
+</script>
+</div>
     </div>
 </section>
+
+
       
 <!-- ============================ Footer =========================== -->
 
