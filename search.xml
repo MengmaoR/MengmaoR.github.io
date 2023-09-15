@@ -59,26 +59,26 @@
       </tags>
   </entry>
   <entry>
-    <title>about</title>
-    <url>/about/index.html</url>
-    <content><![CDATA[<p>here’s about page</p>
-]]></content>
-  </entry>
-  <entry>
     <title>categories</title>
     <url>/categories/index.html</url>
     <content><![CDATA[<p>here’s categories</p>
 ]]></content>
   </entry>
   <entry>
-    <title>tags</title>
-    <url>/tags/index.html</url>
-    <content><![CDATA[<p>here’s tags</p>
+    <title>about</title>
+    <url>/about/index.html</url>
+    <content><![CDATA[<p>here’s about page</p>
 ]]></content>
   </entry>
   <entry>
     <title>Photos</title>
     <url>/masonry/index.html</url>
     <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>tags</title>
+    <url>/tags/index.html</url>
+    <content><![CDATA[<p>here’s tags</p>
+]]></content>
   </entry>
 </search>
