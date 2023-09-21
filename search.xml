@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Hello World</title>
+    <url>/2023/09/13/Hello/</url>
+    <content><![CDATA[<p>Here’s my first BLOG<br>So let’s say</p>
+<p><strong>Hello World!</strong></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Image test</title>
     <url>/2023/09/14/Image-test/</url>
     <content><![CDATA[<p>Try to post a pic</p>
@@ -52,10 +59,9 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/2023/09/13/Hello/</url>
-    <content><![CDATA[<p>Here’s my first BLOG<br>So let’s say</p>
-<p><strong>Hello World!</strong></p>
+    <title>about</title>
+    <url>/about/index.html</url>
+    <content><![CDATA[<p>here’s about page</p>
 ]]></content>
   </entry>
   <entry>
@@ -67,12 +73,6 @@
     <title>categories</title>
     <url>/categories/index.html</url>
     <content><![CDATA[<p>here’s categories</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>about</title>
-    <url>/about/index.html</url>
-    <content><![CDATA[<p>here’s about page</p>
 ]]></content>
   </entry>
   <entry>
