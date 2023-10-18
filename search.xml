@@ -59,21 +59,138 @@
       </tags>
   </entry>
   <entry>
+    <title>the Park 游戏框架</title>
+    <url>/2023/10/16/%E6%B8%B8%E6%88%8F%E6%A1%86%E6%9E%B6/</url>
+    <content><![CDATA[<h1 id="建造模块"><a href="#建造模块" class="headerlink" title="建造模块"></a>建造模块</h1><h2 id="正交俯视建造"><a href="#正交俯视建造" class="headerlink" title="正交俯视建造"></a>正交俯视建造</h2><p>建筑整体框架<br>建筑构造<br>内部装饰</p>
+<div class="note-large blue"><div class="notel-title"><p>允许三种建造模式</p>
+</div><div class="notel-content"><ol>
+<li>快速建造</li>
+<li>专业建造</li>
+<li>模型或代码导入</li>
+</ol>
+</div></div>
+
+<h3 id="快速建造"><a href="#快速建造" class="headerlink" title="快速建造"></a>快速建造</h3><ol>
+<li>通过level up&#x2F;down 按键进行层数调整</li>
+<li>墙壁和地板全部采用模块化网格建造<details class="" data-header-exclude><summary><i class="fa-solid fa-chevron-right"></i>3. 内饰随意放置 </summary>
+              <div class='content'>
+              <p>禁止模型重叠<br>允许模型重叠</p>
+              </div>
+            </details></li>
+</ol>
+<h3 id="专业建造"><a href="#专业建造" class="headerlink" title="专业建造"></a>专业建造</h3><ol>
+<li>通过level up&#x2F;down 按键进行层数调整</li>
+<li>允许调整每层高度</li>
+<li>允许墙壁纵向倾斜<details class="" data-header-exclude><summary><i class="fa-solid fa-chevron-right"></i>4. 允许自定义地板轮廓 </summary>
+              <div class='content'>
+              <p>网格辅助下的矩形选区<br>无辅助的图形选区<br>铅笔绘图</p>
+              </div>
+            </details>
+<details class="" data-header-exclude><summary><i class="fa-solid fa-chevron-right"></i>5. 内饰随意放置 </summary>
+              <div class='content'>
+              <p>禁止模型重叠<br>允许模型重叠</p>
+              </div>
+            </details></li>
+<li>允许室内空间拓展</li>
+</ol>
+<h3 id="模型或代码导入"><a href="#模型或代码导入" class="headerlink" title="模型或代码导入"></a>模型或代码导入</h3><ol>
+<li>模型导入</li>
+<li>放置(拟)代码导入</li>
+</ol>
+<p>后续再做具体构思</p>
+<h2 id="3D第一人称视角修改"><a href="#3D第一人称视角修改" class="headerlink" title="3D第一人称视角修改"></a>3D第一人称视角修改</h2><ol>
+<li>效果预览</li>
+<li>内饰调整</li>
+</ol>
+<h2 id="自定义游戏构建"><a href="#自定义游戏构建" class="headerlink" title="自定义游戏构建"></a>自定义游戏构建</h2><p>后续构思</p>
+<h1 id="地图模块"><a href="#地图模块" class="headerlink" title="地图模块"></a>地图模块</h1><h2 id="主岛"><a href="#主岛" class="headerlink" title="主岛"></a>主岛</h2><ol>
+<li>中心为出生点公园</li>
+<li>公园内部和四周为提前搭建的建筑设施和预留地</li>
+<li>外部地形自动生成<details class="" data-header-exclude><summary><i class="fa-solid fa-chevron-right"></i>4. 外部土地按序分配给玩家 </summary>
+              <div class='content'>
+              <p>创建账号自动分配面积固定土地，可自由选择位置<br>已分配土地可通过官方自由交易<br>未探索土地可通过官方低价购买<br>已购土地长时间不进行有效开发将被强制回购，已获取的资源不会回收</p>
+              </div>
+            </details></li>
+<li>允许在已拥有土地，官方土地和交通路线范围内任意传送</li>
+<li>生存玩法</li>
+</ol>
+<h2 id="狩猎岛"><a href="#狩猎岛" class="headerlink" title="狩猎岛"></a>狩猎岛</h2><ol>
+<li>土地无法获取和开发</li>
+<li>无法传送</li>
+<li>战斗玩法</li>
+<li>其余规则后续构思</li>
+</ol>
+<h2 id="玩家岛"><a href="#玩家岛" class="headerlink" title="玩家岛"></a>玩家岛</h2><ol>
+<li>允许部分玩家自定义岛屿</li>
+<li>自定义玩法</li>
+<li>其余规则后续构思</li>
+</ol>
+<h1 id="玩法模块"><a href="#玩法模块" class="headerlink" title="玩法模块"></a>玩法模块</h1><h2 id="生存玩法"><a href="#生存玩法" class="headerlink" title="生存玩法"></a>生存玩法</h2><ol>
+<li>野外开荒</li>
+<li>材料收集</li>
+<li>少量战斗元素</li>
+<li>有限大小随机生成地图</li>
+</ol>
+<h2 id="创作玩法"><a href="#创作玩法" class="headerlink" title="创作玩法"></a>创作玩法</h2><ol>
+<li>利用所获取的资源进行模型创作</li>
+<li>绘画</li>
+<li>武器锻造</li>
+<li>饰品、服装设计</li>
+<li>家具、内饰、墙壁等建筑设计</li>
+<li>模型导入(需消耗货币)</li>
+<li>创作需在特定场所或设施内</li>
+</ol>
+<h2 id="战斗玩法"><a href="#战斗玩法" class="headerlink" title="战斗玩法"></a>战斗玩法</h2><ol>
+<li>PVE战斗</li>
+<li>其余规则后续构思</li>
+</ol>
+<h2 id="自定义玩法"><a href="#自定义玩法" class="headerlink" title="自定义玩法"></a>自定义玩法</h2><ol>
+<li>玩家自行设计</li>
+<li>通过内置设计器设计或外部设计并导入</li>
+<li>其余规则后续构思</li>
+</ol>
+<h1 id="资产模块"><a href="#资产模块" class="headerlink" title="资产模块"></a>资产模块</h1><h2 id="资产获取"><a href="#资产获取" class="headerlink" title="资产获取"></a>资产获取</h2><ol>
+<li>从生存岛屿获取资源并售卖给官方，获得货币资产</li>
+<li>参与相关活动，获得官方发放的货币资产或徽章、雕像等模型资产</li>
+<li>利用获取或购买的资产创作，产生模型资产</li>
+<li>通过与玩家间的交易获取货币或模型资产</li>
+</ol>
+<h2 id="资产持有"><a href="#资产持有" class="headerlink" title="资产持有"></a>资产持有</h2><ol>
+<li>模型资产不可分割，只能作为整体持有</li>
+<li>玩家拥有的资源、货币和人物模型将合并为角色资产持有</li>
+<li>玩家可以小规模负债，但负债过多将被强制进入破产程序</li>
+</ol>
+<h2 id="资产交易"><a href="#资产交易" class="headerlink" title="资产交易"></a>资产交易</h2><ol>
+<li>提供两种交易协议：使用和买断</li>
+<li>使用 使用 协议交易的资产可以在买家的土地内放置，用于创作新资产并在买家的土地上放置</li>
+<li>使用 买断 协议交易的资产，买家可以享受 使用 协议的全部权利，同时可以用于创作新资产并将该资产用于交易，且卖家对该资产的权利变为 使用 协议包含的权利</li>
+<li>允许玩家对单个交易自行编写交易协议</li>
+<li>详细规则后续构思</li>
+</ol>
+<h2 id="玩家社交"><a href="#玩家社交" class="headerlink" title="玩家社交"></a>玩家社交</h2><ol>
+<li>玩家可以在自己的土地上设置其他玩家的权限</li>
+<li>玩家在主岛上非特殊区域内被禁止相互伤害</li>
+<li>玩家可以自定义自己岛屿上的玩家规则</li>
+<li>玩家被禁止在未经允许的情况下进入他人土地</li>
+</ol>
+]]></content>
+  </entry>
+  <entry>
     <title>about</title>
     <url>/about/index.html</url>
     <content><![CDATA[<p>here’s about page</p>
 ]]></content>
   </entry>
   <entry>
-    <title>Photos</title>
-    <url>/masonry/index.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
     <title>categories</title>
     <url>/categories/index.html</url>
     <content><![CDATA[<p>here’s categories</p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>Photos</title>
+    <url>/masonry/index.html</url>
+    <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title>tags</title>
