@@ -18,16 +18,17 @@
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
     
-        <meta name="description" content="暂未实现部分                               1. 自定义角色第一人称视角2. 仓库系统物品icon                              写在开头准备学一学UE5，顺便做一个生存+建造的游戏demo，后续做项目也方便些，所以上网找了个教程跟着做。感觉每天会写的东西也不多，就每次都在这篇更新了，如果后面内容太多可能分Part。 Day 1最开始的配置">
+        <meta name="description" content="暂未实现部分                               1. 自定义角色第一人称视角2. 仓库系统物品icon3. 仓库UI的Textures                              写在开头准备学一学UE5，顺便做一个生存+建造的游戏demo，后续做项目也方便些，所以上网找了个教程跟着做。感觉每天会写的东西也不多，就每次都在这篇更新了，如果后面内容太多可能分P">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SurvivalCraft DevLog">
 <meta property="og:url" content="http://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/index.html">
 <meta property="og:site_name" content="MENGMAO&#39;S BLOG">
-<meta property="og:description" content="暂未实现部分                               1. 自定义角色第一人称视角2. 仓库系统物品icon                              写在开头准备学一学UE5，顺便做一个生存+建造的游戏demo，后续做项目也方便些，所以上网找了个教程跟着做。感觉每天会写的东西也不多，就每次都在这篇更新了，如果后面内容太多可能分Part。 Day 1最开始的配置">
+<meta property="og:description" content="暂未实现部分                               1. 自定义角色第一人称视角2. 仓库系统物品icon3. 仓库UI的Textures                              写在开头准备学一学UE5，顺便做一个生存+建造的游戏demo，后续做项目也方便些，所以上网找了个教程跟着做。感觉每天会写的东西也不多，就每次都在这篇更新了，如果后面内容太多可能分P">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/CharacterSource.jpg">
+<meta property="og:image" content="http://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/InventoryUISub.jpg">
 <meta property="article:published_time" content="2023-10-18T06:20:43.000Z">
-<meta property="article:modified_time" content="2023-10-18T08:15:30.363Z">
+<meta property="article:modified_time" content="2023-10-18T17:40:38.256Z">
 <meta property="article:author" content="梦猫">
 <meta property="article:tag" content="game Deving">
 <meta name="twitter:card" content="summary">
@@ -421,8 +422,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2023-10-18 16:15:30</span>
-            <span class="mobile">2023-10-18 16:15:30</span>
+            <span class="desktop">2023-10-19 01:40:38</span>
+            <span class="mobile">2023-10-19 01:40:38</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -460,12 +461,12 @@
     
     
         <span class="article-wordcount article-meta-item">
-            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>648 Words</span>
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>890 Words</span>
         </span>
     
     
         <span class="article-min2read article-meta-item">
-            <i class="fa-regular fa-clock"></i>&nbsp;<span>2 Mins</span>
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>3 Mins</span>
         </span>
     
     
@@ -482,7 +483,7 @@
         <div class="article-content markdown-body">
             <details class="red" data-header-exclude><summary><i class="fa-solid fa-chevron-right"></i>暂未实现部分 </summary>
               <div class='content'>
-              <div class="note danger"><p><a href="#ERROR1">1. 自定义角色第一人称视角</a></p></div><div class="note danger"><p><a href="#ERROR1">2. 仓库系统物品icon</a></p></div>
+              <div class="note danger"><p><a href="#ERROR1">1. 自定义角色第一人称视角</a></p></div><div class="note danger"><p><a href="#ERROR2">2. 仓库系统物品icon</a></p></div><div class="note danger"><p><a href="#ERROR3">3. 仓库UI的Textures</a></p></div>
               </div>
             </details>
 
@@ -500,6 +501,16 @@
 <p>同时，视频给出的物品icon又是只有Win能使用，需要后续解决<br><a id="ERROR2"><div class="note danger"><p><a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tg411v7L7?p=15&vd_source=b8a3745f5e89824ea144c46ef4066125" > P15 创建项目信息结构和第一个项目</a></p>
 </div></a></p>
 <p><em><strong>END OF DAY 1</strong></em></p>
+<h1 id="DAY-2"><a href="#DAY-2" class="headerlink" title="DAY 2"></a>DAY 2</h1><h3 id="仓库主要小部件-HUD-搭建"><a href="#仓库主要小部件-HUD-搭建" class="headerlink" title="仓库主要小部件(HUD)搭建"></a>仓库主要小部件(HUD)搭建</h3><p>首先大致介绍了UI界面的设计面板，以及如何通过蓝图和GameMode设置让一个UI界面显示在游戏画面中。</p>
+<p>随后是具体的仓库HUD的搭建。<br>后面的构建中又使用了需要下载的Texture，需要后续补全。<br><a id="ERROR3"><div class="note danger"><p><a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tg411v7L7?p=15&vd_source=b8a3745f5e89824ea144c46ef4066125" > P18 创建库存小部件</a></p>
+</div></a></p>
+<p>这里讲解了多个用于设置UI布局的组件,UE的UI布局可以通过多种Box组件的设置完成。同时设计了一个基本的信息展示UI界面，分别包括了仓库栏，人物信息拦和合成栏。这里的界面背景需要用到课程资源贴图，所以我暂时将背景颜色设为深灰替代。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2023/10/18/SurvivalCraft-DevLog/InventoryUISub.jpg"
+                      alt="Inventory UI Sub" title="Inventory UI Sub"
+                ><figcaption>Inventory UI Sub</figcaption></figure></p>
+<p>随后，增加了通过键盘按键控制刚才设计的UI界面打开和关闭的功能，以及随之的鼠标显示控制。</p>
 
         </div>
 
@@ -514,7 +525,7 @@
         
             <li>
                 <strong>Updated at
-                    :</strong> 2023-10-18 16:15:30
+                    :</strong> 2023-10-19 01:40:38
             </li>
         
         <li>
@@ -610,7 +621,7 @@
     <div class="post-toc">
         <div class="toc-title">On this page</div>
         <div class="page-title">SurvivalCraft DevLog</div>
-        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%BC%80%E5%A4%B4"><span class="nav-text">写在开头</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Day-1"><span class="nav-text">Day 1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E8%87%AA%E5%AE%9A%E4%B9%89%E8%A7%92%E8%89%B2%E6%90%AD%E5%BB%BA"><span class="nav-text">初始自定义角色搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%93%E5%BA%93%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BA"><span class="nav-text">仓库物品信息系统搭建</span></a></li></ol></li></ol></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%BC%80%E5%A4%B4"><span class="nav-text">写在开头</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Day-1"><span class="nav-text">Day 1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E8%87%AA%E5%AE%9A%E4%B9%89%E8%A7%92%E8%89%B2%E6%90%AD%E5%BB%BA"><span class="nav-text">初始自定义角色搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%93%E5%BA%93%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BA"><span class="nav-text">仓库物品信息系统搭建</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DAY-2"><span class="nav-text">DAY 2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%93%E5%BA%93%E4%B8%BB%E8%A6%81%E5%B0%8F%E9%83%A8%E4%BB%B6-HUD-%E6%90%AD%E5%BB%BA"><span class="nav-text">仓库主要小部件(HUD)搭建</span></a></li></ol></li></ol></li></ol>
 
     </div>
 </div>
