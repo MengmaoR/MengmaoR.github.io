@@ -34,6 +34,74 @@
       </tags>
   </entry>
   <entry>
+    <title>SurvivalCraft DevLog</title>
+    <url>/2023/10/18/SurvivalCraft-DevLog/</url>
+    <content><![CDATA[<details class="red" data-header-exclude><summary><i class="fa-solid fa-chevron-right"></i>暂未实现部分 </summary>
+              <div class='content'>
+              <div class="note danger"><p><a href="#ERROR1">1. 自定义角色第一人称视角</a></p></div><div class="note danger"><p><a href="#ERROR2">2. 仓库系统物品icon</a></p></div><div class="note danger"><p><a href="#ERROR3">3. 仓库UI的Textures</a></p></div><div class="note danger"><p><a href="#ERROR4">4. 物品栏UI的Texture</a></p></div>
+              </div>
+            </details>
+
+<h1 id="写在开头"><a href="#写在开头" class="headerlink" title="写在开头"></a>写在开头</h1><p>准备学一学UE5，顺便做一个生存+建造的游戏demo，后续做项目也方便些，所以上网找了个<a class="link"   href="https://www.bilibili.com/video/BV1tg411v7L7?p=1&vd_source=b8a3745f5e89824ea144c46ef4066125" >教程</a>跟着做。感觉每天会写的东西也不多，就每次都在这篇更新了，如果后面内容太多可能分Part。</p>
+<h1 id="Day-1"><a href="#Day-1" class="headerlink" title="Day 1"></a>Day 1</h1><p>最开始的配置部分就不写了，正常配置就可以。<br>不过在搭github仓库的时候出了点问题，M1 Mac版的UE5一直找不到它把仓库存在哪了，最后也没找到，就先不搭了，记得备份就行。</p>
+<h3 id="初始自定义角色搭建"><a href="#初始自定义角色搭建" class="headerlink" title="初始自定义角色搭建"></a>初始自定义角色搭建</h3><p>这个部分也比较简单，就是大概讲解了一下动画混合器的使用，以及编写了一下根据人物速度绑定混合后动画的蓝图<br>一些比较基本的蓝图功能也在这里第一次真的用到了，例如branch和变量定义</p>
+<p>搭建角色模型的时候又出问题了，视频里推荐下载的模型只有Win能用，而且给的动画素材下载要钱，暂时就没下。<br>在商场里稍微找了找，发现有一个还不错的资源，自带一些基本的移动动画，能满足这部分第三人称角色的要求。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2023/10/18/SurvivalCraft-DevLog/CharacterSource.jpg"
+                      alt="CharacterSource" title="CharacterSource"
+                ><figcaption>CharacterSource</figcaption></figure><br>但这个资源在第一人称视角下表现很古怪，研究了一阵也没找到好资源，暂时用一个很简陋的版本替代，其他的做完了有需求再回来改。<br><a id="ERROR1"><div class="note danger"><p><a class="link"   href="https://www.bilibili.com/video/BV1tg411v7L7/?p=9&vd_source=b8a3745f5e89824ea144c46ef4066125" > P9 设置我们的自定义角色 P1</a></p>
+</div></a></p>
+<h3 id="仓库物品信息系统搭建"><a href="#仓库物品信息系统搭建" class="headerlink" title="仓库物品信息系统搭建"></a>仓库物品信息系统搭建</h3><p>这部分主要是构建了几个数组和结构体，用于存储仓库中物品的信息。然后还初次用到了蓝图的循环等新逻辑，整体没有什么困难。<br>他对物品抽象的思路比较值得学习，抽象程度比较高，在后续组织的时候想必会有一定帮助。不过他在信息结构体里存储了部分可能用不到的信息，后面可以研究一下能否把这部分剥离出基本的信息框架，通过更细分的结构体存储。<br><strong>此外，他的存储结构比较混乱，后面可以进行一定修改</strong></p>
+<p>同时，视频给出的物品icon又是只有Win能使用，需要后续解决<br><a id="ERROR2"><div class="note danger"><p><a class="link"   href="https://www.bilibili.com/video/BV1tg411v7L7?p=15&vd_source=b8a3745f5e89824ea144c46ef4066125" > P15 创建项目信息结构和第一个项目</a></p>
+</div></a></p>
+<p><em><strong>END OF DAY 1</strong></em></p>
+<h1 id="DAY-2"><a href="#DAY-2" class="headerlink" title="DAY 2"></a>DAY 2</h1><h3 id="仓库HUD界面搭建"><a href="#仓库HUD界面搭建" class="headerlink" title="仓库HUD界面搭建"></a>仓库HUD界面搭建</h3><p>首先大致介绍了UI界面的设计面板，以及如何通过蓝图和GameMode设置让一个UI界面显示在游戏画面中。</p>
+<p>随后是具体的仓库HUD界面的搭建。<br>后面的构建中又使用了需要下载的Texture，需要后续补全。<br><a id="ERROR3"><div class="note danger"><p><a class="link"   href="https://www.bilibili.com/video/BV1tg411v7L7?p=15&vd_source=b8a3745f5e89824ea144c46ef4066125" > P18 创建库存小部件</a></p>
+</div></a></p>
+<p>这里讲解了多个用于设置UI布局的组件,UE的UI布局可以通过多种Box组件的设置完成。同时设计了一个基本的信息展示UI界面，分别包括了仓库栏，人物信息拦和合成栏。这里的界面背景需要用到课程资源贴图，所以我暂时将背景颜色设为深灰替代。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2023/10/18/SurvivalCraft-DevLog/InventoryUISub.jpg"
+                      alt="Inventory UI Sub" title="Inventory UI Sub"
+                ><figcaption>Inventory UI Sub</figcaption></figure></p>
+<p>随后，增加了通过键盘按键控制刚才设计的UI界面打开和关闭的功能，以及随之的鼠标显示控制。</p>
+<h3 id="物品HUD搭建"><a href="#物品HUD搭建" class="headerlink" title="物品HUD搭建"></a>物品HUD搭建</h3><p>创建一个小型正方形HUD，用于展示仓库中的单个物品</p>
+<p>新组件介绍</p>
+<ol>
+<li>overlay: 覆盖层组件，添加后允许图像、文本等图层相互叠加</li>
+</ol>
+<p><a id="ERROR4"><div class="note danger"><p><a class="link"   href="https://www.bilibili.com/video/BV1tg411v7L7/?p=19&spm_id_from=pageDriver&vd_source=b8a3745f5e89824ea144c46ef4066125" > P19 创建物品栏小部件</a></p>
+</div></a><br>随后为其添加了背景图，依然在附件中，需要下载，继续使用深灰色背景替代。<br>同时还使用了前面下载的<a href="#ERROR2">icon</a>作为物品图标，这里使用特殊颜色进行替代。<br>再然后添加了一些文字描述，介绍了文字阴影等功能，并添加了一个进度条显示物品耐久。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2023/10/18/SurvivalCraft-DevLog/InventorySlotUI.jpg"
+                      alt="InventorySlot UI" title="InventorySlot UI"
+                ><figcaption>InventorySlot UI</figcaption></figure></p>
+<p>需要注意，对每个组件，在组建名右侧有一个Is Variable选项，勾选它便可以将该组件作为变量在蓝图中进行访问，也就可以通过程序更改组件内容。</p>
+<h3 id="HUD网格容器搭建"><a href="#HUD网格容器搭建" class="headerlink" title="HUD网格容器搭建"></a>HUD网格容器搭建</h3><p>创建用于承载每个物品HUD的网格容器，使其按合理的组织方式呈现在屏幕上</p>
+<p>新组件介绍</p>
+<ol>
+<li>Scroll Box: 滚动框，可以滚动显示其下的组件，用于在有限空间内显示大量物品</li>
+<li>Uniform Grid Panel: 统一网格面板，可以将其下每个组件按相等的大小排列</li>
+</ol>
+<p>随后使用蓝图编写逻辑，使游戏开始时在 ItemContainerGrid 中按每行 SlotPerRow 个创建共 TotalSlots 个物品HUD。<br>同时，ItemContainerGrid 被编写为一个通用的网格显示系统，不仅可以显示仓库物品，还可以在后续其他场景中使用，具体种类通过一个enum存储。</p>
+<p>最后，将前面物品HUD中所有信息的可见性设为 hidden，便可以成功创造出一个空的仓库。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2023/10/18/SurvivalCraft-DevLog/InventoryGridUI.jpg"
+                      alt="Inventory Grid UI" title="Inventory Grid UI"
+                ><figcaption>Inventory Grid UI</figcaption></figure></p>
+<p><em><strong>END OF DAY 2</strong></em></p>
+]]></content>
+      <categories>
+        <category>游戏开发日志</category>
+      </categories>
+      <tags>
+        <tag>game Deving</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>TJUOJ 4441: 合并果子（堆）</title>
     <url>/2023/09/15/tjuoj-4441-%E5%90%88%E5%B9%B6%E6%9E%9C%E5%AD%90%EF%BC%88%E5%A0%86%EF%BC%89/</url>
     <content><![CDATA[<p>补程设课，没什么事干，就在学校OJ上找了道<a class="link"   href="http://tjuacm.chaosheng.top/problem.php?id=4441" >简单题</a>做<br>算法复健一下，顺便试一试代码块插入</p>
@@ -59,45 +127,10 @@
       </tags>
   </entry>
   <entry>
-    <title>SurvivalCraft DevLog</title>
-    <url>/2023/10/18/SurvivalCraft-DevLog/</url>
-    <content><![CDATA[<details class="red" data-header-exclude><summary><i class="fa-solid fa-chevron-right"></i>暂未实现部分 </summary>
-              <div class='content'>
-              <div class="note danger"><p><a href="#ERROR1">1. 自定义角色第一人称视角</a></p></div><div class="note danger"><p><a href="#ERROR2">2. 仓库系统物品icon</a></p></div><div class="note danger"><p><a href="#ERROR3">3. 仓库UI的Textures</a></p></div>
-              </div>
-            </details>
-
-<h1 id="写在开头"><a href="#写在开头" class="headerlink" title="写在开头"></a>写在开头</h1><p>准备学一学UE5，顺便做一个生存+建造的游戏demo，后续做项目也方便些，所以上网找了个<a class="link"   href="https://www.bilibili.com/video/BV1tg411v7L7?p=1&vd_source=b8a3745f5e89824ea144c46ef4066125" >教程</a>跟着做。感觉每天会写的东西也不多，就每次都在这篇更新了，如果后面内容太多可能分Part。</p>
-<h1 id="Day-1"><a href="#Day-1" class="headerlink" title="Day 1"></a>Day 1</h1><p>最开始的配置部分就不写了，正常配置就可以。<br>不过在搭github仓库的时候出了点问题，M1 Mac版的UE5一直找不到它把仓库存在哪了，最后也没找到，就先不搭了，记得备份就行。</p>
-<h3 id="初始自定义角色搭建"><a href="#初始自定义角色搭建" class="headerlink" title="初始自定义角色搭建"></a>初始自定义角色搭建</h3><p>这个部分也比较简单，就是大概讲解了一下动画混合器的使用，以及编写了一下根据人物速度绑定混合后动画的蓝图<br>一些比较基本的蓝图功能也在这里第一次真的用到了，例如branch和变量定义</p>
-<p>搭建角色模型的时候又出问题了，视频里推荐下载的模型只有Win能用，而且给的动画素材下载要钱，暂时就没下。<br>在商场里稍微找了找，发现有一个还不错的资源，自带一些基本的移动动画，能满足这部分第三人称角色的要求。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2023/10/18/SurvivalCraft-DevLog/CharacterSource.jpg"
-                      alt="CharacterSource" title="CharacterSource"
-                ><figcaption>CharacterSource</figcaption></figure><br>但这个资源在第一人称视角下表现很古怪，研究了一阵也没找到好资源，暂时用一个很简陋的版本替代，其他的做完了有需求再回来改。<br><a id="ERROR1"><div class="note danger"><p><a class="link"   href="https://www.bilibili.com/video/BV1tg411v7L7/?p=9&vd_source=b8a3745f5e89824ea144c46ef4066125" > P9 设置我们的自定义角色 P1</a></p>
-</div></a></p>
-<h3 id="仓库物品信息系统搭建"><a href="#仓库物品信息系统搭建" class="headerlink" title="仓库物品信息系统搭建"></a>仓库物品信息系统搭建</h3><p>这部分主要是构建了几个数组和结构体，用于存储仓库中物品的信息。然后还初次用到了蓝图的循环等新逻辑，整体没有什么困难。<br>他对物品抽象的思路比较值得学习，抽象程度比较高，在后续组织的时候想必会有一定帮助。不过他在信息结构体里存储了部分可能用不到的信息，后面可以研究一下能否把这部分剥离出基本的信息框架，通过更细分的结构体存储。<br><strong>此外，他的存储结构比较混乱，后面可以进行一定修改</strong></p>
-<p>同时，视频给出的物品icon又是只有Win能使用，需要后续解决<br><a id="ERROR2"><div class="note danger"><p><a class="link"   href="https://www.bilibili.com/video/BV1tg411v7L7?p=15&vd_source=b8a3745f5e89824ea144c46ef4066125" > P15 创建项目信息结构和第一个项目</a></p>
-</div></a></p>
-<p><em><strong>END OF DAY 1</strong></em></p>
-<h1 id="DAY-2"><a href="#DAY-2" class="headerlink" title="DAY 2"></a>DAY 2</h1><h3 id="仓库主要小部件-HUD-搭建"><a href="#仓库主要小部件-HUD-搭建" class="headerlink" title="仓库主要小部件(HUD)搭建"></a>仓库主要小部件(HUD)搭建</h3><p>首先大致介绍了UI界面的设计面板，以及如何通过蓝图和GameMode设置让一个UI界面显示在游戏画面中。</p>
-<p>随后是具体的仓库HUD的搭建。<br>后面的构建中又使用了需要下载的Texture，需要后续补全。<br><a id="ERROR3"><div class="note danger"><p><a class="link"   href="https://www.bilibili.com/video/BV1tg411v7L7?p=15&vd_source=b8a3745f5e89824ea144c46ef4066125" > P18 创建库存小部件</a></p>
-</div></a></p>
-<p>这里讲解了多个用于设置UI布局的组件,UE的UI布局可以通过多种Box组件的设置完成。同时设计了一个基本的信息展示UI界面，分别包括了仓库栏，人物信息拦和合成栏。这里的界面背景需要用到课程资源贴图，所以我暂时将背景颜色设为深灰替代。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2023/10/18/SurvivalCraft-DevLog/InventoryUISub.jpg"
-                      alt="Inventory UI Sub" title="Inventory UI Sub"
-                ><figcaption>Inventory UI Sub</figcaption></figure></p>
-<p>随后，增加了通过键盘按键控制刚才设计的UI界面打开和关闭的功能，以及随之的鼠标显示控制。</p>
+    <title>about</title>
+    <url>/about/index.html</url>
+    <content><![CDATA[<p>here’s about page</p>
 ]]></content>
-      <categories>
-        <category>游戏开发日志</category>
-      </categories>
-      <tags>
-        <tag>game Deving</tag>
-      </tags>
   </entry>
   <entry>
     <title>Photos</title>
@@ -105,21 +138,15 @@
     <content><![CDATA[]]></content>
   </entry>
   <entry>
-    <title>about</title>
-    <url>/about/index.html</url>
-    <content><![CDATA[<p>here’s about page</p>
+    <title>tags</title>
+    <url>/tags/index.html</url>
+    <content><![CDATA[<p>here’s tags</p>
 ]]></content>
   </entry>
   <entry>
     <title>categories</title>
     <url>/categories/index.html</url>
     <content><![CDATA[<p>here’s categories</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>tags</title>
-    <url>/tags/index.html</url>
-    <content><![CDATA[<p>here’s tags</p>
 ]]></content>
   </entry>
 </search>
