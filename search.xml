@@ -258,9 +258,23 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Photos</title>
+    <title>时光博物馆</title>
     <url>/masonry/index.html</url>
-    <content><![CDATA[]]></content>
+    <content><![CDATA[<hr>
+
+  <div class="note-large blue">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <i class="notel-icon fa-solid fa-ticket-airline"></i><p>记忆收录</p>
+
+    </div>
+    <div class="notel-content">
+      <ol>
+<li>阿那亚 2022.2.22 - 2022.2.26</li>
+<li>日本 2024.2.14 - 2024.2.21</li>
+</ol>
+
+    </div>
+  </div>]]></content>
   </entry>
   <entry>
     <title>tags</title>
