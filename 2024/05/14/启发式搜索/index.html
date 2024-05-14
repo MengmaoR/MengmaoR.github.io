@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="梦猫">
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://mengmaor.github.io/2024/05/14/启发式搜索/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+        <meta name="description" content="启发式搜索实验报告一、实验要求这次实验要求我们用A算法求解八数码问题。八数码问题是指，在一个3*3的棋盘上，存在8个棋子和1个空位，其中每个棋子都可以向上下左右四个方向移动（若存在空位）。给定一个初始状态和目标状态，要求找到从初始状态变换至目标状态的最短路径，输出步数和路径中的状态。8-puzzle而启发式搜索算法则是一种状态空间树搜索算法。我们首先根据问题定义一个启发函数h，将h的值作为当前状态">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI Lab2: 启发式搜索">
+<meta property="og:url" content="http://mengmaor.github.io/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/index.html">
+<meta property="og:site_name" content="MENGMAO&#39;S BLOG">
+<meta property="og:description" content="启发式搜索实验报告一、实验要求这次实验要求我们用A算法求解八数码问题。八数码问题是指，在一个3*3的棋盘上，存在8个棋子和1个空位，其中每个棋子都可以向上下左右四个方向移动（若存在空位）。给定一个初始状态和目标状态，要求找到从初始状态变换至目标状态的最短路径，输出步数和路径中的状态。8-puzzle而启发式搜索算法则是一种状态空间树搜索算法。我们首先根据问题定义一个启发函数h，将h的值作为当前状态">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://mengmaor.github.io/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/8-puzzle.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/algorithm.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/h-function.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/manhattan.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/test1.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/test2.jpeg">
+<meta property="article:published_time" content="2024-05-14T02:52:20.000Z">
+<meta property="article:modified_time" content="2024-05-14T05:14:32.523Z">
+<meta property="article:author" content="梦猫">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://mengmaor.github.io/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/8-puzzle.jpeg">
+    
+    
+        <!-- Google tag (gtag.js) -->
+        <script src="https://www.googletagmanager.com/gtag/js?id="></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', '');
+        </script>
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/logo.png" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.png">
+    <meta name="theme-color" content="#A31F34">
+    <link rel="shortcut icon" href="/images/logo.png">
+    <!--- Page Info-->
+    
+    <title>
+        
+            AI Lab2: 启发式搜索 -
+        
+        MENGMAO&#39;S BLOG
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/styles.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/fonts.css">
+
+    
+<link rel="stylesheet" href="/fonts/Satoshi/satoshi.css">
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+    <!--- Font Part-->
+    
+    
+    
+        <link href="" rel="stylesheet">
+    
+    
+        <link href="" rel="stylesheet">
+    
+
+    <!--- Inject Part-->
+    
+    <script id="hexo-configurations">
+    let Global = window.Global || {};
+    Global.hexo_config = {"hostname":"mengmaor.github.io","root":"/","language":"en","path":"search.xml"};
+    Global.theme_config = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":true,"link_icon":false},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":false},"copyright":true,"lazyload":true,"recommendation":{"enable":true,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":true,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js","enable":false,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"open_graph":true,"google_analytics":{"enable":true,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg_1.png","dark":"/images/bg_1.png"},"title":"WHAT A DANCE, <n>WELCOME.</n>","subtitle":{"text":["每一个不曾起舞的日子都是对生命的辜负。"],"hitokoto":{"enable":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":false,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"links":{"github":"https://github.com/MengmaoR","email":"tianxj0520@163.com"},"qrs":null}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":true,"type":"fixed","audios":[{"name":"What A Life","artist":"Scarlet Pleasure","url":"/music/WhatALife.mp3","cover":"/music/cover/WhatALife.jpeg"}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.4.4","navbar":{"auto_hide":true,"color":{"left":"#f78736","right":"#367df7","transparency":35},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Posts":{"icon":"fa-regular fa-archive","submenus":{"Archives":"/archives","Categories":"/categories","Tags":"/tags"}},"Photos":{"icon":"fa-solid fa-image","path":"/masonry"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about","Blog":"https://mengmaor.github.io","Github":"https://github.com/MengmaoR"}}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":false,"position":"left","first_item":"menu","announcement":null,"links":{"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tag"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2023/9/13 11:12:00"};
+    Global.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    Global.data_config = {"masonry":true};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+        <span class="pjax-progress-bar"></span>
+        <span class="swup-progress-icon">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+        </span>
+    
+</div>
+
+
+<main class="page-container" id="swup">
+
+    
+
+    <div class="main-content-container">
+
+
+        <div class="main-content-header">
+            <header class="navbar-container">
+    
+    <div class="navbar-content">
+        <div class="left">
+            
+                <a class="logo-image" href="http://mengmaor.github.io/">
+                    <img src="/images/logo.png">
+                </a>
+            
+            <a class="logo-title" href="http://mengmaor.github.io/">
+                
+                MENGMAO&#39;S BLOG
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/"  >
+                                    
+                                        
+                                            <i class="fa-regular fa-house"></i>
+                                        
+                                        HOME
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown" 
+                                    href="#" onClick="return false;">
+                                    
+                                        
+                                            <i class="fa-regular fa-archive"></i>
+                                        
+                                        POSTS&nbsp;<i class="fa-solid fa-chevron-down"></i>
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                    
+                                        <li>
+                                        <a href="/archives">ARCHIVES
+                                        </a>
+                                        </li>
+                                    
+                                        <li>
+                                        <a href="/categories">CATEGORIES
+                                        </a>
+                                        </li>
+                                    
+                                        <li>
+                                        <a href="/tags">TAGS
+                                        </a>
+                                        </li>
+                                    
+                                    </ul>
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/masonry"  >
+                                    
+                                        
+                                            <i class="fa-solid fa-image"></i>
+                                        
+                                        PHOTOS
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown" 
+                                    href="#" onClick="return false;">
+                                    
+                                        
+                                            <i class="fa-regular fa-user"></i>
+                                        
+                                        ABOUT&nbsp;<i class="fa-solid fa-chevron-down"></i>
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                    
+                                        <li>
+                                        <a href="/about">ME
+                                        </a>
+                                        </li>
+                                    
+                                        <li>
+                                        <a href="https://mengmaor.github.io">BLOG
+                                        </a>
+                                        </li>
+                                    
+                                        <li>
+                                        <a target="_blank" rel="noopener" href="https://github.com/MengmaoR">GITHUB
+                                        </a>
+                                        </li>
+                                    
+                                    </ul>
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i></div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile drawer -->
+    <div class="navbar-drawer w-full absolute top-0 left-0 bg-background-color">
+        <ul class="drawer-navbar-list flex flex-col justify-start items-center">
+            
+                
+                    <li class="drawer-navbar-item text-base my-1.5 flex justify-center items-center">
+                        <a class="rounded-3xl py-1.5 px-5 hover:border hover:!text-primary active:!text-primary group " 
+                        href="/"  >
+                             
+                                
+                                    <i class="fa-regular fa-house"></i>
+                                
+                                HOME
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+                
+                    <li class="drawer-navbar-item text-base my-1.5 flex justify-center items-center">
+                        <a class="rounded-3xl py-1.5 px-5 hover:border hover:!text-primary active:!text-primary group has-dropdown" 
+                        href="#" onClick="return false;">
+                            
+                                
+                                    <i class="fa-regular fa-archive"></i>
+                                
+                                POSTS&nbsp;<i class="group-hover:rotate-180 transition-transform fa-solid fa-chevron-down"></i>
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                              
+                        
+                            <li class="text-base flex justify-center items-center hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                <a class="py-0.5" href="/archives">ARCHIVES</a>
+                            </li>
+                        
+                            <li class="text-base flex justify-center items-center hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                <a class="py-0.5" href="/categories">CATEGORIES</a>
+                            </li>
+                        
+                            <li class="text-base flex justify-center items-center hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                <a class="py-0.5" href="/tags">TAGS</a>
+                            </li>
+                        
+                    
+            
+                
+                    <li class="drawer-navbar-item text-base my-1.5 flex justify-center items-center">
+                        <a class="rounded-3xl py-1.5 px-5 hover:border hover:!text-primary active:!text-primary group " 
+                        href="/masonry"  >
+                             
+                                
+                                    <i class="fa-solid fa-image"></i>
+                                
+                                PHOTOS
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+                
+                    <li class="drawer-navbar-item text-base my-1.5 flex justify-center items-center">
+                        <a class="rounded-3xl py-1.5 px-5 hover:border hover:!text-primary active:!text-primary group has-dropdown" 
+                        href="#" onClick="return false;">
+                            
+                                
+                                    <i class="fa-regular fa-user"></i>
+                                
+                                ABOUT&nbsp;<i class="group-hover:rotate-180 transition-transform fa-solid fa-chevron-down"></i>
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                              
+                        
+                            <li class="text-base flex justify-center items-center hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                <a class="py-0.5" href="/about">ME</a>
+                            </li>
+                        
+                            <li class="text-base flex justify-center items-center hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                <a class="py-0.5" href="https://mengmaor.github.io">BLOG</a>
+                            </li>
+                        
+                            <li class="text-base flex justify-center items-center hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                <a class="py-0.5" target="_blank" rel="noopener" href="https://github.com/MengmaoR">GITHUB</a>
+                            </li>
+                        
+                    
+            
+
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="main-content-body">
+
+            
+
+            <div class="main-content">
+
+                
+                    <div class="post-page-container">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            
+                <h1 class="article-title-regular">AI Lab2: 启发式搜索</h1>
+            
+            </div>
+            
+                    
+        
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/logo.png">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">梦猫</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2024-05-14 10:52:20</span>
+        <span class="mobile">2024-05-14 10:52:20</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2024-05-14 13:14:32</span>
+            <span class="mobile">2024-05-14 13:14:32</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E5%9F%BA%E7%A1%80%E5%AE%9E%E9%AA%8C/">人工智能基础实验</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>3.4k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>16 Mins</span>
+        </span>
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        
+
+
+        <div class="article-content markdown-body">
+            <h1 id="启发式搜索实验报告"><a href="#启发式搜索实验报告" class="headerlink" title="启发式搜索实验报告"></a>启发式搜索实验报告</h1><h2 id="一、实验要求"><a href="#一、实验要求" class="headerlink" title="一、实验要求"></a>一、实验要求</h2><p>这次实验要求我们用A算法求解八数码问题。<br>八数码问题是指，在一个3*3的棋盘上，存在8个棋子和1个空位，其中每个棋子都可以向上下左右四个方向移动（若存在空位）。给定一个初始状态和目标状态，要求找到从初始状态变换至目标状态的最短路径，输出步数和路径中的状态。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/8-puzzle.jpeg"
+                      alt="8-puzzle" title="八数码问题"
+                ><figcaption>8-puzzle</figcaption></figure><br>而启发式搜索算法则是一种状态空间树搜索算法。我们首先根据问题定义一个启发函数h，将h的值作为当前状态与目标状态之间的“差距”，用以判断当前状态的“好坏”。随后，我们对所有未扩展状态进行按估值h进行排序，每次都扩展当前最“好”的状态，直至找到目标状态，或是完全遍历状态空间树（无解）。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/algorithm.jpeg"
+                      alt="heuristic-algorithm" title="启发式搜索"
+                ><figcaption>heuristic-algorithm</figcaption></figure></p>
+<h2 id="二、算法设计"><a href="#二、算法设计" class="headerlink" title="二、算法设计"></a>二、算法设计</h2><p>A算法最核心的地方就在于针对具体问题设计良好的启发函数h，剩下只需要用一个优先级队列存储所有未扩展状态，按h大小排序，挨个扩展并计算搜索深度（即步数）即可。因为这次实验要求我们给出结果路径的中间状态，所以还需要把已扩展节点也进行储存，并且在扩展过程中保留好路径信息。<br>估值函数上，这次实验给了四种h函数的备选，我们从中选择一个进行实现即可。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/h-function.jpeg"
+                      alt="heuristic-function" title="启发函数"
+                ><figcaption>heuristic-function</figcaption></figure><br>我选了曼哈顿距离和（启发函数二）作为启发函数，曼哈顿距离是指两个点坐标之间的绝对轴距之和，是一种很简单但很经典的启发函数。我们只需计算当前状态中每个点与目标状态中对应点的曼哈顿距离之和，便可以得到当前状态的估值h，h值越小代表状态与目标状态越接近，也就是状态越“好”。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/manhattan.jpeg"
+                      alt="Manhattan-distance" title="曼哈顿距离"
+                ><figcaption>Manhattan-distance</figcaption></figure><br>算法设计完成，下面就可以Coding了（这次还是用了C++）。</p>
+<h2 id="Define"><a href="#Define" class="headerlink" title="Define"></a>Define</h2><p>首先是一些定义和初始化工作。定义状态结构体Node，存储对应的棋盘状态，估值h，步数depth。同时，因为对输出路径的要求，还需要存储状态id，以及其父状态parent，用于回溯求解路径。随后，我们需要定义用于优先级队列排序的比较函数，定义曼哈顿距离h更小的状态更优，而在h相等的情况下，我们应优先选择步数更少的状态。同时，我们定义存储未扩展节点的优先级队列open，用于回溯路径的已扩展节点序列close和路径path。最后，我们还需定义目标状态中各点的坐标。</p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>DEFINE</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Node</span> &#123;</span><br><span class="line">    <span class="type">int</span> map[<span class="number">3</span>][<span class="number">3</span>];</span><br><span class="line">    <span class="type">int</span> h, depth;</span><br><span class="line">    <span class="type">int</span> id, parent;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">cmp</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(Node a, Node b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(a.h &gt; b.h)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(a.h &lt; b.h)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> a.depth &gt; b.depth;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Node.h最小堆</span></span><br><span class="line">priority_queue&lt;Node, vector&lt;Node&gt;, cmp&gt; open;</span><br><span class="line">vector&lt;Node&gt; close;</span><br><span class="line">vector&lt;Node&gt; path;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 目标状态</span></span><br><span class="line"><span class="comment">// 1 2 3</span></span><br><span class="line"><span class="comment">// 8 0 4</span></span><br><span class="line"><span class="comment">// 7 6 5</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> end_loc[<span class="number">8</span>][<span class="number">2</span>] = &#123;&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, &#123;<span class="number">0</span>, <span class="number">1</span>&#125;, &#123;<span class="number">0</span>, <span class="number">2</span>&#125;, &#123;<span class="number">1</span>, <span class="number">2</span>&#125;, &#123;<span class="number">2</span>, <span class="number">2</span>&#125;, &#123;<span class="number">2</span>, <span class="number">1</span>&#125;, &#123;<span class="number">2</span>, <span class="number">0</span>&#125;, &#123;<span class="number">1</span>, <span class="number">0</span>&#125;&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Manhattan-Distance"><a href="#Manhattan-Distance" class="headerlink" title="Manhattan Distance"></a>Manhattan Distance</h2><p>下面根据曼哈顿距离算法编写启发函数h。计算map中除0（即空位）外所有点与目标状态下的曼哈顿距离，并不断加和即可。</p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>ManhDis</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 计算当前状态的曼哈顿距离</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">H</span><span class="params">(<span class="type">int</span> map[<span class="number">3</span>][<span class="number">3</span>])</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; j++) &#123;</span><br><span class="line">            <span class="type">int</span> num = map[i][j];</span><br><span class="line">            <span class="keyword">if</span> (num == <span class="number">0</span>) <span class="keyword">continue</span>;</span><br><span class="line">            sum += <span class="built_in">abs</span>(i - end_loc[num - <span class="number">1</span>][<span class="number">0</span>]) + <span class="built_in">abs</span>(j - end_loc[num - <span class="number">1</span>][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Other-Functions"><a href="#Other-Functions" class="headerlink" title="Other Functions"></a>Other Functions</h2><p>随后再定义一些辅助函数。例如checkSame函数，用于检验当前状态是否在open或close序列中存在，以避免对状态的重复搜索。以及print_info函数（可选），用于在搜索过程中输出每次扩展的状态信息，辅助调试。</p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>HELPER</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 检查是否存在已搜索的相同状态</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">checkSame</span><span class="params">(Node t)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; close.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">        <span class="type">bool</span> same = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; j++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">0</span>; k &lt; <span class="number">3</span>; k++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (close[i].map[j][k] != t.map[j][k]) &#123;</span><br><span class="line">                    same = <span class="number">0</span>;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (same)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print_info</span><span class="params">(Node cur)</span> </span>&#123;</span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;当前状态：&quot;</span>&lt;&lt;endl;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;i++)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">3</span>;j++)&#123;</span><br><span class="line">            cout&lt;&lt;cur.map[i][j]&lt;&lt;<span class="string">&quot; &quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        cout&lt;&lt;endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//id</span></span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;id: &quot;</span>&lt;&lt;cur.id&lt;&lt;endl;</span><br><span class="line">    <span class="comment">//parent</span></span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;parent: &quot;</span>&lt;&lt;cur.parent&lt;&lt;endl;</span><br><span class="line">    <span class="comment">//depth</span></span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;depth: &quot;</span>&lt;&lt;cur.depth&lt;&lt;endl;</span><br><span class="line">    <span class="comment">//h</span></span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;曼哈顿距离：&quot;</span>&lt;&lt;cur.h &lt;&lt;endl;</span><br><span class="line">    cout&lt;&lt;endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Init"><a href="#Init" class="headerlink" title="Init"></a>Init</h2><p>下面进入main函数。首先是初始化部分，要求用户输入初始状态（以数字0表示空位），设置其相关信息，并将初始状态加入未扩展节点列表。</p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>INIT</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Node start;</span><br><span class="line">cout&lt;&lt;<span class="string">&quot;请输入初始状态：&quot;</span>&lt;&lt;endl;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;i++)&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">3</span>;j++)&#123;</span><br><span class="line">        cin&gt;&gt;start.map[i][j];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">start.h = <span class="built_in">H</span>(start.map);</span><br><span class="line">start.depth = <span class="number">0</span>;</span><br><span class="line">start.id = <span class="number">0</span>;</span><br><span class="line">start.parent = <span class="number">-1</span>;</span><br><span class="line">open.<span class="built_in">push</span>(start);</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Search"><a href="#Search" class="headerlink" title="Search"></a>Search</h2><p>随后，开始对状态空间树的搜索。我们从open队列中取出最优的状态，检查其是否为目标状态（后续给出）后，尝试对其进行变换，搜索其子状态。对于状态的变换，虽然实际的定义是尝试让每个棋子向上下左右四个方向移动，但由于只有移动至空格位置才能变换成功，因此可以等效为尝试将空格进行上下左右四个方向（处于边界则移动失败）的移动。因此，我们可以分别尝试四种移动。对于每次变换后的子状态，我们首先更新其棋盘，并根据棋盘进行相同状态检索。若该状态已经检索过，则跳过。否则，我们应计算其估值，步数，id等信息，并记录其父状态的id，以便后续回溯求解路径。最后，我们将该状态加入未扩展状态队列open中，并继续搜索下一子状态。</p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>SEARCH</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">Node cur = open.<span class="built_in">top</span>();</span><br><span class="line">        open.<span class="built_in">pop</span>();</span><br><span class="line">        close.<span class="built_in">push_back</span>(cur);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// print_info(cur);</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> x, y;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (cur.map[i][j] == <span class="number">0</span>) &#123;</span><br><span class="line">                    x = i;</span><br><span class="line">                    y = j;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (x &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            Node next = cur;</span><br><span class="line">            next.map[x][y] = cur.map[x - <span class="number">1</span>][y];</span><br><span class="line">            next.map[x - <span class="number">1</span>][y] = <span class="number">0</span>;</span><br><span class="line">            <span class="comment">// 遍历close表和open，若存在相同状态则跳过</span></span><br><span class="line">            <span class="type">bool</span> flag = <span class="number">0</span>;</span><br><span class="line">            flag = <span class="built_in">checkSame</span>(next);</span><br><span class="line">            <span class="keyword">if</span> (!flag) &#123;</span><br><span class="line">                next.h = <span class="built_in">H</span>(next.map);</span><br><span class="line">                next.depth = cur.depth + <span class="number">1</span>;</span><br><span class="line">                next.id = ++count;</span><br><span class="line">                next.parent = cur.id;</span><br><span class="line">                open.<span class="built_in">push</span>(next);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (x &lt; <span class="number">2</span>) &#123;</span><br><span class="line">            Node next = cur;</span><br><span class="line">            next.map[x][y] = cur.map[x + <span class="number">1</span>][y];</span><br><span class="line">            next.map[x + <span class="number">1</span>][y] = <span class="number">0</span>;</span><br><span class="line">            <span class="type">bool</span> flag = <span class="number">0</span>;</span><br><span class="line">            flag = <span class="built_in">checkSame</span>(next);</span><br><span class="line">            <span class="keyword">if</span> (!flag) &#123;</span><br><span class="line">                next.h = <span class="built_in">H</span>(next.map);</span><br><span class="line">                next.depth = cur.depth + <span class="number">1</span>;</span><br><span class="line">                next.id = ++count;</span><br><span class="line">                next.parent = cur.id;</span><br><span class="line">                open.<span class="built_in">push</span>(next);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (y &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            Node next = cur;</span><br><span class="line">            next.map[x][y] = cur.map[x][y - <span class="number">1</span>];</span><br><span class="line">            next.map[x][y - <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">            <span class="type">bool</span> flag = <span class="number">0</span>;</span><br><span class="line">            flag = <span class="built_in">checkSame</span>(next);</span><br><span class="line">            <span class="keyword">if</span> (!flag) &#123;</span><br><span class="line">                next.h = <span class="built_in">H</span>(next.map);</span><br><span class="line">                next.depth = cur.depth + <span class="number">1</span>;</span><br><span class="line">                next.id = ++count;</span><br><span class="line">                next.parent = cur.id;</span><br><span class="line">                open.<span class="built_in">push</span>(next);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (y &lt; <span class="number">2</span>) &#123;</span><br><span class="line">            Node next = cur;</span><br><span class="line">            next.map[x][y] = cur.map[x][y + <span class="number">1</span>];</span><br><span class="line">            next.map[x][y + <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">            <span class="type">bool</span> flag = <span class="number">0</span>;</span><br><span class="line">            flag = <span class="built_in">checkSame</span>(next);</span><br><span class="line">            <span class="keyword">if</span> (!flag) &#123;</span><br><span class="line">                next.h = <span class="built_in">H</span>(next.map);</span><br><span class="line">                next.depth = cur.depth + <span class="number">1</span>;</span><br><span class="line">                next.id = ++count;</span><br><span class="line">                next.parent = cur.id;</span><br><span class="line">                open.<span class="built_in">push</span>(next);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Check"><a href="#Check" class="headerlink" title="Check"></a>Check</h2><p>前面提到，我们在取出一个未扩展状态后需要先检查其是否为目标状态，随后再进行扩展，现在就对检查进行讨论。当状态估值h为0时，代表状态为目标状态。因此，我们可以认定找到一个解，并输出步数和搜索空间（可指示算法运行时间）。而对于路径的回溯，我们需要从最终的状态开始，不断根据状态的parent属性，在close序列中查找id等于parent的状态，并将其加入path序列中。最后倒序输出path即为我们搜索到的求解路径。</p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>CHECK</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (cur.h == <span class="number">0</span>) &#123;</span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;找到解！&quot;</span>&lt;&lt;endl;</span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;步数：&quot;</span>&lt;&lt;cur.depth&lt;&lt;endl;</span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;搜索空间：&quot;</span>&lt;&lt;count&lt;&lt;endl;</span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;路径：&quot;</span>&lt;&lt;endl;</span><br><span class="line">    path.<span class="built_in">push_back</span>(cur);</span><br><span class="line">    <span class="keyword">while</span> (cur.parent != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; close.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (close[i].id == cur.parent) &#123;</span><br><span class="line">                path.<span class="built_in">push_back</span>(close[i]);</span><br><span class="line">                cur = close[i];</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = path.<span class="built_in">size</span>() - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        cout&lt;&lt;<span class="string">&quot;第 &quot;</span> &lt;&lt;path.<span class="built_in">size</span>() - i - <span class="number">1</span> &lt;&lt;<span class="string">&quot; 步：\n&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">3</span>;j++)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> k=<span class="number">0</span>;k&lt;<span class="number">3</span>;k++)&#123;</span><br><span class="line">                cout&lt;&lt;path[i].map[j][k]&lt;&lt;<span class="string">&quot; &quot;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            cout&lt;&lt;endl;</span><br><span class="line">        &#125;</span><br><span class="line">        cout&lt;&lt;<span class="string">&quot;曼哈顿距离：&quot;</span> &lt;&lt;path[i].h &lt;&lt;endl;</span><br><span class="line">        cout&lt;&lt;endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="三、程序测试"><a href="#三、程序测试" class="headerlink" title="三、程序测试"></a>三、程序测试</h2><p>实验手册给出了两个测试样例，涵盖了步数较少和较多两种情况，我就直接拿来用了。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/test1.jpeg"
+                      alt="test-1" title="测试样例1"
+                ><figcaption>test-1</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/test2.jpeg"
+                      alt="test-2" title="测试样例2"
+                ><figcaption>test-2</figcaption></figure><br>第二个样例的路径较长，就不全放了。</p>
+<h2 id="四、实验总结"><a href="#四、实验总结" class="headerlink" title="四、实验总结"></a>四、实验总结</h2><p>这次实验的算法也比较简单，编码上搜索状态空间树的部分有点复杂，但难度也不大。而A算法最核心的就是启发函数的设计，实验直接给了4个函数备选，因此也没什么设计难度，编码实现即可。</p>
+<h2 id="五、源码"><a href="#五、源码" class="headerlink" title="五、源码"></a>五、源码</h2><p>最后放一下全部代码。</p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>CODE</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstdlib&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;queue&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cmath&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Node</span> &#123;</span><br><span class="line">    <span class="type">int</span> map[<span class="number">3</span>][<span class="number">3</span>];</span><br><span class="line">    <span class="type">int</span> h, depth;</span><br><span class="line">    <span class="type">int</span> id, parent;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">cmp</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(Node a, Node b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(a.h &gt; b.h)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(a.h &lt; b.h)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> a.depth &gt; b.depth;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Node.h最小堆</span></span><br><span class="line">priority_queue&lt;Node, vector&lt;Node&gt;, cmp&gt; open;</span><br><span class="line">vector&lt;Node&gt; close;</span><br><span class="line">vector&lt;Node&gt; path;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 目标状态</span></span><br><span class="line"><span class="comment">// 1 2 3</span></span><br><span class="line"><span class="comment">// 8 0 4</span></span><br><span class="line"><span class="comment">// 7 6 5</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> end_loc[<span class="number">8</span>][<span class="number">2</span>] = &#123;&#123;<span class="number">0</span>, <span class="number">0</span>&#125;, &#123;<span class="number">0</span>, <span class="number">1</span>&#125;, &#123;<span class="number">0</span>, <span class="number">2</span>&#125;, &#123;<span class="number">1</span>, <span class="number">2</span>&#125;, &#123;<span class="number">2</span>, <span class="number">2</span>&#125;, &#123;<span class="number">2</span>, <span class="number">1</span>&#125;, &#123;<span class="number">2</span>, <span class="number">0</span>&#125;, &#123;<span class="number">1</span>, <span class="number">0</span>&#125;&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算当前状态的曼哈顿距离</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">H</span><span class="params">(<span class="type">int</span> map[<span class="number">3</span>][<span class="number">3</span>])</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; j++) &#123;</span><br><span class="line">            <span class="type">int</span> num = map[i][j];</span><br><span class="line">            <span class="keyword">if</span> (num == <span class="number">0</span>) <span class="keyword">continue</span>;</span><br><span class="line">            sum += <span class="built_in">abs</span>(i - end_loc[num - <span class="number">1</span>][<span class="number">0</span>]) + <span class="built_in">abs</span>(j - end_loc[num - <span class="number">1</span>][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 检查是否存在已搜索的相同状态</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">checkSame</span><span class="params">(Node t)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; close.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">        <span class="type">bool</span> same = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; j++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">0</span>; k &lt; <span class="number">3</span>; k++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (close[i].map[j][k] != t.map[j][k]) &#123;</span><br><span class="line">                    same = <span class="number">0</span>;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (same)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">print_info</span><span class="params">(Node cur)</span> </span>&#123;</span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;当前状态：&quot;</span>&lt;&lt;endl;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;i++)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">3</span>;j++)&#123;</span><br><span class="line">            cout&lt;&lt;cur.map[i][j]&lt;&lt;<span class="string">&quot; &quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        cout&lt;&lt;endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//id</span></span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;id: &quot;</span>&lt;&lt;cur.id&lt;&lt;endl;</span><br><span class="line">    <span class="comment">//parent</span></span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;parent: &quot;</span>&lt;&lt;cur.parent&lt;&lt;endl;</span><br><span class="line">    <span class="comment">//depth</span></span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;depth: &quot;</span>&lt;&lt;cur.depth&lt;&lt;endl;</span><br><span class="line">    <span class="comment">//h</span></span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;曼哈顿距离：&quot;</span>&lt;&lt;cur.h &lt;&lt;endl;</span><br><span class="line">    cout&lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Node start;</span><br><span class="line">    cout&lt;&lt;<span class="string">&quot;请输入初始状态：&quot;</span>&lt;&lt;endl;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;i++)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">3</span>;j++)&#123;</span><br><span class="line">            cin&gt;&gt;start.map[i][j];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    start.h = <span class="built_in">H</span>(start.map);</span><br><span class="line">    start.depth = <span class="number">0</span>;</span><br><span class="line">    start.id = <span class="number">0</span>;</span><br><span class="line">    start.parent = <span class="number">-1</span>;</span><br><span class="line">    open.<span class="built_in">push</span>(start);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (!open.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        Node cur = open.<span class="built_in">top</span>();</span><br><span class="line">        open.<span class="built_in">pop</span>();</span><br><span class="line">        close.<span class="built_in">push_back</span>(cur);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// print_info(cur);</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (cur.h == <span class="number">0</span>) &#123;</span><br><span class="line">            cout&lt;&lt;<span class="string">&quot;找到解！&quot;</span>&lt;&lt;endl;</span><br><span class="line">            cout&lt;&lt;<span class="string">&quot;步数：&quot;</span>&lt;&lt;cur.depth&lt;&lt;endl;</span><br><span class="line">            cout&lt;&lt;<span class="string">&quot;搜索空间：&quot;</span>&lt;&lt;count&lt;&lt;endl;</span><br><span class="line">            cout&lt;&lt;<span class="string">&quot;路径：&quot;</span>&lt;&lt;endl;</span><br><span class="line">            path.<span class="built_in">push_back</span>(cur);</span><br><span class="line">            <span class="keyword">while</span> (cur.parent != <span class="number">-1</span>) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; close.<span class="built_in">size</span>(); i++) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (close[i].id == cur.parent) &#123;</span><br><span class="line">                        path.<span class="built_in">push_back</span>(close[i]);</span><br><span class="line">                        cur = close[i];</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> i = path.<span class="built_in">size</span>() - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">                cout&lt;&lt;<span class="string">&quot;第 &quot;</span> &lt;&lt;path.<span class="built_in">size</span>() - i - <span class="number">1</span> &lt;&lt;<span class="string">&quot; 步：\n&quot;</span>;</span><br><span class="line">                <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">3</span>;j++)&#123;</span><br><span class="line">                    <span class="keyword">for</span>(<span class="type">int</span> k=<span class="number">0</span>;k&lt;<span class="number">3</span>;k++)&#123;</span><br><span class="line">                        cout&lt;&lt;path[i].map[j][k]&lt;&lt;<span class="string">&quot; &quot;</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    cout&lt;&lt;endl;</span><br><span class="line">                &#125;</span><br><span class="line">                cout&lt;&lt;<span class="string">&quot;曼哈顿距离：&quot;</span> &lt;&lt;path[i].h &lt;&lt;endl;</span><br><span class="line">                cout&lt;&lt;endl;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> x, y;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">3</span>; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (cur.map[i][j] == <span class="number">0</span>) &#123;</span><br><span class="line">                    x = i;</span><br><span class="line">                    y = j;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (x &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            Node next = cur;</span><br><span class="line">            next.map[x][y] = cur.map[x - <span class="number">1</span>][y];</span><br><span class="line">            next.map[x - <span class="number">1</span>][y] = <span class="number">0</span>;</span><br><span class="line">            <span class="comment">// 遍历close表和open，若存在相同状态则跳过</span></span><br><span class="line">            <span class="type">bool</span> flag = <span class="number">0</span>;</span><br><span class="line">            flag = <span class="built_in">checkSame</span>(next);</span><br><span class="line">            <span class="keyword">if</span> (!flag) &#123;</span><br><span class="line">                next.h = <span class="built_in">H</span>(next.map);</span><br><span class="line">                next.depth = cur.depth + <span class="number">1</span>;</span><br><span class="line">                next.id = ++count;</span><br><span class="line">                next.parent = cur.id;</span><br><span class="line">                open.<span class="built_in">push</span>(next);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (x &lt; <span class="number">2</span>) &#123;</span><br><span class="line">            Node next = cur;</span><br><span class="line">            next.map[x][y] = cur.map[x + <span class="number">1</span>][y];</span><br><span class="line">            next.map[x + <span class="number">1</span>][y] = <span class="number">0</span>;</span><br><span class="line">            <span class="type">bool</span> flag = <span class="number">0</span>;</span><br><span class="line">            flag = <span class="built_in">checkSame</span>(next);</span><br><span class="line">            <span class="keyword">if</span> (!flag) &#123;</span><br><span class="line">                next.h = <span class="built_in">H</span>(next.map);</span><br><span class="line">                next.depth = cur.depth + <span class="number">1</span>;</span><br><span class="line">                next.id = ++count;</span><br><span class="line">                next.parent = cur.id;</span><br><span class="line">                open.<span class="built_in">push</span>(next);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (y &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            Node next = cur;</span><br><span class="line">            next.map[x][y] = cur.map[x][y - <span class="number">1</span>];</span><br><span class="line">            next.map[x][y - <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">            <span class="type">bool</span> flag = <span class="number">0</span>;</span><br><span class="line">            flag = <span class="built_in">checkSame</span>(next);</span><br><span class="line">            <span class="keyword">if</span> (!flag) &#123;</span><br><span class="line">                next.h = <span class="built_in">H</span>(next.map);</span><br><span class="line">                next.depth = cur.depth + <span class="number">1</span>;</span><br><span class="line">                next.id = ++count;</span><br><span class="line">                next.parent = cur.id;</span><br><span class="line">                open.<span class="built_in">push</span>(next);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (y &lt; <span class="number">2</span>) &#123;</span><br><span class="line">            Node next = cur;</span><br><span class="line">            next.map[x][y] = cur.map[x][y + <span class="number">1</span>];</span><br><span class="line">            next.map[x][y + <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">            <span class="type">bool</span> flag = <span class="number">0</span>;</span><br><span class="line">            flag = <span class="built_in">checkSame</span>(next);</span><br><span class="line">            <span class="keyword">if</span> (!flag) &#123;</span><br><span class="line">                next.h = <span class="built_in">H</span>(next.map);</span><br><span class="line">                next.depth = cur.depth + <span class="number">1</span>;</span><br><span class="line">                next.id = ++count;</span><br><span class="line">                next.parent = cur.id;</span><br><span class="line">                open.<span class="built_in">push</span>(next);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+        </div>
+
+        
+            <div class="post-copyright-info">
+                <div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> AI Lab2: 启发式搜索</li>
+        <li><strong>Author:</strong> 梦猫</li>
+        <li><strong>Created at
+                :</strong> 2024-05-14 10:52:20</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2024-05-14 13:14:32
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://mengmaor.github.io/2024/05/14/启发式搜索/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+                
+                   All Rights Reserved &#169; 梦猫
+                
+            
+
+        </li>
+    </ul>
+</div>
+
+            </div>
+        
+
+        
+
+        
+  <div class="recommended-article">
+   <div class="recommended-desktop">
+    <div class="recommended-article-header">
+     <i aria-hidden="true"></i><span>推荐阅读</span>
+    </div>
+    <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/08/产生式动物识别系统/" title="AI Lab1: 产生式动物识别系统" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="AI Lab1: 产生式动物识别系统" class="!max-w-none">
+  <span class="title">AI Lab1: 产生式动物识别系统</span>
+</a><a class="recommended-article-item" href="/2023/09/15/tjuoj-4441-合并果子（堆）/" title="TJUOJ 4441: 合并果子（堆）" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="TJUOJ 4441: 合并果子（堆）" class="!max-w-none">
+  <span class="title">TJUOJ 4441: 合并果子（堆）</span>
+</a><a class="recommended-article-item" href="/2023/10/18/SurvivalCraft-DevLog/" title="SurvivalCraft DevLog" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="SurvivalCraft DevLog" class="!max-w-none">
+  <span class="title">SurvivalCraft DevLog</span>
+</a></div>
+   </div>
+   <div class="recommended-mobile">
+   <div class="recommended-article-header">
+     <i aria-hidden="true"></i><span>推荐阅读</span>
+   </div>
+   <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/08/产生式动物识别系统/" title="AI Lab1: 产生式动物识别系统" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="AI Lab1: 产生式动物识别系统" class="!max-w-none">
+  <span class="title">AI Lab1: 产生式动物识别系统</span>
+</a><a class="recommended-article-item" href="/2023/09/15/tjuoj-4441-合并果子（堆）/" title="TJUOJ 4441: 合并果子（堆）" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="TJUOJ 4441: 合并果子（堆）" class="!max-w-none">
+  <span class="title">TJUOJ 4441: 合并果子（堆）</span>
+</a></div>
+   </div>
+  </div>
+
+        
+            <div class="article-nav">
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                        rel="next"
+                        href="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/"
+                        >
+                            <span class="title flex justify-center items-center">
+                                <span class="post-nav-title-item">AI Lab1: 产生式动物识别系统</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex justify-center items-center">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+
+        
+    </div>
+
+    
+        <div class="toc-content-container">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <div class="toc-title">On this page</div>
+        <div class="page-title">AI Lab2: 启发式搜索</div>
+        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A"><span class="nav-text">启发式搜索实验报告</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AE%9E%E9%AA%8C%E8%A6%81%E6%B1%82"><span class="nav-text">一、实验要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%AE%97%E6%B3%95%E8%AE%BE%E8%AE%A1"><span class="nav-text">二、算法设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Define"><span class="nav-text">Define</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Manhattan-Distance"><span class="nav-text">Manhattan Distance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Other-Functions"><span class="nav-text">Other Functions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Init"><span class="nav-text">Init</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Search"><span class="nav-text">Search</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Check"><span class="nav-text">Check</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%A8%8B%E5%BA%8F%E6%B5%8B%E8%AF%95"><span class="nav-text">三、程序测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93"><span class="nav-text">四、实验总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E6%BA%90%E7%A0%81"><span class="nav-text">五、源码</span></a></li></ol></li></ol>
+
+    </div>
+</div>
+        </div>
+    
+</div>
+
+
+
+                
+
+            </div>
+
+            
+
+        </div>
+
+        <div class="main-content-footer">
+            <footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2023</span>
+              -
+            
+            2024&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">梦猫</a>
+        </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.4.4</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="article-tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="right-bottom-tools page-aside-toggle">
+                <i class="fa-regular fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-side-tools-container">
+        <div class="side-tools-container">
+    <ul class="hidden-tools-list">
+        <li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+            <i class="fa-regular fa-magnifying-glass-plus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+            <i class="fa-regular fa-magnifying-glass-minus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-expand-width flex justify-center items-center">
+            <i class="fa-regular fa-expand"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+            <i class="fa-regular fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+
+        <li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+            <i class="fa-regular fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="visible-tools-list">
+        <li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+            <i class="fa-regular fa-cog fa-spin"></i>
+        </li>
+        
+            <li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+                <i class="arrow-up fas fa-arrow-up"></i>
+                <span class="percent"></span>
+            </li>
+        
+        
+    </ul>
+</div>
+
+    </div>
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+        <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-input-field-pre">
+            <i class="fa-solid fa-keyboard"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="Search..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="popup-btn-close">
+                <i class="fa-solid fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+</main>
+
+
+    
+<script src="/js/libs/Swup.min.js"></script>
+
+<script src="/js/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/libs/SwupScrollPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+        ],
+        containers: ["#swup"],
+    });
+
+    swup.hooks.on("page:view", () => {
+        Global.refresh();
+    });
+
+    // if (document.readyState === "complete") {
+    //
+    // } else {
+    //     document.addEventListener("DOMContentLoaded", () => init());
+    // }
+</script>
+
+
+
+
+
+
+<script src="/js/utils.js" type="module"></script>
+
+<script src="/js/main.js" type="module"></script>
+
+<script src="/js/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/tools/localSearch.js"></script>
+
+
+
+
+    
+<script src="/js/tools/codeBlock.js"></script>
+
+
+
+
+    
+<script src="/js/layouts/lazyload.js"></script>
+
+
+
+
+    
+<script src="/js/tools/runtime.js"></script>
+
+    
+<script src="/js/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/libs/Typed.min.js"></script>
+
+  
+<script src="/js/plugins/typed.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/libs/minimasonry.min.js"></script>
+
+    
+<script src="/js/plugins/masonry.js" type="module"></script>
+
+
+
+
+<div class="post-scripts" data-swup-reload-script>
+    
+        
+<script src="/js/libs/anime.min.js"></script>
+
+        
+<script src="/js/tools/tocToggle.js" type="module"></script>
+
+<script src="/js/layouts/toc.js" type="module"></script>
+
+<script src="/js/plugins/tabs.js" type="module"></script>
+
+    
+</div>
+
+
+    <div id="aplayer"></div>
+
+<script src="/js/libs/APlayer.min.js"></script>
+
+
+<script src="/js/plugins/aplayer.js"></script>
+
+
+</body>
+</html>
