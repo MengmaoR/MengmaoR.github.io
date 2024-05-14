@@ -18,18 +18,18 @@
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
     
-        <meta name="description" content="补程设课，没什么事干，就在学校OJ上找了道简单题做算法复健一下，顺便试一试代码块插入 题目给了提示，应该是道堆排序的题由于每次体力增加值为当前已合并果子的总数，因此我们只需保证每次合并的两个堆都是当前果子数量最少的两个堆即可思路有些像霍夫曼编码，但题目只要求求最终的体力消耗，所以没有构建霍夫曼树的必要准备直接做一个最小堆，每次合并操作都取两次堆顶元素，将求出的和累加至totalCost变量中，并放">
+        <meta name="description" content="false">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TJUOJ 4441: 合并果子（堆）">
 <meta property="og:url" content="http://mengmaor.github.io/2023/09/15/tjuoj-4441-%E5%90%88%E5%B9%B6%E6%9E%9C%E5%AD%90%EF%BC%88%E5%A0%86%EF%BC%89/index.html">
 <meta property="og:site_name" content="MENGMAO&#39;S BLOG">
-<meta property="og:description" content="补程设课，没什么事干，就在学校OJ上找了道简单题做算法复健一下，顺便试一试代码块插入 题目给了提示，应该是道堆排序的题由于每次体力增加值为当前已合并果子的总数，因此我们只需保证每次合并的两个堆都是当前果子数量最少的两个堆即可思路有些像霍夫曼编码，但题目只要求求最终的体力消耗，所以没有构建霍夫曼树的必要准备直接做一个最小堆，每次合并操作都取两次堆顶元素，将求出的和累加至totalCost变量中，并放">
+<meta property="og:description" content="false">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-09-15T02:37:16.000Z">
-<meta property="article:modified_time" content="2023-09-15T11:59:31.542Z">
+<meta property="article:modified_time" content="2024-05-14T15:38:48.421Z">
 <meta property="article:author" content="梦猫">
-<meta property="article:tag" content="algorithem">
 <meta property="article:tag" content="test">
+<meta property="article:tag" content="algorithem">
 <meta name="twitter:card" content="summary">
     
     
@@ -244,7 +244,7 @@
 
     <script id="hexo-configurations">
     window.config = {"hostname":"mengmaor.github.io","root":"/","language":"en","path":"search.xml"};
-    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":true,"link_icon":false},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":true,"list":["梦猫"]},"code_block":{"copy":true,"style":"mac","font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":false},"copyright":true,"lazyload":true,"recommendation":{"enable":true,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":true,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":true,"open_graph":true,"google_analytics":{"enable":true,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg_1.png","dark":"/images/bg_1.png"},"title":"WHAT A DANCE, <n>WELCOME.</n>","subtitle":{"text":["每一个不曾起舞的日子都是对生命的辜负."],"hitokoto":{"enable":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":false,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"links":{"github":"https://github.com/MengmaoR","email":"tianxj0520@163.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":true,"type":"fixed","audios":[{"name":"What A Life","artist":"Scarlet Pleasure","url":"/music/WhatALife.mp3","cover":"/music/cover/WhatALife.jpeg"}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.6.1","navbar":{"auto_hide":true,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Posts":{"icon":"fa-regular fa-archive","submenus":{"Archives":"/archives","Categories":"/categories","Tags":"/tags"}},"Photos":{"icon":"fa-solid fa-image","path":"/masonry"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about","Blog":"https://mengmaor.github.io","Github":"https://github.com/MengmaoR"}}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":false,"position":"left","first_item":"menu","announcement":null,"links":{"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tag"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2022/8/17 11:45:14"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":true,"link_icon":false},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":true,"list":["梦猫"]},"code_block":{"copy":true,"style":"mac","font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":false},"copyright":true,"lazyload":true,"recommendation":{"enable":true,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":true,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":true,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":true,"open_graph":true,"google_analytics":{"enable":true,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg_1.png","dark":"/images/bg_1.png"},"title":"WHAT A DANCE, <n>WELCOME.</n>","subtitle":{"text":["每一个不曾起舞的日子都是对生命的辜负."],"hitokoto":{"enable":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":false,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"links":{"github":"https://github.com/MengmaoR","email":"tianxj0520@163.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":true,"type":"fixed","audios":[{"name":"What A Life","artist":"Scarlet Pleasure","url":"/music/WhatALife.mp3","cover":"/music/cover/WhatALife.jpeg"}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.6.1","navbar":{"auto_hide":true,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Posts":{"icon":"fa-regular fa-archive","submenus":{"Archives":"/archives","Categories":"/categories","Tags":"/tags"}},"Photos":{"icon":"fa-solid fa-image","path":"/masonry"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about","Blog":"https://mengmaor.github.io","Github":"https://github.com/MengmaoR"}}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":false,"position":"left","first_item":"menu","announcement":null,"links":{"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tag"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2022/8/17 11:45:14"};
     window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
     window.data = {"masonry":true};
   </script>
@@ -275,6 +275,8 @@
 
 <body>
 <div class="progress-bar-container">
+    
+        <span class="scroll-progress-bar"></span>
     
 
     
@@ -641,8 +643,12 @@
 
         <div class="article-title relative w-full">
             
-                <div class="w-full flex items-center pt-6 justify-start">
-                    <h1 class="article-title-regular text-second-text-color text-4xl md:text-6xl font-bold px-2 sm:px-6 md:px-8 py-3">TJUOJ 4441: 合并果子（堆）</h1>
+                
+                
+                <img src="/cover/ACM.jpg" alt="TJUOJ 4441: 合并果子（堆）" class="w-full h-60 sm:h-72 md:h-80 object-cover sm:rounded-t-large dark:brightness-75"/>
+                
+                <div class="w-full flex items-center absolute bottom-0 justify-start">
+                    <h1 class="article-title-cover text-center mx-6 my-6 text-second-text-color bg-background-color-transparent px-4 py-3 text-3xl sm:text-4xl md:text-5xl font-bold backdrop-blur-lg rounded-xl border border-border-color ">TJUOJ 4441: 合并果子（堆）</h1>
                 </div>
             
             </div>
@@ -670,8 +676,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2023-09-15 19:59:31</span>
-            <span class="mobile">2023-09-15 19:59:31</span>
+            <span class="desktop">2024-05-14 23:38:48</span>
+            <span class="mobile">2024-05-14 23:38:48</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -699,11 +705,11 @@
             <ul>
                 
                     <li>
-                        <a href="/tags/algorithem/">algorithem</a>&nbsp;
+                        <a href="/tags/test/">test</a>&nbsp;
                     </li>
                 
                     <li>
-                        | <a href="/tags/test/">test</a>&nbsp;
+                        | <a href="/tags/algorithem/">algorithem</a>&nbsp;
                     </li>
                 
             </ul>
@@ -764,7 +770,7 @@
         
             <li>
                 <strong>Updated at
-                    :</strong> 2023-09-15 19:59:31
+                    :</strong> 2024-05-14 23:38:48
             </li>
         
         <li>
@@ -790,11 +796,11 @@
             <ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
                 
                     <li class="tag-item mx-0.5">
-                        <a href="/tags/algorithem/">#algorithem</a>&nbsp;
+                        <a href="/tags/test/">#test</a>&nbsp;
                     </li>
                 
                     <li class="tag-item mx-0.5">
-                        <a href="/tags/test/">#test</a>&nbsp;
+                        <a href="/tags/algorithem/">#algorithem</a>&nbsp;
                     </li>
                 
             </ul>
@@ -807,13 +813,13 @@
      <i aria-hidden="true"></i><span>推荐阅读</span>
     </div>
     <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/14/启发式搜索/" title="AI Lab2: 启发式搜索" rel="bookmark">
-  <img src="/images/wallhaven-wqery6-light.webp" alt="AI Lab2: 启发式搜索" class="!max-w-none">
+  <img src="cover/AI-Lab.jpg" alt="AI Lab2: 启发式搜索" class="!max-w-none">
   <span class="title">AI Lab2: 启发式搜索</span>
 </a><a class="recommended-article-item" href="/2023/10/18/SurvivalCraft-DevLog/" title="SurvivalCraft DevLog" rel="bookmark">
-  <img src="/images/wallhaven-wqery6-light.webp" alt="SurvivalCraft DevLog" class="!max-w-none">
+  <img src="cover/SurvivalCraft-DevLog.jpeg" alt="SurvivalCraft DevLog" class="!max-w-none">
   <span class="title">SurvivalCraft DevLog</span>
 </a><a class="recommended-article-item" href="/2024/05/08/产生式动物识别系统/" title="AI Lab1: 产生式动物识别系统" rel="bookmark">
-  <img src="/images/wallhaven-wqery6-light.webp" alt="AI Lab1: 产生式动物识别系统" class="!max-w-none">
+  <img src="cover/AI-Lab.jpg" alt="AI Lab1: 产生式动物识别系统" class="!max-w-none">
   <span class="title">AI Lab1: 产生式动物识别系统</span>
 </a></div>
    </div>
@@ -822,10 +828,10 @@
      <i aria-hidden="true"></i><span>推荐阅读</span>
    </div>
    <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/14/启发式搜索/" title="AI Lab2: 启发式搜索" rel="bookmark">
-  <img src="/images/wallhaven-wqery6-light.webp" alt="AI Lab2: 启发式搜索" class="!max-w-none">
+  <img src="cover/AI-Lab.jpg" alt="AI Lab2: 启发式搜索" class="!max-w-none">
   <span class="title">AI Lab2: 启发式搜索</span>
 </a><a class="recommended-article-item" href="/2023/10/18/SurvivalCraft-DevLog/" title="SurvivalCraft DevLog" rel="bookmark">
-  <img src="/images/wallhaven-wqery6-light.webp" alt="SurvivalCraft DevLog" class="!max-w-none">
+  <img src="cover/SurvivalCraft-DevLog.jpeg" alt="SurvivalCraft DevLog" class="!max-w-none">
   <span class="title">SurvivalCraft DevLog</span>
 </a></div>
    </div>
