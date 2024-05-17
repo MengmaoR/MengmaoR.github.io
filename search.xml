@@ -184,6 +184,9 @@
       <categories>
         <category>人工智能基础实验</category>
       </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
   </entry>
   <entry>
     <title>AI Lab2: 启发式搜索</title>
@@ -244,6 +247,68 @@
       <categories>
         <category>人工智能基础实验</category>
       </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Socket编程日志 Week1</title>
+    <url>/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/</url>
+    <content><![CDATA[<p>这次实验要求所有源码不得外传和共享，因此在博客里就不再给出源码了。</p>
+<h1 id="实验概要"><a href="#实验概要" class="headerlink" title="实验概要"></a>实验概要</h1><p>第一周需要实现一个简单的echo web server模块，可以对传入的消息进行解析，判断其合法性，并按消息的不同类别进行响应。<br>对于具体的消息解析部分，利用Lex&amp;Yacc分词方法进行词法分析，以此解析出HTTP请求的种类。</p>
+<h1 id="协议设计"><a href="#协议设计" class="headerlink" title="协议设计"></a>协议设计</h1><p>这次实验所要实现的功能比较简单，不需要额外设计数据结构来辅助实现。因此在数据结构部分主要描述在设计中使用到的数据结构以及对某些重要数据结构的分析。</p>
+<h2 id="协议头结构"><a href="#协议头结构" class="headerlink" title="协议头结构"></a>协议头结构</h2><h3 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h3><p>在最初环境部署的阶段中，曾使用过<code>example</code>程序测试过对<code>/samples/sample_request_example</code>文件中HTTP请求的响应。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>sample_request_example</span></figcaption><table><tr><td class="code"><pre><span class="line">GET /~prs/15-441-F15/ HTTP/1.1</span><br><span class="line">Host: www.cs.cmu.edu</span><br></pre></td></tr></table></figure></div>
+<p>可以看到，该文件的输入只包含了一行HTTP请求行和一行HTTP请求头部。在此情况下，框架代码能够正确识别并处理这一HTTP请求。但在实际情况中，HTTP请求包含多行请求头部，因此需要在后续的词法分析设计中保证程序可以处理多行请求头部的语法规则匹配。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/HTTPRequest.jpeg"
+                      alt="HTTP Request" title="HTTP 请求报文结构"
+                ><figcaption>HTTP Request</figcaption></figure><br>此外，在对解析后消息进行响应时，会涉及到对缓冲区的匹配识别和修改问题。因此需要提前定义一些用于匹配和填充的字符串，用以更便捷和安全的操作缓冲区。</p>
+<h3 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h3><p>对于解析后的HTTP请求消息，共分为三种情况处理：</p>
+
+  <div class="note-large green">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <p>GET&#x2F;HEAD&#x2F;POST</p>
+
+    </div>
+    <div class="notel-content">
+      <p>当解析发现消息为已实现的合法HTTP请求时，将消息进行重新封装，并直接发送回客户端。</p>
+
+    </div>
+  </div>
+
+  <div class="note-large orange">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <p>Implemented</p>
+
+    </div>
+    <div class="notel-content">
+      <p>当解析后发现消息为合法的HTTP请求，但并未实现该请求对应的功能时，向客户端发送”HTTP&#x2F;1.1 501 Not<br>Implemented\r\n\r\n”.</p>
+
+    </div>
+  </div>
+
+  <div class="note-large red">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <p>Request</p>
+
+    </div>
+    <div class="notel-content">
+      <p>当解析过程中发现消息格式错误，为非法消息时，向客户端发送”HTTP&#x2F;1.1 400 Bad request\r\n\r\n”.</p>
+
+    </div>
+  </div>
+<p>在词法分析模块将输入消息进行解析后，将缓冲区中的解析结果与上述情况进行一一匹配，便能得到正确的响应。随后再根据上述要求进行响应即可。</p>
+<h2 id="Lex-Yacc词法分析结构"><a href="#Lex-Yacc词法分析结构" class="headerlink" title="Lex&amp;Yacc词法分析结构"></a>Lex&amp;Yacc词法分析结构</h2><h3 id="数据结构设计-1"><a href="#数据结构设计-1" class="headerlink" title="数据结构设计"></a>数据结构设计</h3><p>总体来说，Lex&amp;Yacc词法分析的框架是：Lex先扫描每个输入的字符串，按预先设定的种类对字符串进行匹配，并将其替换为该种类的标签符。<br>随后，Yacc扫描Lex处理后得到的标签串，根据实现定义的语法规则对标签串进行规约匹配，得到规约后的输出结果。</p>
+<h3 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h3><p>在查看Yacc规约规则的源码<code>/src/parser.y</code>后，发现其中已经定义了用于识别HTTP请求行的规则<code>request_line</code>，和用于识别HTTP请求头部的规则<code>request_header</code>。仔细阅读后，发现已有的语法规则只能成功识别一行HTTP请求头部，这与实验要求不符，因此需要设计可识别多行请求头部的语法规则。<br>由于对于每行请求头部，它所遵循的语法规则都是相同的，且与单行请求头部的规则一致，因此使用递归的方式就能很好的完成多行识别，这在某些已有规则的定义中也有所体现。<br>由此，只需先对第一行按单行请求头部的语法规则进行匹配，再递归的对后续输入尝试用此规则进行匹配即可。</p>
+<h1 id="协议实现"><a href="#协议实现" class="headerlink" title="协议实现"></a>协议实现</h1><h2 id="客户端输入部分"><a href="#客户端输入部分" class="headerlink" title="客户端输入部分"></a>客户端输入部分</h2><h2 id="词法分析部分"><a href="#词法分析部分" class="headerlink" title="词法分析部分"></a>词法分析部分</h2><h2 id="服务器响应部分"><a href="#服务器响应部分" class="headerlink" title="服务器响应部分"></a>服务器响应部分</h2><h2 id="缓冲区清除"><a href="#缓冲区清除" class="headerlink" title="缓冲区清除"></a>缓冲区清除</h2><h1 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h1><h1 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h1>]]></content>
+      <categories>
+        <category>计算机网络课程设计</category>
+      </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
   </entry>
   <entry>
     <title>categories</title>
