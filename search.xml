@@ -280,7 +280,7 @@
 
   <div class="note-large orange">
     <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
-      <p>Implemented</p>
+      <p>Not-Implemented</p>
 
     </div>
     <div class="notel-content">
@@ -291,7 +291,7 @@
 
   <div class="note-large red">
     <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
-      <p>Request</p>
+      <p>Bad-Request</p>
 
     </div>
     <div class="notel-content">
