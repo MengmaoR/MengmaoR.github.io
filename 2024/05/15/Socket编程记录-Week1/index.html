@@ -27,7 +27,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://mengmaor.github.io/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/HTTPRequest.jpeg">
 <meta property="article:published_time" content="2024-05-15T08:54:59.000Z">
-<meta property="article:modified_time" content="2024-05-17T16:58:18.012Z">
+<meta property="article:modified_time" content="2024-05-17T17:00:49.530Z">
 <meta property="article:author" content="梦猫">
 <meta property="article:tag" content="TJU CS Lab">
 <meta name="twitter:card" content="summary">
@@ -677,8 +677,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2024-05-18 00:58:18</span>
-            <span class="mobile">2024-05-18 00:58:18</span>
+            <span class="desktop">2024-05-18 01:49</span>
+            <span class="mobile">2024-05-18 01:49</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -763,7 +763,7 @@
 
     </div>
     <div class="notel-content">
-      <p>当解析发现消息为已实现的合法HTTP请求时，将消息进行重新封装，并直接发送回客户端。</p>
+      <p>当解析后发现消息为合法HTTP请求，且方法为GET&#x2F;HEAD&#x2F;POST，为已实现的方法，此时将消息进行重新封装，并直接发送回客户端。</p>
 
     </div>
   </div>
@@ -774,7 +774,7 @@
 
     </div>
     <div class="notel-content">
-      <p>当解析后发现消息为合法的HTTP请求，但并未实现该请求对应的功能时，向客户端发送”HTTP&#x2F;1.1 501 Not<br>Implemented\r\n\r\n”.</p>
+      <p>当解析后发现消息为合法的HTTP请求，但该消息请求的方法并未实现时，向客户端发送”HTTP&#x2F;1.1 501 Not Implemented\r\n\r\n”.</p>
 
     </div>
   </div>
@@ -806,7 +806,7 @@
         
             <li>
                 <strong>Updated at
-                    :</strong> 2024-05-18 00:58:18
+                    :</strong> 2024-05-18 01:00:49
             </li>
         
         <li>

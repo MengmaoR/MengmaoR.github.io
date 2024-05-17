@@ -277,7 +277,7 @@
 
     </div>
     <div class="notel-content">
-      <p>当解析发现消息为已实现的合法HTTP请求时，将消息进行重新封装，并直接发送回客户端。</p>
+      <p>当解析后发现消息为合法HTTP请求，且方法为GET&#x2F;HEAD&#x2F;POST，为已实现的方法，此时将消息进行重新封装，并直接发送回客户端。</p>
 
     </div>
   </div>
@@ -288,7 +288,7 @@
 
     </div>
     <div class="notel-content">
-      <p>当解析后发现消息为合法的HTTP请求，但并未实现该请求对应的功能时，向客户端发送”HTTP&#x2F;1.1 501 Not<br>Implemented\r\n\r\n”.</p>
+      <p>当解析后发现消息为合法的HTTP请求，但该消息请求的方法并未实现时，向客户端发送”HTTP&#x2F;1.1 501 Not Implemented\r\n\r\n”.</p>
 
     </div>
   </div>
