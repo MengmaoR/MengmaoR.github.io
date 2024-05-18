@@ -34,6 +34,135 @@
       </tags>
   </entry>
   <entry>
+    <title>Socket编程日志 Week1</title>
+    <url>/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/</url>
+    <content><![CDATA[<p>这次实验要求所有源码不得外传和共享，因此在博客里就不再给出源码了。</p>
+<h1 id="实验概要"><a href="#实验概要" class="headerlink" title="实验概要"></a>实验概要</h1><p>第一周需要实现一个简单的echo web server模块，可以对传入的消息进行解析，判断其合法性，并按消息的不同类别进行响应。<br>对于具体的消息解析部分，利用Lex&amp;Yacc分词方法进行词法分析，以此解析出HTTP请求的种类。</p>
+<h1 id="协议设计"><a href="#协议设计" class="headerlink" title="协议设计"></a>协议设计</h1><p>这次实验所要实现的功能比较简单，不需要额外设计数据结构来辅助实现。因此在数据结构部分主要描述在设计中使用到的数据结构以及对某些重要数据结构的分析。</p>
+<h2 id="协议头结构"><a href="#协议头结构" class="headerlink" title="协议头结构"></a>协议头结构</h2><h3 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h3><p>在最初环境部署的阶段中，曾使用过<code>example</code>程序测试过对<code>/samples/sample_request_example</code>文件中HTTP请求的响应。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>sample_request_example</span></figcaption><table><tr><td class="code"><pre><span class="line">GET /~prs/15-441-F15/ HTTP/1.1</span><br><span class="line">Host: www.cs.cmu.edu</span><br></pre></td></tr></table></figure></div>
+<p>可以看到，该文件的输入只包含了一行HTTP请求行和一行HTTP请求头部。在此情况下，框架代码能够正确识别并处理这一HTTP请求。但在实际情况中，HTTP请求包含多行请求头部，因此需要在后续的词法分析设计中保证程序可以处理多行请求头部的语法规则匹配。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/HTTPRequest.jpeg"
+                      alt="HTTP Request" title="HTTP 请求报文结构"
+                ><figcaption>HTTP Request</figcaption></figure><br>而对于Yacc解析出的数据，它通过一个特殊的数据结构Request来存储，该结构定义如下。</p>
+<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>Request</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">// /include/parse.h</span></span><br><span class="line"><span class="comment">// HTTP Request Header</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="type">char</span> http_version[<span class="number">50</span>];</span><br><span class="line">	<span class="type">char</span> http_method[<span class="number">50</span>];</span><br><span class="line">	<span class="type">char</span> http_uri[<span class="number">4096</span>];</span><br><span class="line">	Request_header *headers;</span><br><span class="line">	<span class="type">int</span> header_count;</span><br><span class="line">&#125; Request;</span><br></pre></td></tr></table></figure></div>
+<p>可以看到，<code>http_version</code>、<code>http_version</code>和<code>http_version</code>将会分别存储HTTP请求行中的协议版本，请求方法和请求URI。而HTTP请求头部则被存储在一个<code>Request_header</code>结构的数组中。</p>
+<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>Request_header</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">// /include/parse.h</span></span><br><span class="line"><span class="comment">// Header field</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="type">char</span> header_name[<span class="number">4096</span>];</span><br><span class="line">	<span class="type">char</span> header_value[<span class="number">4096</span>];</span><br><span class="line">&#125; Request_header;</span><br></pre></td></tr></table></figure></div>
+<p>在<code>Request_header</code>中则会存储HTTP请求头部的头部字段名和值。<br>根据以上数据结构，我们可以更好的对解析后结果进行分类匹配并响应。<br>此外，在对解析后消息进行响应时，会涉及到对缓冲区的匹配识别和修改问题。因此需要提前定义一些用于匹配和填充的字符串，用以更便捷和安全的操作缓冲区。</p>
+<h3 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h3><p>对于解析后的HTTP请求消息，共分为三种情况处理：</p>
+
+  <div class="note-large green">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <p>GET&#x2F;HEAD&#x2F;POST</p>
+
+    </div>
+    <div class="notel-content">
+      <p>当解析后发现消息为合法HTTP请求，且方法为GET&#x2F;HEAD&#x2F;POST，为已实现的方法，此时将消息进行重新封装，并直接发送回客户端。</p>
+
+    </div>
+  </div>
+
+  <div class="note-large orange">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <p>Not-Implemented</p>
+
+    </div>
+    <div class="notel-content">
+      <p>当解析后发现消息为合法的HTTP请求，但该消息请求的方法并未实现时，向客户端发送”HTTP&#x2F;1.1 501 Not Implemented\r\n\r\n”.</p>
+
+    </div>
+  </div>
+
+  <div class="note-large red">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <p>Bad-Request</p>
+
+    </div>
+    <div class="notel-content">
+      <p>当解析过程中发现消息格式错误，为非法消息时，向客户端发送”HTTP&#x2F;1.1 400 Bad request\r\n\r\n”.</p>
+
+    </div>
+  </div>
+<p>在词法分析模块将输入消息进行解析后，将缓冲区中的解析结果与上述情况进行一一匹配，便能得到正确的响应。随后再根据上述要求进行响应即可。</p>
+<h2 id="Lex-Yacc词法分析结构"><a href="#Lex-Yacc词法分析结构" class="headerlink" title="Lex&amp;Yacc词法分析结构"></a>Lex&amp;Yacc词法分析结构</h2><h3 id="数据结构设计-1"><a href="#数据结构设计-1" class="headerlink" title="数据结构设计"></a>数据结构设计</h3><p>总体来说，Lex&amp;Yacc词法分析的框架是：Lex先扫描每个输入的字符串，按预先设定的种类对字符串进行匹配，并将其替换为该种类的标签符。<br>随后，Yacc扫描Lex处理后得到的标签串，根据实现定义的语法规则对标签串进行规约匹配，得到规约后的输出结果。</p>
+<h3 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h3><p>在查看Yacc规约规则的源码<code>/src/parser.y</code>后，发现其中已经定义了用于识别HTTP请求行的规则<code>request_line</code>，和用于识别HTTP请求头部的规则<code>request_header</code>。仔细阅读后，发现已有的语法规则只能成功识别一行HTTP请求头部，这与实验要求不符，因此需要设计可识别多行请求头部的语法规则。<br>由于对于每行请求头部，它所遵循的语法规则都是相同的，且与单行请求头部的规则一致，因此使用递归的方式就能很好的完成多行识别，这在某些已有规则的定义中也有所体现。<br>由此，只需先对第一行按单行请求头部的语法规则进行匹配，再递归的对后续输入尝试用此规则进行匹配即可。</p>
+<h1 id="协议实现"><a href="#协议实现" class="headerlink" title="协议实现"></a>协议实现</h1><h2 id="客户端输入部分"><a href="#客户端输入部分" class="headerlink" title="客户端输入部分"></a>客户端输入部分</h2><p>首先，在最初的环境配置阶段，以及阅读源码后可知，<code>echo_client</code>程序目前通过命令行输入的方式来读取输入，而<code>example</code>程序则可以通过文件来获取输入。因此，我们首先需要将<code>echo_client</code>更改为通过文件输入。这一部分的实现较为简单，只需参照<code>/src/example.c</code>中的代码实现即可，并注意在读取参数表时加入一项输入文件的路径。</p>
+<h2 id="词法分析部分"><a href="#词法分析部分" class="headerlink" title="词法分析部分"></a>词法分析部分</h2><p>在前面的设计部分提到过，通过递归的方式设计语法规则就可以很好的完成对多行请求头部的匹配。具体而言，在Yacc中，通过逻辑连接词<code>｜</code>就可以实现递归匹配。</p>
+<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>Rules_Rec</span></figcaption><table><tr><td class="code"><pre><span class="line">rules_rec: rules &#123;</span><br><span class="line">    body1;</span><br><span class="line">&#125;; |</span><br><span class="line">rules_rec &#123;</span><br><span class="line">    body2;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+<p>如上伪代码给出了一种递归语法规则<code>rules_rec</code>的定义方式。其中，<code>rules</code>是对单行定义的语法规则，而在<code>rules_rec</code>匹配时，会尝试匹配一个<code>rules</code>或是一个<code>rules_rec</code>，这就形成了递归调用，以此可以根据一个语法规则对多行中的每行都按<code>rules</code>规则进行匹配。<br>由于在框架代码中，对于单行HTTP请求头部的语法规则<code>request_header</code>已经定义，因此只需在<code>/src/parser.y</code>参照上面给出的定义方式，定义递归匹配多行的语法规则<code>request_header_rec</code>，并使用此规则进行匹配即可。<br>此外，前面提到过，<code>/src/parser.c</code>会将解析完毕的HTTP请求存储在<code>Request -&gt; headers</code>中，而在框架代码中，由于只进行一行的请求头部解析，所以程序只为<code>Request -&gt; headers</code>申请了一个元素的空间。因此还需增加程序为<code>Request -&gt; headers</code>申请的空间大小，以存储全部的HTTP请求头部信息。在这次实验中，我们将空间大小设为64行，应该可以顺利实现实验所要求的功能。</p>
+<h2 id="服务器响应部分"><a href="#服务器响应部分" class="headerlink" title="服务器响应部分"></a>服务器响应部分</h2><p>服务器响应模块应在<code>/src/echo_server.c</code>中实现。在服务器响应部分中，已有的框架代码会从客户端接收请求消息，将其存储至缓冲区<code>buf</code>中，并直接发送回客户端。因此，需要为其加入词法分析和对应响应功能。首先，利用在<code>/src/parser.h</code>中定义的<code>parser</code>函数，将<code>buf</code>中的内容使用词法分析模块进行解析，并将解析结果存储在专门的数据结构<code>Request</code>中。随后，可以对解析结果进行判断。在解析失败时，<code>request</code>应为空，此时返回400报错；否则解析成功，此时判断<code>request -&gt; http_method</code>是否为<code>&quot;GET&quot;\&quot;HEAD&quot;\&quot;POST&quot;</code>，若字符串比对成功，则应将解析后的消息复制至缓冲区中，并直接发送回客户端；否则，则代表请求为未实现的HTTP方法，此时返回501报错。同时，在每次发送响应时还应检查发送是否成功，此部分代码在框架代码中已经给出。由此可以写出响应模块的伪代码如下：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Response</span></figcaption><table><tr><td class="code"><pre><span class="line">IF request IS NULL</span><br><span class="line">    THEN SEND ERROR 400</span><br><span class="line">        CHECK SEND</span><br><span class="line">ELSE IF request -&gt; http_method IS &quot;GET&quot;</span><br><span class="line">        OR IS &quot;HEAD&quot; OR IS &quot;POST&quot;</span><br><span class="line">    THEN COPY request TO buf </span><br><span class="line">        SEND buf</span><br><span class="line">        CHECK SEND</span><br><span class="line">ELSE</span><br><span class="line">    THEN SEND ERROR 501</span><br><span class="line">        CHECK SEND</span><br><span class="line">END IF</span><br></pre></td></tr></table></figure></div>
+<h2 id="缓冲区清除"><a href="#缓冲区清除" class="headerlink" title="缓冲区清除"></a>缓冲区清除</h2><p>在每完成一个HTTP请求信息的解析和响应后，为避免上一次的消息影响对下一次消息的解析和响应结果，我们需要对解析结果<code>request</code>和缓冲区都进行清空。这一部分很容易就可以在<code>/src/echo_server.c</code>进行实现。但在一次测试中，发现如果先传输一个格式错误，响应ERROR 400的HTTP请求，再传输格式正确的HTTP请求，程序依然会判断该消息格式错误，响应ERROR 400。经过检查，发现此时<code>request</code>为空，即错误出现在词法分析模块。仔细检查测试中的输出可以发现，在输入格式正确的HTTP请求后词法分析模块进行匹配的字符串并非新输入的字符串，而是前面格式错误输入文件的后续部分。因此可以断定出现此问题的原因是词法分析模块存在未被清空的缓冲区。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/Debug.jpeg"
+                      alt="Wrong Output Log" title="错误部分的详细输出"
+                ><figcaption>Wrong Output Log</figcaption></figure><br>于是再度深入语法分析模块进行检查，最终发现是Lex在进行匹配时存在隐藏的栈结构缓冲区（<code>/src/lex.yy.c</code>），而其中也已经定义了用于清除该隐藏缓冲区的函数<code>yylex_destroy</code>。因此，只需在<code>/src/parser.c</code>文件中，开始进行语法分析前调用上述函数，清空Lex的隐藏缓冲区即可。随后再次测试即可得到正确的结果。</p>
+<h1 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h1><p>在结果测试部分，分别进行了如下测试：</p>
+<h2 id="GET-HEAD-POST请求"><a href="#GET-HEAD-POST请求" class="headerlink" title="GET&#x2F;HEAD&#x2F;POST请求"></a>GET&#x2F;HEAD&#x2F;POST请求</h2><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/get.jpeg"
+                      alt="HTTP GET" title="HTTP GET请求"
+                ><figcaption>HTTP GET</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/head.jpeg"
+                      alt="HTTP HEAD" title="HTTP HEAD请求"
+                ><figcaption>HTTP HEAD</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/post.jpeg"
+                      alt="HTTP POST" title="HTTP POST请求"
+                ><figcaption>HTTP POST</figcaption></figure></p>
+<h2 id="未实现方法PUT-WRONG"><a href="#未实现方法PUT-WRONG" class="headerlink" title="未实现方法PUT&#x2F;WRONG"></a>未实现方法PUT&#x2F;WRONG</h2><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/501_put.jpeg"
+                      alt="501 PUT" title="501报错 PUT"
+                ><figcaption>501 PUT</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/501_wrong.jpeg"
+                      alt="501 WRONG" title="501报错 WRONG"
+                ><figcaption>501 WRONG</figcaption></figure></p>
+<h2 id="5种格式错误"><a href="#5种格式错误" class="headerlink" title="5种格式错误"></a>5种格式错误</h2><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/400_1.jpeg"
+                      alt="400 1" title="400报错 1"
+                ><figcaption>400 1</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/400_2.jpeg"
+                      alt="400 2" title="400报错 2"
+                ><figcaption>400 2</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/400_3.jpeg"
+                      alt="400 3" title="400报错 3"
+                ><figcaption>400 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/400_4.jpeg"
+                      alt="400 4" title="400报错 4"
+                ><figcaption>400 4</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/400_5.jpeg"
+                      alt="400 5" title="400报错 5"
+                ><figcaption>400 5</figcaption></figure></p>
+<h1 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h1>]]></content>
+      <categories>
+        <category>计算机网络课程设计</category>
+      </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>SurvivalCraft DevLog</title>
     <url>/2023/10/18/SurvivalCraft-DevLog/</url>
     <content><![CDATA[<details class="red" data-header-exclude><summary><i class="fa-solid fa-chevron-right"></i>暂未实现部分 </summary>
@@ -252,141 +381,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Socket编程日志 Week1</title>
-    <url>/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/</url>
-    <content><![CDATA[<p>这次实验要求所有源码不得外传和共享，因此在博客里就不再给出源码了。</p>
-<h1 id="实验概要"><a href="#实验概要" class="headerlink" title="实验概要"></a>实验概要</h1><p>第一周需要实现一个简单的echo web server模块，可以对传入的消息进行解析，判断其合法性，并按消息的不同类别进行响应。<br>对于具体的消息解析部分，利用Lex&amp;Yacc分词方法进行词法分析，以此解析出HTTP请求的种类。</p>
-<h1 id="协议设计"><a href="#协议设计" class="headerlink" title="协议设计"></a>协议设计</h1><p>这次实验所要实现的功能比较简单，不需要额外设计数据结构来辅助实现。因此在数据结构部分主要描述在设计中使用到的数据结构以及对某些重要数据结构的分析。</p>
-<h2 id="协议头结构"><a href="#协议头结构" class="headerlink" title="协议头结构"></a>协议头结构</h2><h3 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h3><p>在最初环境部署的阶段中，曾使用过<code>example</code>程序测试过对<code>/samples/sample_request_example</code>文件中HTTP请求的响应。</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>sample_request_example</span></figcaption><table><tr><td class="code"><pre><span class="line">GET /~prs/15-441-F15/ HTTP/1.1</span><br><span class="line">Host: www.cs.cmu.edu</span><br></pre></td></tr></table></figure></div>
-<p>可以看到，该文件的输入只包含了一行HTTP请求行和一行HTTP请求头部。在此情况下，框架代码能够正确识别并处理这一HTTP请求。但在实际情况中，HTTP请求包含多行请求头部，因此需要在后续的词法分析设计中保证程序可以处理多行请求头部的语法规则匹配。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/HTTPRequest.jpeg"
-                      alt="HTTP Request" title="HTTP 请求报文结构"
-                ><figcaption>HTTP Request</figcaption></figure><br>而对于Yacc解析出的数据，它通过一个特殊的数据结构Request来存储，该结构定义如下。</p>
-<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>Request</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">// /include/parse.h</span></span><br><span class="line"><span class="comment">// HTTP Request Header</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="type">char</span> http_version[<span class="number">50</span>];</span><br><span class="line">	<span class="type">char</span> http_method[<span class="number">50</span>];</span><br><span class="line">	<span class="type">char</span> http_uri[<span class="number">4096</span>];</span><br><span class="line">	Request_header *headers;</span><br><span class="line">	<span class="type">int</span> header_count;</span><br><span class="line">&#125; Request;</span><br></pre></td></tr></table></figure></div>
-<p>可以看到，<code>http_version</code>、<code>http_version</code>和<code>http_version</code>将会分别存储HTTP请求行中的协议版本，请求方法和请求URI。而HTTP请求头部则被存储在一个<code>Request_header</code>结构的数组中。</p>
-<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>Request_header</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">// /include/parse.h</span></span><br><span class="line"><span class="comment">// Header field</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="type">char</span> header_name[<span class="number">4096</span>];</span><br><span class="line">	<span class="type">char</span> header_value[<span class="number">4096</span>];</span><br><span class="line">&#125; Request_header;</span><br></pre></td></tr></table></figure></div>
-<p>在<code>Request_header</code>中则会存储HTTP请求头部的头部字段名和值。<br>根据以上数据结构，我们可以更好的对解析后结果进行分类匹配并响应。<br>此外，在对解析后消息进行响应时，会涉及到对缓冲区的匹配识别和修改问题。因此需要提前定义一些用于匹配和填充的字符串，用以更便捷和安全的操作缓冲区。</p>
-<h3 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h3><p>对于解析后的HTTP请求消息，共分为三种情况处理：</p>
-
-  <div class="note-large green">
-    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
-      <p>GET&#x2F;HEAD&#x2F;POST</p>
-
-    </div>
-    <div class="notel-content">
-      <p>当解析后发现消息为合法HTTP请求，且方法为GET&#x2F;HEAD&#x2F;POST，为已实现的方法，此时将消息进行重新封装，并直接发送回客户端。</p>
-
-    </div>
-  </div>
-
-  <div class="note-large orange">
-    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
-      <p>Not-Implemented</p>
-
-    </div>
-    <div class="notel-content">
-      <p>当解析后发现消息为合法的HTTP请求，但该消息请求的方法并未实现时，向客户端发送”HTTP&#x2F;1.1 501 Not Implemented\r\n\r\n”.</p>
-
-    </div>
-  </div>
-
-  <div class="note-large red">
-    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
-      <p>Bad-Request</p>
-
-    </div>
-    <div class="notel-content">
-      <p>当解析过程中发现消息格式错误，为非法消息时，向客户端发送”HTTP&#x2F;1.1 400 Bad request\r\n\r\n”.</p>
-
-    </div>
-  </div>
-<p>在词法分析模块将输入消息进行解析后，将缓冲区中的解析结果与上述情况进行一一匹配，便能得到正确的响应。随后再根据上述要求进行响应即可。</p>
-<h2 id="Lex-Yacc词法分析结构"><a href="#Lex-Yacc词法分析结构" class="headerlink" title="Lex&amp;Yacc词法分析结构"></a>Lex&amp;Yacc词法分析结构</h2><h3 id="数据结构设计-1"><a href="#数据结构设计-1" class="headerlink" title="数据结构设计"></a>数据结构设计</h3><p>总体来说，Lex&amp;Yacc词法分析的框架是：Lex先扫描每个输入的字符串，按预先设定的种类对字符串进行匹配，并将其替换为该种类的标签符。<br>随后，Yacc扫描Lex处理后得到的标签串，根据实现定义的语法规则对标签串进行规约匹配，得到规约后的输出结果。</p>
-<h3 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h3><p>在查看Yacc规约规则的源码<code>/src/parser.y</code>后，发现其中已经定义了用于识别HTTP请求行的规则<code>request_line</code>，和用于识别HTTP请求头部的规则<code>request_header</code>。仔细阅读后，发现已有的语法规则只能成功识别一行HTTP请求头部，这与实验要求不符，因此需要设计可识别多行请求头部的语法规则。<br>由于对于每行请求头部，它所遵循的语法规则都是相同的，且与单行请求头部的规则一致，因此使用递归的方式就能很好的完成多行识别，这在某些已有规则的定义中也有所体现。<br>由此，只需先对第一行按单行请求头部的语法规则进行匹配，再递归的对后续输入尝试用此规则进行匹配即可。</p>
-<h1 id="协议实现"><a href="#协议实现" class="headerlink" title="协议实现"></a>协议实现</h1><h2 id="客户端输入部分"><a href="#客户端输入部分" class="headerlink" title="客户端输入部分"></a>客户端输入部分</h2><p>首先，在最初的环境配置阶段，以及阅读源码后可知，<code>echo_client</code>程序目前通过命令行输入的方式来读取输入，而<code>example</code>程序则可以通过文件来获取输入。因此，我们首先需要将<code>echo_client</code>更改为通过文件输入。这一部分的实现较为简单，只需参照<code>/src/example.c</code>中的代码实现即可，并注意在读取参数表时加入一项输入文件的路径。</p>
-<h2 id="词法分析部分"><a href="#词法分析部分" class="headerlink" title="词法分析部分"></a>词法分析部分</h2><p>在前面的设计部分提到过，通过递归的方式设计语法规则就可以很好的完成对多行请求头部的匹配。具体而言，在Yacc中，通过逻辑连接词<code>｜</code>就可以实现递归匹配。</p>
-<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>Rules_Rec</span></figcaption><table><tr><td class="code"><pre><span class="line">rules_rec: rules &#123;</span><br><span class="line">    body1;</span><br><span class="line">&#125;; |</span><br><span class="line">rules_rec &#123;</span><br><span class="line">    body2;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
-<p>如上伪代码给出了一种递归语法规则<code>rules_rec</code>的定义方式。其中，<code>rules</code>是对单行定义的语法规则，而在<code>rules_rec</code>匹配时，会尝试匹配一个<code>rules</code>或是一个<code>rules_rec</code>，这就形成了递归调用，以此可以根据一个语法规则对多行中的每行都按<code>rules</code>规则进行匹配。<br>由于在框架代码中，对于单行HTTP请求头部的语法规则<code>request_header</code>已经定义，因此只需在<code>/src/parser.y</code>参照上面给出的定义方式，定义递归匹配多行的语法规则<code>request_header_rec</code>，并使用此规则进行匹配即可。<br>此外，前面提到过，<code>/src/parser.c</code>会将解析完毕的HTTP请求存储在<code>Request -&gt; headers</code>中，而在框架代码中，由于只进行一行的请求头部解析，所以程序只为<code>Request -&gt; headers</code>申请了一个元素的空间。因此还需增加程序为<code>Request -&gt; headers</code>申请的空间大小，以存储全部的HTTP请求头部信息。在这次实验中，我们将空间大小设为64行，应该可以顺利实现实验所要求的功能。</p>
-<h2 id="服务器响应部分"><a href="#服务器响应部分" class="headerlink" title="服务器响应部分"></a>服务器响应部分</h2><p>服务器响应模块应在<code>/src/echo_server.c</code>中实现。在服务器响应部分中，已有的框架代码会从客户端接收请求消息，将其存储至缓冲区<code>buf</code>中，并直接发送回客户端。因此，需要为其加入词法分析和对应响应功能。首先，利用在<code>/src/parser.h</code>中定义的<code>parser</code>函数，将<code>buf</code>中的内容使用词法分析模块进行解析，并将解析结果存储在专门的数据结构<code>Request</code>中。随后，可以对解析结果进行判断。在解析失败时，<code>request</code>应为空，此时返回400报错；否则解析成功，此时判断<code>request -&gt; http_method</code>是否为<code>&quot;GET&quot;\&quot;HEAD&quot;\&quot;POST&quot;</code>，若字符串比对成功，则应将解析后的消息复制至缓冲区中，并直接发送回客户端；否则，则代表请求为未实现的HTTP方法，此时返回501报错。同时，在每次发送响应时还应检查发送是否成功，此部分代码在框架代码中已经给出。由此可以写出响应模块的伪代码如下：</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Response</span></figcaption><table><tr><td class="code"><pre><span class="line">IF request IS NULL</span><br><span class="line">    THEN SEND ERROR 400</span><br><span class="line">        CHECK SEND</span><br><span class="line">ELSE IF request -&gt; http_method IS &quot;GET&quot;</span><br><span class="line">        OR IS &quot;HEAD&quot; OR IS &quot;POST&quot;</span><br><span class="line">    THEN COPY request TO buf </span><br><span class="line">        SEND buf</span><br><span class="line">        CHECK SEND</span><br><span class="line">ELSE</span><br><span class="line">    THEN SEND ERROR 501</span><br><span class="line">        CHECK SEND</span><br><span class="line">END IF</span><br></pre></td></tr></table></figure></div>
-<h2 id="缓冲区清除"><a href="#缓冲区清除" class="headerlink" title="缓冲区清除"></a>缓冲区清除</h2><p>在每完成一个HTTP请求信息的解析和响应后，为避免上一次的消息影响对下一次消息的解析和响应结果，我们需要对解析结果<code>request</code>和缓冲区都进行清空。这一部分很容易就可以在<code>/src/echo_server.c</code>进行实现。但在一次测试中，发现如果先传输一个格式错误，响应ERROR 400的HTTP请求，再传输格式正确的HTTP请求，程序依然会判断该消息格式错误，响应ERROR 400。经过检查，发现此时<code>request</code>为空，即错误出现在词法分析模块。仔细检查测试中的输出可以发现，在输入格式正确的HTTP请求后词法分析模块进行匹配的字符串并非新输入的字符串，而是前面格式错误输入文件的后续部分。因此可以断定出现此问题的原因是词法分析模块存在未被清空的缓冲区。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/Debug.jpeg"
-                      alt="Wrong Output Log" title="错误部分的详细输出"
-                ><figcaption>Wrong Output Log</figcaption></figure><br>于是再度深入语法分析模块进行检查，最终发现是Lex在进行匹配时存在隐藏的栈结构缓冲区（<code>/src/lex.yy.c</code>），而其中也已经定义了用于清除该隐藏缓冲区的函数<code>yylex_destroy</code>。因此，只需在<code>/src/parser.c</code>文件中，开始进行语法分析前调用上述函数，清空Lex的隐藏缓冲区即可。随后再次测试即可得到正确的结果。</p>
-<h1 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h1><p>在结果测试部分，分别进行了如下测试：</p>
-<h2 id="GET-HEAD-POST请求"><a href="#GET-HEAD-POST请求" class="headerlink" title="GET&#x2F;HEAD&#x2F;POST请求"></a>GET&#x2F;HEAD&#x2F;POST请求</h2><p><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/get.jpeg"
-                      alt="HTTP GET" title="HTTP GET请求"
-                ><figcaption>HTTP GET</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/head.jpeg"
-                      alt="HTTP HEAD" title="HTTP HEAD请求"
-                ><figcaption>HTTP HEAD</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/post.jpeg"
-                      alt="HTTP POST" title="HTTP POST请求"
-                ><figcaption>HTTP POST</figcaption></figure></p>
-<h2 id="未实现方法PUT-WRONG"><a href="#未实现方法PUT-WRONG" class="headerlink" title="未实现方法PUT&#x2F;WRONG"></a>未实现方法PUT&#x2F;WRONG</h2><p><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/501_put.jpeg"
-                      alt="501 PUT" title="501报错 PUT"
-                ><figcaption>501 PUT</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/501_wrong.jpeg"
-                      alt="501 WRONG" title="501报错 WRONG"
-                ><figcaption>501 WRONG</figcaption></figure></p>
-<h2 id="5种格式错误"><a href="#5种格式错误" class="headerlink" title="5种格式错误"></a>5种格式错误</h2><p><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/400_1.jpeg"
-                      alt="400 1" title="400报错 1"
-                ><figcaption>400 1</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/400_2.jpeg"
-                      alt="400 2" title="400报错 2"
-                ><figcaption>400 2</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/400_3.jpeg"
-                      alt="400 3" title="400报错 3"
-                ><figcaption>400 3</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/400_4.jpeg"
-                      alt="400 4" title="400报错 4"
-                ><figcaption>400 4</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/400_5.jpeg"
-                      alt="400 5" title="400报错 5"
-                ><figcaption>400 5</figcaption></figure></p>
-<h1 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h1>]]></content>
-      <categories>
-        <category>计算机网络课程设计</category>
-      </categories>
-      <tags>
-        <tag>TJU CS Lab</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>categories</title>
-    <url>/categories/index.html</url>
-    <content><![CDATA[<p>here’s categories</p>
-]]></content>
-  </entry>
-  <entry>
     <title>about</title>
     <url>/about/index.html</url>
     <content><![CDATA[<p>here’s about page</p>
@@ -410,6 +404,12 @@
 
     </div>
   </div>]]></content>
+  </entry>
+  <entry>
+    <title>categories</title>
+    <url>/categories/index.html</url>
+    <content><![CDATA[<p>here’s categories</p>
+]]></content>
   </entry>
   <entry>
     <title>tags</title>
