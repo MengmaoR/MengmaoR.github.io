@@ -128,7 +128,7 @@
                      data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/501_wrong.jpeg"
                       alt="501 WRONG" title="501报错 WRONG"
                 ><figcaption>501 WRONG</figcaption></figure></p>
-<h2 id="5种格式错误"><a href="#5种格式错误" class="headerlink" title="5种格式错误"></a>5种格式错误</h2><p><figure class="image-caption"><img  
+<h2 id="6种格式错误"><a href="#6种格式错误" class="headerlink" title="6种格式错误"></a>6种格式错误</h2><p><figure class="image-caption"><img  
                      lazyload
                      src="/images/loading.svg"
                      data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/400_1.jpeg"
@@ -153,8 +153,14 @@
                      src="/images/loading.svg"
                      data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/400_5.jpeg"
                       alt="400 5" title="400报错 5"
-                ><figcaption>400 5</figcaption></figure></p>
-<h1 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h1>]]></content>
+                ><figcaption>400 5</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/400_6.jpeg"
+                      alt="400 6" title="400报错 6"
+                ><figcaption>400 6</figcaption></figure></p>
+<h1 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h1><p>大概了解了一下实验环境，学了点正则表达式相关的知识和运用。明白了框架代码中服务器和客户端是如何通过socket进行通信的，以及源码的一些数据结构和程序框架，算是一个简单的入门。</p>
+]]></content>
       <categories>
         <category>计算机网络课程设计</category>
       </categories>
