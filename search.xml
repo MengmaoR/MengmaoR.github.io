@@ -389,8 +389,7 @@
   <entry>
     <title>about</title>
     <url>/about/index.html</url>
-    <content><![CDATA[<p>here’s about page</p>
-]]></content>
+    <content><![CDATA[<h1 id="WELCOME-TO-MY-BLOG"><a href="#WELCOME-TO-MY-BLOG" class="headerlink" title="WELCOME TO MY BLOG"></a>WELCOME TO MY BLOG</h1><h3 id="BY-MENGMAO-REINE"><a href="#BY-MENGMAO-REINE" class="headerlink" title="BY MENGMAO REINE"></a>BY MENGMAO REINE</h3><h5 id="天津大学CS本科在读，随机生成一些课程实验记录、算法笔记和旅拍照片。"><a href="#天津大学CS本科在读，随机生成一些课程实验记录、算法笔记和旅拍照片。" class="headerlink" title="天津大学CS本科在读，随机生成一些课程实验记录、算法笔记和旅拍照片。"></a>天津大学CS本科在读，随机生成一些课程实验记录、算法笔记和旅拍照片。</h5>]]></content>
   </entry>
   <entry>
     <title>时光博物馆</title>
