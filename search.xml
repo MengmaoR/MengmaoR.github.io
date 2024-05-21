@@ -99,7 +99,7 @@
                      src="/images/loading.svg"
                      data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/Debug.jpeg"
                       alt="Wrong Output Log" title="错误部分的详细输出"
-                ><figcaption>Wrong Output Log</figcaption></figure><br>于是再度深入语法分析模块进行检查，最终发现是Lex在进行匹配时存在隐藏的栈结构缓冲区（<code>/src/lex.yy.c</code>），而其中也已经定义了用于清除该隐藏缓冲区的函数<code>yylex_destroy</code>。因此，只需在<code>/src/parser.c</code>文件中，开始进行语法分析前调用上述函数，清空Lex的隐藏缓冲区即可。随后再次测试即可得到正确的结果。</p>
+                ><figcaption>Wrong Output Log</figcaption></figure><br>于是再度深入语法分析模块进行检查，最终发现是Lex在进行匹配时存在隐藏的队列结构的缓冲区（<code>/src/lex.yy.c</code>），这会导致每次产生解析错误后，其后续消息会被作为下一次消息解析的开头，进而再次导致解析错误。不过，框架代码中也已经定义了用于清除该隐藏缓冲区的函数<code>yylex_destroy</code>，因此只需在<code>/src/parser.c</code>文件中，开始进行语法分析前调用上述函数，清空Lex的隐藏缓冲区即可。随后再次测试即可得到正确的结果。</p>
 <h1 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h1><p>在结果测试部分，分别进行了如下测试：</p>
 <h2 id="GET-HEAD-POST请求"><a href="#GET-HEAD-POST请求" class="headerlink" title="GET&#x2F;HEAD&#x2F;POST请求"></a>GET&#x2F;HEAD&#x2F;POST请求</h2><p><figure class="image-caption"><img  
                      lazyload
@@ -159,6 +159,12 @@
                      data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/400_6.jpeg"
                       alt="400 6" title="400报错 6"
                 ><figcaption>400 6</figcaption></figure></p>
+<h2 id="Autolab测试"><a href="#Autolab测试" class="headerlink" title="Autolab测试"></a>Autolab测试</h2><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/15/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week1/autolab.jpeg"
+                      alt="Autolab" title="Autolab 自动测试结果"
+                ><figcaption>Autolab</figcaption></figure></p>
 <h1 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h1><p>大概了解了一下实验环境，学了点正则表达式相关的知识和运用。明白了框架代码中服务器和客户端是如何通过socket进行通信的，以及源码的一些数据结构和程序框架，算是一个简单的入门。</p>
 ]]></content>
       <categories>
