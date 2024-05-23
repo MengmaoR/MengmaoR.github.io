@@ -335,7 +335,7 @@
     <content><![CDATA[
   <div class="note-large red">
     <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
-      <i class="notel-icon fa-solid fa-info"></i><p>宇宙安全声明</p>
+      <i class="notel-icon fa-solid fa-circle-info"></i><p>宇宙安全声明</p>
 
     </div>
     <div class="notel-content">
