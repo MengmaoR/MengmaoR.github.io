@@ -13,28 +13,27 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="http://mengmaor.github.io/2023/10/18/survivalcraft-devlog/"/>
+    <link rel="canonical" href="http://mengmaor.github.io/2024/05/22/socket编程记录-week2/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
     
         <meta name="description" content="false">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SurvivalCraft DevLog">
-<meta property="og:url" content="http://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/index.html">
+<meta property="og:title" content="Socket编程记录-Week2">
+<meta property="og:url" content="http://mengmaor.github.io/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/index.html">
 <meta property="og:site_name" content="MENGMAO&#39;S BLOG">
 <meta property="og:description" content="false">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/CharacterSource.jpg">
-<meta property="og:image" content="http://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/InventoryUISub.jpg">
-<meta property="og:image" content="http://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/InventorySlotUI.jpg">
-<meta property="og:image" content="http://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/InventoryGridUI.jpg">
-<meta property="article:published_time" content="2023-10-18T06:20:43.000Z">
-<meta property="article:modified_time" content="2024-05-14T15:55:41.072Z">
+<meta property="og:image" content="http://mengmaor.github.io/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/answer_format.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/GET_generate.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/HEAD_generate.jpeg">
+<meta property="article:published_time" content="2024-05-22T03:57:57.000Z">
+<meta property="article:modified_time" content="2024-05-24T05:42:08.879Z">
 <meta property="article:author" content="梦猫">
-<meta property="article:tag" content="game Deving">
+<meta property="article:tag" content="TJU CS Lab">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/CharacterSource.jpg">
+<meta name="twitter:image" content="http://mengmaor.github.io/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/answer_format.jpeg">
     
     
         <!-- Google tag (gtag.js) -->
@@ -56,7 +55,7 @@
     
     <title>
         
-            SurvivalCraft DevLog -
+            Socket编程记录-Week2 -
         
         MENGMAO&#39;S BLOG
     </title>
@@ -248,7 +247,7 @@
 
     <script id="hexo-configurations">
     window.config = {"hostname":"mengmaor.github.io","root":"/","language":"en","path":"search.xml"};
-    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":true,"link_icon":false},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":true,"list":["梦猫"]},"code_block":{"copy":true,"style":"mac","font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":false},"copyright":true,"lazyload":true,"recommendation":{"enable":true,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":true,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":true,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":true,"open_graph":true,"google_analytics":{"enable":true,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg_1.png","dark":"/images/bg_1.png"},"title":"WHAT A DANCE, <n>WELCOME.</n>","subtitle":{"text":["每一个不曾起舞的日子都是对生命的辜负."],"hitokoto":{"enable":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":false,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"links":{"github":"https://github.com/MengmaoR","email":"tianxj0520@163.com"},"qrs":{"weixin":"/images/wechat.jpg","qq":"/images/qq.jpg"}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":true,"type":"fixed","audios":[{"name":"What A Life","artist":"Scarlet Pleasure","url":"/music/WhatALife.mp3","cover":"/music/cover/WhatALife.jpeg"},{"name":"Loving Strangers","artist":"Jocelyn Pook, Russian Red","url":"/music/LovingStrangers.mp3","cover":"/music/cover/LovingStrangers.jpg"},{"name":"Merry Christmas Mr. Lawrence","artist":"坂本 龍一","url":"/music/MerryChristmasMrLawrence.mp3","cover":"/music/cover/MerryChristmasMrLawrence.jpg"}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.6.1","navbar":{"auto_hide":true,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Posts":{"icon":"fa-regular fa-archive","submenus":{"Archives":"/archives","Categories":"/categories","Tags":"/tags"}},"Photos":{"icon":"fa-solid fa-image","path":"/masonry"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about","Blog":"https://mengmaor.github.io","Github":"https://github.com/MengmaoR"}}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":false,"position":"left","first_item":"menu","announcement":null,"links":{"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tag"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2022/8/17 11:45:14"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":true,"link_icon":false},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":true,"list":["梦猫"]},"code_block":{"copy":true,"style":"mac","font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":4,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"recommendation":{"enable":true,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null},"global":{"fonts":{"chinese":{"enable":true,"family":null,"url":null},"english":{"enable":true,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":true,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":true,"open_graph":true,"google_analytics":{"enable":true,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/bg_1.png","dark":"/images/bg_1.png"},"title":"WHAT A DANCE, <n>WELCOME.</n>","subtitle":{"text":["每一个不曾起舞的日子都是对生命的辜负."],"hitokoto":{"enable":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":false,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"links":{"github":"https://github.com/MengmaoR","email":"tianxj0520@163.com"},"qrs":{"weixin":"/images/wechat.jpg","qq":"/images/qq.jpg"}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":true,"type":"fixed","audios":[{"name":"What A Life","artist":"Scarlet Pleasure","url":"/music/WhatALife.mp3","cover":"/music/cover/WhatALife.jpeg"},{"name":"Loving Strangers","artist":"Jocelyn Pook, Russian Red","url":"/music/LovingStrangers.mp3","cover":"/music/cover/LovingStrangers.jpg"},{"name":"Merry Christmas Mr. Lawrence","artist":"坂本 龍一","url":"/music/MerryChristmasMrLawrence.mp3","cover":"/music/cover/MerryChristmasMrLawrence.jpg"}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.6.1","navbar":{"auto_hide":true,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Posts":{"icon":"fa-regular fa-archive","submenus":{"Archives":"/archives","Categories":"/categories","Tags":"/tags"}},"Photos":{"icon":"fa-solid fa-image","path":"/masonry"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about","Blog":"https://mengmaor.github.io","Github":"https://github.com/MengmaoR"}}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":false,"position":"left","first_item":"menu","announcement":null,"links":{"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tag"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2022/8/17 11:45:14"};
     window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
     window.data = {"masonry":true};
   </script>
@@ -614,11 +613,11 @@
 
         <div class="statistics flex justify-around my-2.5">
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">4</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">3</div>
         <div class="label text-third-text-color text-sm">Tags</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">6</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">5</div>
         <div class="label text-third-text-color text-sm">Categories</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
@@ -649,10 +648,10 @@
             
                 
                 
-                <img src="/cover/SurvivalCraft-DevLog.jpeg" alt="SurvivalCraft DevLog" class="w-full h-60 sm:h-72 md:h-80 object-cover sm:rounded-t-large dark:brightness-75"/>
+                <img src="/cover/Socket.jpg" alt="Socket编程记录-Week2" class="w-full h-60 sm:h-72 md:h-80 object-cover sm:rounded-t-large dark:brightness-75"/>
                 
                 <div class="w-full flex items-center absolute bottom-0 justify-start">
-                    <h1 class="article-title-cover text-center mx-6 my-6 text-second-text-color bg-background-color-transparent px-4 py-3 text-3xl sm:text-4xl md:text-5xl font-bold backdrop-blur-lg rounded-xl border border-border-color ">SurvivalCraft DevLog</h1>
+                    <h1 class="article-title-cover text-center mx-6 my-6 text-second-text-color bg-background-color-transparent px-4 py-3 text-3xl sm:text-4xl md:text-5xl font-bold backdrop-blur-lg rounded-xl border border-border-color ">Socket编程记录-Week2</h1>
                 </div>
             
             </div>
@@ -673,15 +672,15 @@
                         <div class="article-meta-info">
     <span class="article-date article-meta-item">
         <i class="fa-regular fa-pen-fancy"></i>&nbsp;
-        <span class="desktop">2023-10-18 14:20:43</span>
-        <span class="mobile">2023-10-18 14:20:43</span>
+        <span class="desktop">2024-05-22 11:57:57</span>
+        <span class="mobile">2024-05-22 11:57:57</span>
         <span class="hover-info">Created</span>
     </span>
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2024-05-14 23:55:41</span>
-            <span class="mobile">2024-05-14 23:55:41</span>
+            <span class="desktop">2024-05-24 13:42:08</span>
+            <span class="mobile">2024-05-24 13:42:08</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -695,7 +694,7 @@
                     
                         
                         <li>
-                            <a href="/categories/%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97/">游戏开发日志</a>&nbsp;
+                            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E8%AF%BE%E7%A8%8B%E8%AE%BE%E8%AE%A1/">计算机网络课程设计</a>&nbsp;
                         </li>
                     
                     
@@ -709,7 +708,7 @@
             <ul>
                 
                     <li>
-                        <a href="/tags/game-Deving/">game Deving</a>&nbsp;
+                        <a href="/tags/TJU-CS-Lab/">TJU CS Lab</a>&nbsp;
                     </li>
                 
             </ul>
@@ -719,12 +718,12 @@
     
     
         <span class="article-wordcount article-meta-item">
-            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>1.7k Words</span>
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>2.4k Words</span>
         </span>
     
     
         <span class="article-min2read article-meta-item">
-            <i class="fa-regular fa-clock"></i>&nbsp;<span>5 Mins</span>
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>8 Mins</span>
         </span>
     
     
@@ -743,103 +742,165 @@
 
 
         <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-            <details class="red" data-header-exclude><summary><i class="fa-solid fa-chevron-right"></i>暂未实现部分 </summary>
-              <div class='content'>
-              <div class="note p-4 mb-4 rounded-small danger">  <p><a href="#ERROR1">1. 自定义角色第一人称视角</a></p></div><div class="note p-4 mb-4 rounded-small danger">  <p><a href="#ERROR2">2. 仓库系统物品icon</a></p></div><div class="note p-4 mb-4 rounded-small danger">  <p><a href="#ERROR3">3. 仓库UI的Texture</a></p></div><div class="note p-4 mb-4 rounded-small danger">  <p><a href="#ERROR4">4. 物品栏UI的Texture</a></p></div><div class="note p-4 mb-4 rounded-small danger">  <p><a href="#ERROR5">4. Hotbar区域UI的Texture</a></p></div>
-              </div>
-            </details>
+            <h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第二周需要实现的功能模块主要有以下几部分。</p>
 
-<h1 id="写在开头"><a href="#写在开头" class="headerlink" title="写在开头"></a>写在开头</h1><p>准备学一学UE5，顺便做一个生存+建造的游戏demo，后续做项目也方便些，所以上网找了个<a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tg411v7L7?p=1&vd_source=b8a3745f5e89824ea144c46ef4066125" >教程</a>跟着做。感觉每天会写的东西也不多，就每次都在这篇更新了，如果后面内容太多可能分Part。</p>
-<h1 id="Day-1"><a href="#Day-1" class="headerlink" title="Day 1"></a>Day 1</h1><p>最开始的配置部分就不写了，正常配置就可以。<br>不过在搭github仓库的时候出了点问题，M1 Mac版的UE5一直找不到它把仓库存在哪了，最后也没找到，就先不搭了，记得备份就行。</p>
-<h3 id="初始自定义角色搭建"><a href="#初始自定义角色搭建" class="headerlink" title="初始自定义角色搭建"></a>初始自定义角色搭建</h3><p>这个部分也比较简单，就是大概讲解了一下动画混合器的使用，以及编写了一下根据人物速度绑定混合后动画的蓝图<br>一些比较基本的蓝图功能也在这里第一次真的用到了，例如branch和变量定义</p>
-<p>搭建角色模型的时候又出问题了，视频里推荐下载的模型只有Win能用，而且给的动画素材下载要钱，暂时就没下。<br>在商场里稍微找了找，发现有一个还不错的资源，自带一些基本的移动动画，能满足这部分第三人称角色的要求。<br><figure class="image-caption"><img  
+  <div class="note-large green">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <p>请求响应模块</p>
+
+    </div>
+    <div class="notel-content">
+      <p>1.正确响应GET&#x2F;HEAD&#x2F;POST请求，并能建立持久连接<br>2.支持四种错误代码：400，404，501，505<br>3.妥善管理缓冲区，避免缓冲区溢出错误</p>
+
+    </div>
+  </div>
+
+  <div class="note-large blue">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <p>文件错误处理模块</p>
+
+    </div>
+    <div class="notel-content">
+      <p>1.能够处理文件读写过程中遇到的错误，如权限问题、文件不存在、IO错误等</p>
+
+    </div>
+  </div>
+
+  <div class="note-large yellow">
+    <div class="notel-title rounded-t-lg p-3 font-bold text-lg flex flex-row gap-2 items-center">
+      <p>日志模块</p>
+
+    </div>
+    <div class="notel-content">
+      <p>1.按“Error Log”格式记录服务器的出错情况<br>2.按“Access Log”的“Common Log Format”格式记录服务器处理的请求<br>3.其它辅助调试的日志记录（不做格式要求）</p>
+
+    </div>
+  </div>
+
+<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h3 id="1-响应生成模块"><a href="#1-响应生成模块" class="headerlink" title="1. 响应生成模块"></a>1. 响应生成模块</h3><p>首先，需要实现对GET、HEAD、POST三种请求的响应生成。</p>
+<h4 id="GET响应生成"><a href="#GET响应生成" class="headerlink" title="GET响应生成"></a>GET响应生成</h4><h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><ol>
+<li><p>响应数据结构<br>为了实现HTTP GET响应，首先需要了解正确的响应结构是什么样的。如下所示是需要实现的HTTP GET响应结构示意图。<br><figure class="image-caption"><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/2023/10/18/SurvivalCraft-DevLog/CharacterSource.jpg"
-                      alt="CharacterSource" title="CharacterSource"
-                ><figcaption>CharacterSource</figcaption></figure><br>但这个资源在第一人称视角下表现很古怪，研究了一阵也没找到好资源，暂时用一个很简陋的版本替代，其他的做完了有需求再回来改。<br><a id="ERROR1">
-  <div class="note p-4 mb-4 rounded-small danger">
-    <p><a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tg411v7L7/?p=9&vd_source=b8a3745f5e89824ea144c46ef4066125" > P9 设置我们的自定义角色 P1</a></p>
-
-  </div></a></p>
-<h3 id="仓库物品信息系统搭建"><a href="#仓库物品信息系统搭建" class="headerlink" title="仓库物品信息系统搭建"></a>仓库物品信息系统搭建</h3><p>这部分主要是构建了几个数组和结构体，用于存储仓库中物品的信息。然后还初次用到了蓝图的循环等新逻辑，整体没有什么困难。<br>他对物品抽象的思路比较值得学习，抽象程度比较高，在后续组织的时候想必会有一定帮助。不过他在信息结构体里存储了部分可能用不到的信息，后面可以研究一下能否把这部分剥离出基本的信息框架，通过更细分的结构体存储。<br><strong>此外，他的存储结构比较混乱，后面可以进行一定修改</strong></p>
-<p>同时，视频给出的物品icon又是只有Win能使用，需要后续解决<br><a id="ERROR2">
-  <div class="note p-4 mb-4 rounded-small danger">
-    <p><a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tg411v7L7?p=15&vd_source=b8a3745f5e89824ea144c46ef4066125" > P15 创建项目信息结构和第一个项目</a></p>
-
-  </div></a></p>
-<p><em><strong>END OF DAY 1</strong></em></p>
-<h1 id="DAY-2"><a href="#DAY-2" class="headerlink" title="DAY 2"></a>DAY 2</h1><h3 id="仓库HUD界面搭建"><a href="#仓库HUD界面搭建" class="headerlink" title="仓库HUD界面搭建"></a>仓库HUD界面搭建</h3><p>首先大致介绍了UI界面的设计面板，以及如何通过蓝图和GameMode设置让一个UI界面显示在游戏画面中。</p>
-<p>随后是具体的仓库HUD界面的搭建。<br>后面的构建中又使用了需要下载的Texture，需要后续补全。<br><a id="ERROR3">
-  <div class="note p-4 mb-4 rounded-small danger">
-    <p><a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tg411v7L7?p=15&vd_source=b8a3745f5e89824ea144c46ef4066125" > P18 创建库存小部件</a></p>
-
-  </div></a></p>
-<p>这里讲解了多个用于设置UI布局的组件,UE的UI布局可以通过多种Box组件的设置完成。同时设计了一个基本的信息展示UI界面，分别包括了仓库栏，人物信息拦和合成栏。这里的界面背景需要用到课程资源贴图，所以我暂时将背景颜色设为深灰替代。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2023/10/18/SurvivalCraft-DevLog/InventoryUISub.jpg"
-                      alt="Inventory UI Sub" title="Inventory UI Sub"
-                ><figcaption>Inventory UI Sub</figcaption></figure></p>
-<p>随后，增加了通过键盘按键控制刚才设计的UI界面打开和关闭的功能，以及随之的鼠标显示控制。</p>
-<h3 id="物品HUD搭建"><a href="#物品HUD搭建" class="headerlink" title="物品HUD搭建"></a>物品HUD搭建</h3><p>创建一个小型正方形HUD，用于展示仓库中的单个物品</p>
-<p>新组件介绍</p>
-<ol>
-<li>overlay: 覆盖层组件，添加后允许图像、文本等图层相互叠加</li>
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/answer_format.jpeg"
+                      alt="GET Answer" title="HTTP GET响应结构"
+                ><figcaption>GET Answer</figcaption></figure><br>根据手册要求，响应中必须包含<code>&quot;HTTP/1.1 200 OK\r\n&quot;</code>，而响应实体部分则需从请求文件中获取。因此可以定义响应的结构为一个字符串，具体组成如下。<br><code>&quot;HTTP/1.1 200 OK\r\n&quot; + Data_in_file</code><br>此外，根据手册要求，缓冲区大小应设为<code>8192</code>。</p>
+</li>
+<li><p>文件状态结构<br>根据手册提示，使用<code>stat</code>函数来获取文件状态，并以此检测文件权限、大小等信息，处理可能产生的文件读写错误。而<code>stat</code>的返回值为一个自定义结构<code>struct stat</code>，该结构定义在头文件<code>sys/stat.h</code>中，其部分重要定义如下。</p>
+<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>struct stat</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">mode_t</span>		st_mode;                <span class="comment">/* [XSI] Mode of file (see below) */</span> \</span><br><span class="line"><span class="type">off_t</span>		st_size;                <span class="comment">/* [XSI] file size, in bytes */</span> \</span><br></pre></td></tr></table></figure></div>
+<p>其中，<code>st_mode</code>为该文件的模式码，包含该文件的类型、权限信息等重要信息；而<code>st_stze</code>为该文件的大小，可用于判断文件大小是否超限。<br>而对<code>st_mode</code>值的定义，继续深入查看，可以在<code>sys/stat.h</code>和<code>sys/_types/_s_ifmt.h</code>文件中找到对于该值的部分定义如下。</p>
+<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>st_mode</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* file &quot;sys/stat.h&quot; */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_ISREG(m)      (((m) &amp; S_IFMT) == S_IFREG)     <span class="comment">/* regular file */</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* file &quot;sys/_types/_s_ifmt.h&quot; */</span></span><br><span class="line"><span class="comment">/* File type */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IFMT          0170000         <span class="comment">/* [XSI] type of file mask */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IFREG         0100000         <span class="comment">/* [XSI] regular */</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* File mode */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IRWXU         0000700         <span class="comment">/* [XSI] RWX mask for owner */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IRUSR         0000400         <span class="comment">/* [XSI] R for owner */</span></span></span><br></pre></td></tr></table></figure></div>
+<p>根据定义，如果宏<code>S_ISREG(st_mode)</code>返回<code>TRUE</code>，则代表该文件为常规媒体文件，文件类型正确；<br>同时，可以仿照宏<code>S_ISREG(m)</code>，通过表达式<br><code>((st_mode) &amp; S_IRWXU) == S_IRUSR</code><br>定义宏<code>S_ISRFL(m)</code>检查文件的权限，若返回<code>TRUE</code>则代表用户有可读权限，权限类型正确。</p>
+</li>
 </ol>
-<p><a id="ERROR4">
-  <div class="note p-4 mb-4 rounded-small danger">
-    <p><a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tg411v7L7/?p=19&spm_id_from=pageDriver&vd_source=b8a3745f5e89824ea144c46ef4066125" > P19 创建物品栏小部件</a></p>
-
-  </div></a><br>随后为其添加了背景图，依然在附件中，需要下载，继续使用深灰色背景替代。<br>同时还使用了前面下载的<a href="#ERROR2">icon</a>作为物品图标，这里使用特殊颜色进行替代。<br>再然后添加了一些文字描述，介绍了文字阴影等功能，并添加了一个进度条显示物品耐久。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2023/10/18/SurvivalCraft-DevLog/InventorySlotUI.jpg"
-                      alt="InventorySlot UI" title="InventorySlot UI"
-                ><figcaption>InventorySlot UI</figcaption></figure></p>
-<p>需要注意，对每个组件，在组建名右侧有一个Is Variable选项，勾选它便可以将该组件作为变量在蓝图中进行访问，也就可以通过程序更改组件内容。</p>
-<h3 id="HUD网格容器搭建"><a href="#HUD网格容器搭建" class="headerlink" title="HUD网格容器搭建"></a>HUD网格容器搭建</h3><p>创建用于承载每个物品HUD的网格容器，使其按合理的组织方式呈现在屏幕上</p>
-<p>新组件介绍</p>
+<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>要生成针对HTTP GET请求的响应，大体可以分为一下几部分：</p>
 <ol>
-<li>Scroll Box: 滚动框，可以滚动显示其下的组件，用于在有限空间内显示大量物品</li>
-<li>Uniform Grid Panel: 统一网格面板，可以将其下每个组件按相等的大小排列</li>
+<li><p>从请求中获取请求文件的<code>URL</code>，并以此设置文件路径<br>若为默认<code>URL</code>，则将路径设为默认文件路径；<br>若为指定的<code>URL</code>，则根据<code>URL</code>拼接路径；<br>若<code>URL</code>长度超限，返回生成失败。</p>
+</li>
+<li><p>根据路径打开文件，检查文件权限、大小等信息<br>根据前面解析出的路径尝试获取该文件的<code>stat</code>信息，若获取失败则返回生成失败；<br>比对文件的<code>st_mode</code>，判断其是否为常规媒体类型文件，且用户拥有可读权限，若不符合则返回生成失败；<br>获取文件的<code>st_size</code>，计算其与<code>200 OK</code>响应的长度和是否小于缓冲区长度，若不符合则返回生成失败。</p>
+</li>
+<li><p>将文件内容和<code>200 OK</code>响应拷贝至缓冲区中作为响应<br>打开该文件，打开失败则返回生成失败；<br>清空缓冲区，将<code>200 OK</code>响应拷贝至缓冲区中，再将文件内容拼接至缓冲区中，生成响应。</p>
+</li>
 </ol>
-<p>随后使用蓝图编写逻辑，使游戏开始时在 ItemContainerGrid 中按每行 SlotPerRow 个创建共 TotalSlots 个物品HUD。<br>同时，ItemContainerGrid 被编写为一个通用的网格显示系统，不仅可以显示仓库物品，还可以在后续其他场景中使用，具体种类通过一个enum存储。</p>
-<p>最后，将前面物品HUD中所有信息的可见性设为 hidden，便可以成功创造出一个空的仓库。<br><figure class="image-caption"><img  
+<p>根据以上设计，可以绘制出生成HTTP GET响应的流程图。<br><figure class="image-caption"><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/2023/10/18/SurvivalCraft-DevLog/InventoryGridUI.jpg"
-                      alt="Inventory Grid UI" title="Inventory Grid UI"
-                ><figcaption>Inventory Grid UI</figcaption></figure></p>
-<h3 id="连接库存组件与库存HUD"><a href="#连接库存组件与库存HUD" class="headerlink" title="连接库存组件与库存HUD"></a>连接库存组件与库存HUD</h3><p>这一部分的大致内容是通过蓝图接口(Blue Print Interface)连接前面实现的多个蓝图组件，随后编写了一些接口函数，以及部分中间功能。最终完成了从用户输入到库存HUD的信息传递，实现了按下 1 键就可以在库存中添加一个物品的功能。</p>
-<p>感觉他的编写逻辑很奇怪，函数层层调用，而且也没有做出相应的解释。暂时先跟着做吧，顺便思考一下要不要先学一个更加基础的教程。<br><em><strong>END OF DAY 2</strong></em></p>
-<h1 id="DAY-3"><a href="#DAY-3" class="headerlink" title="DAY 3"></a>DAY 3</h1><h3 id="拖放功能"><a href="#拖放功能" class="headerlink" title="拖放功能"></a>拖放功能</h3><p>实现了仓库中物品的拖拽和放置。<br>有一点小问题，在实现拖拽的时候是直接复制了一个新物品跟随鼠标移动，因此旧物品仍然在原先的物品栏中，视觉上略显奇怪，后面可以适当进行修改。<br>例如，在拖拽的时候先讲原有的物品删除并临时记录，如果放置失败再添加回去。</p>
-<h3 id="Hotbar"><a href="#Hotbar" class="headerlink" title="Hotbar"></a>Hotbar</h3><p>实现了屏幕中下方hotbar的现实。<br><a id="ERROR5">
-  <div class="note p-4 mb-4 rounded-small danger">
-    <p><a class="link"   target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1tg411v7L7?p=27&vd_source=b8a3745f5e89824ea144c46ef4066125" > P27 设置Hotbar小部件</a></p>
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/GET_generate.jpeg"
+                      alt="GET Generate" title="GET响应生成流程"
+                ><figcaption>GET Generate</figcaption></figure></p>
+<h4 id="HEAD响应生成"><a href="#HEAD响应生成" class="headerlink" title="HEAD响应生成"></a>HEAD响应生成</h4><p>HTTP HEAD请求的响应生成与GET类似，只不过在最后生成响应时只需包含<code>200 OK</code>响应的内容即可。<br>因此，容易得到HTTP HEAD响应的流程图如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/HEAD_generate.jpeg"
+                      alt="HEAD Generate" title="HEAD响应生成流程"
+                ><figcaption>HEAD Generate</figcaption></figure></p>
+<h4 id="POST响应生成"><a href="#POST响应生成" class="headerlink" title="POST响应生成"></a>POST响应生成</h4><p>HTTP POST响应的生成则更为简单，根据手册要求，只需将请求echo回客户端即可。而这一功能在Week 1中已经成功实现了，因此此处不再讨论。</p>
+<h3 id="2-服务器响应模块"><a href="#2-服务器响应模块" class="headerlink" title="2. 服务器响应模块"></a>2. 服务器响应模块</h3><p>随后，还需要对Week 1中实现的服务器响应模块进行一定更改，以支持对GET、HEAD、POST请求的分别响应，以及对404、505这两种新错误的响应。<br>此次实验不需要在此模块中定义新的数据结构，因此跳过数据结构设计部分。</p>
+<h5 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>根据实验要求，响应模块总共需要支持7种不同类型的响应，分别如下：</p>
 
-  </div></a></p>
-<p>UI界面存在一些需要在课程资料中下载的贴图，临时用相近的颜色代替，后续补上。</p>
-<p><em><strong>找了一个入门的引擎教程，先把引擎整体学习一遍再继续跟着这个做，或许会更有收获一点</strong></em><br><em><strong>等到寒假把它做完</strong></em></p>
+  <div class="note p-4 mb-4 rounded-small green icon-padding">
+    <i class="note-icon fa-solid fa-square-1"></i><p>HTTP GET 请求</p>
 
+  </div>
+
+  <div class="note p-4 mb-4 rounded-small green icon-padding">
+    <i class="note-icon fa-solid fa-square-2"></i><p>HTTP HEAD 请求</p>
+
+  </div>
+
+  <div class="note p-4 mb-4 rounded-small green icon-padding">
+    <i class="note-icon fa-solid fa-square-3"></i><p>HTTP POST 请求</p>
+
+  </div>
+
+  <div class="note p-4 mb-4 rounded-small green icon-padding">
+    <i class="note-icon fa-solid fa-square-4"></i><p>400 Bad Request 错误</p>
+
+  </div>
+
+  <div class="note p-4 mb-4 rounded-small green icon-padding">
+    <i class="note-icon fa-solid fa-square-5"></i><p>501 Not Implement 错误</p>
+
+  </div>
+
+  <div class="note p-4 mb-4 rounded-small red icon-padding">
+    <i class="note-icon fa-solid fa-square-6"></i><p>404 Not Found 错误</p>
+
+  </div>
+
+  <div class="note p-4 mb-4 rounded-small red icon-padding">
+    <i class="note-icon fa-solid fa-square-7"></i><p>505 Version not supported 错误</p>
+
+  </div>
+<p>对于GET、HEAD、POST请求，响应的主要功能已经实现，只需按照本次实验的要求对其进行分别处理，并通过前面设计的响应生成模块生成对应的响应内容，存储至缓冲区中发送即可；<br>对于400和501错误，前面已经实现，无需更改；<br>对于505错误，要求如下：<br>请求消息解析完成后，将其HTTP版本与服务器支持HTTP版本(<code>HTTP/1.1</code>)进行比对，若版本不匹配，则响应<code>&quot;HTTP/1.1 505 HTTP Version not supported\r\n\r\n&quot;</code>。<br>对于404错误，要求如下：<br>若在GET和HEAD请求的响应生成模块中，对文件进行获取和读入时出现任何错误，导致响应生成失败，程序返回<code>HTTP_FAIL</code>，则响应<code>&quot;HTTP/1.1 404 Not Found\r\n\r\n&quot;</code>。</p>
+<h3 id="3-日志记录模块"><a href="#3-日志记录模块" class="headerlink" title="3. 日志记录模块"></a>3. 日志记录模块</h3><p>最后，还需要按照给定格式记录服务器响应请求的<code>Access Log</code>，和服务器错误的<code>Error Log</code>。此外，也可以根据自己的需求记录相关日志信息，无格式要求。</p>
+<h5 id="数据结构设计-1"><a href="#数据结构设计-1" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>显然，为了顺利记录日志，需要在程序中对文件进行读写操作。在C语言中使用<code>FILE</code>结构即可定义一个文件，因此无需自行定义相关数据结构。<br>随后，还需理清Apache手册中<code>Access Log</code>和<code>Error Log</code>的格式。经过阅读，并按实验的实际情况作出适当调整后，可以得到格式如下。</p>
+<p><b><code>Access Log: IP:Port - frank [Time] &quot;http_method URL http_version&quot; 200 OK body_size</code></b></p>
+<p><b><code>Error Log: [Time] [core:error] [client: IP:Port] error_info</code></b></p>
+<p>注：IP:Port在本实验环境中统一为<code>127.0.0.1:9999</code></p>
+<p>对于<code>Access Log</code>，使用之前分析或定义过的数据结构即可完成日志的生成和写入，无需进一步分析；<br>而对于<code>Error Log</code>，可以发现在其最后需要输出当前错误类型对应的错误信息<code>error_info</code>。由于错误种类较多，错误信息均为字符串，且需考虑到程序对支持其它错误的可扩展性，因此在此可以通过自定义枚举和查找表数据结构来更便捷的生成错误日志。<br>首先，需要设计一个枚举类型，用于存储每种错误类型，形如如下伪代码。</p>
+<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>ERROR TYPE</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">ERROR_TYPE</span> &#123;</span></span><br><span class="line">    ERROR_1,</span><br><span class="line">	ERROR_2,</span><br><span class="line">	ERROR_3,</span><br><span class="line">	......</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+<p>随后，再定义一个字符串数组，按前面枚举类型的顺序依次存储对应的错误信息，形如如下伪代码。</p>
+<div class="highlight-container" data-rel="C"><figure class="iseeu highlight c"><figcaption><span>ERROR INFO TABLE</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> log_error_1[] = Error_Info_1;</span><br><span class="line"><span class="type">char</span> log_error_2[] = Error_Info_2;</span><br><span class="line"><span class="type">char</span> log_error_3[] = Error_Info_3;</span><br><span class="line">......</span><br><span class="line"></span><br><span class="line"><span class="type">char</span>* error_table[] = &#123;</span><br><span class="line">	log_error_1,</span><br><span class="line">	log_error_2,</span><br><span class="line">	log_error_3,</span><br><span class="line">	......</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+<p>如此，便得到了一个错误信息的查找表。通过<code>error_table[ERROR_TYPE]</code>就能得到对应的错误信息，以结构化生成相应的日志记录。同时，可以便捷、快速的扩展新的错误类型，只需为其添加<code>ERROR_TYPE</code>和对应的<code>log_error</code>，并插入至<code>error_table</code>的正确位置即可。</p>
+<h5 id="协议规则设计-2"><a href="#协议规则设计-2" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>在完成日志记录格式和相关数据结构的定义后，很快便能完成对日志模块的设计。只需编写两个日志记录函数，用于参数化写入日志记录，并在需要记录的地方调用即可。此外，对于自定义的日志记录，直接在需要记录处对日志文件进行写入即可。</p>
+<h3 id="4-缓冲区管理"><a href="#4-缓冲区管理" class="headerlink" title="4. 缓冲区管理"></a>4. 缓冲区管理</h3><h5 id="协议设计"><a href="#协议设计" class="headerlink" title="协议设计"></a>协议设计</h5><p>实验手册中要求对缓冲区进行合理的管理，以避免通信过程中出现缓冲区溢出错误。按照手册要求，共有3种潜在的缓冲区溢出风险。</p>
+
+  <div class="note p-4 mb-4 rounded-small green icon-padding">
+    <i class="note-icon fa-solid fa-square-1"></i><p>URL长度超限</p>
+
+  </div>
+
+  <div class="note p-4 mb-4 rounded-small green icon-padding">
+    <i class="note-icon fa-solid fa-square-2"></i><p>响应内容长度超限</p>
+
+  </div>
+
+  <div class="note p-4 mb-4 rounded-small red icon-padding">
+    <i class="note-icon fa-solid fa-square-3"></i><p>请求头部长度超限</p>
+
+  </div>
+<p>对于前两种情况，在先前的设计中已经进行了相关的设计和说明，不再赘述。因此此处只对请求头部长度超限的情况进行设计。<br>根据要求，请求头部大小应不超过8192字节。</p>
+<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><h3 id="1-响应生成模块-1"><a href="#1-响应生成模块-1" class="headerlink" title="1. 响应生成模块"></a>1. 响应生成模块</h3><h3 id="2-服务器响应模块-1"><a href="#2-服务器响应模块-1" class="headerlink" title="2. 服务器响应模块"></a>2. 服务器响应模块</h3><h3 id="3-日志记录模块-1"><a href="#3-日志记录模块-1" class="headerlink" title="3. 日志记录模块"></a>3. 日志记录模块</h3><p>其中，<code>Access Log</code>记录函数中应使用<code>Request</code>结构体获取请求中的<code>http_method</code>、<code>http_uri</code>、<code>http_version</code>等信息；而<code>Error Log</code>记录函数中只需传入对应的<code>ERROR_TYPE</code>，便可以完成日志记录的生成。</p>
+<h3 id="4-缓冲区管理-1"><a href="#4-缓冲区管理-1" class="headerlink" title="4. 缓冲区管理"></a>4. 缓冲区管理</h3>
         </div>
 
         
             <div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
                 <div class="article-copyright-info-container">
     <ul>
-        <li><strong>Title:</strong> SurvivalCraft DevLog</li>
+        <li><strong>Title:</strong> Socket编程记录-Week2</li>
         <li><strong>Author:</strong> 梦猫</li>
         <li><strong>Created at
-                :</strong> 2023-10-18 14:20:43</li>
+                :</strong> 2024-05-22 11:57:57</li>
         
             <li>
                 <strong>Updated at
-                    :</strong> 2024-05-14 23:55:41
+                    :</strong> 2024-05-24 13:42:08
             </li>
         
         <li>
-            <strong>Link:</strong> https://mengmaor.github.io/2023/10/18/SurvivalCraft-DevLog/
+            <strong>Link:</strong> https://mengmaor.github.io/2024/05/22/Socket编程记录-Week2/
         </li>
         <li>
             <strong>
@@ -861,7 +922,7 @@
             <ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
                 
                     <li class="tag-item mx-0.5">
-                        <a href="/tags/game-Deving/">#game Deving</a>&nbsp;
+                        <a href="/tags/TJU-CS-Lab/">#TJU CS Lab</a>&nbsp;
                     </li>
                 
             </ul>
@@ -873,27 +934,27 @@
     <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
     </div>
-    <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/19/转智算机试直通车-1/" title="转智算机试直通车-1" rel="bookmark">
-  <img src="/cover/CIC.jpg" alt="转智算机试直通车-1" class="!max-w-none">
-  <span class="title">转智算机试直通车-1</span>
-</a><a class="recommended-article-item" href="/2024/05/15/Socket编程记录-Week1/" title="Socket编程日志 Week1" rel="bookmark">
+    <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/15/Socket编程记录-Week1/" title="Socket编程日志 Week1" rel="bookmark">
   <img src="/cover/Socket.jpg" alt="Socket编程日志 Week1" class="!max-w-none">
   <span class="title">Socket编程日志 Week1</span>
-</a><a class="recommended-article-item" href="/2024/05/08/产生式动物识别系统/" title="AI Lab1: 产生式动物识别系统" rel="bookmark">
-  <img src="/cover/AI-Lab.jpg" alt="AI Lab1: 产生式动物识别系统" class="!max-w-none">
-  <span class="title">AI Lab1: 产生式动物识别系统</span>
+</a><a class="recommended-article-item" href="/2024/05/19/转智算机试直通车-1/" title="转智算机试直通车-1" rel="bookmark">
+  <img src="/cover/CIC.jpg" alt="转智算机试直通车-1" class="!max-w-none">
+  <span class="title">转智算机试直通车-1</span>
+</a><a class="recommended-article-item" href="/2024/05/14/启发式搜索/" title="AI Lab2: 启发式搜索" rel="bookmark">
+  <img src="/cover/AI-Lab.jpg" alt="AI Lab2: 启发式搜索" class="!max-w-none">
+  <span class="title">AI Lab2: 启发式搜索</span>
 </a></div>
    </div>
    <div class="recommended-mobile">
    <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
      <i aria-hidden="true"></i><span>推荐阅读</span>
    </div>
-   <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/19/转智算机试直通车-1/" title="转智算机试直通车-1" rel="bookmark">
-  <img src="/cover/CIC.jpg" alt="转智算机试直通车-1" class="!max-w-none">
-  <span class="title">转智算机试直通车-1</span>
-</a><a class="recommended-article-item" href="/2024/05/15/Socket编程记录-Week1/" title="Socket编程日志 Week1" rel="bookmark">
+   <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/15/Socket编程记录-Week1/" title="Socket编程日志 Week1" rel="bookmark">
   <img src="/cover/Socket.jpg" alt="Socket编程日志 Week1" class="!max-w-none">
   <span class="title">Socket编程日志 Week1</span>
+</a><a class="recommended-article-item" href="/2024/05/19/转智算机试直通车-1/" title="转智算机试直通车-1" rel="bookmark">
+  <img src="/cover/CIC.jpg" alt="转智算机试直通车-1" class="!max-w-none">
+  <span class="title">转智算机试直通车-1</span>
 </a></div>
    </div>
   </div>
@@ -901,29 +962,14 @@
         
             <div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
                 
-                    <div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-                        <a class="prev"
-                        rel="prev"
-                        href="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/"
-                        >
-                            <span class="left arrow-icon flex justify-center items-center">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </span>
-                            <span class="title flex justify-center items-center">
-                                <span class="post-nav-title-item">AI Lab1: 产生式动物识别系统</span>
-                                <span class="post-nav-item">Prev posts</span>
-                            </span>
-                        </a>
-                    </div>
-                
                 
                     <div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
                         <a class="next"
                         rel="next"
-                        href="/2023/09/15/tjuoj-4441-%E5%90%88%E5%B9%B6%E6%9E%9C%E5%AD%90%EF%BC%88%E5%A0%86%EF%BC%89/"
+                        href="/2024/05/19/%E8%BD%AC%E6%99%BA%E7%AE%97%E6%9C%BA%E8%AF%95%E7%9B%B4%E9%80%9A%E8%BD%A6-1/"
                         >
                             <span class="title flex justify-center items-center">
-                                <span class="post-nav-title-item">TJUOJ 4441: 合并果子（堆）</span>
+                                <span class="post-nav-title-item">转智算机试直通车-1</span>
                                 <span class="post-nav-item">Next posts</span>
                             </span>
                             <span class="right arrow-icon flex justify-center items-center">
@@ -944,8 +990,8 @@
             <div class="post-toc-wrap">
     <div class="post-toc">
         <div class="toc-title">On this page</div>
-        <div class="page-title">SurvivalCraft DevLog</div>
-        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%BC%80%E5%A4%B4"><span class="nav-text">写在开头</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Day-1"><span class="nav-text">Day 1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E8%87%AA%E5%AE%9A%E4%B9%89%E8%A7%92%E8%89%B2%E6%90%AD%E5%BB%BA"><span class="nav-text">初始自定义角色搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%93%E5%BA%93%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E7%B3%BB%E7%BB%9F%E6%90%AD%E5%BB%BA"><span class="nav-text">仓库物品信息系统搭建</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DAY-2"><span class="nav-text">DAY 2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%93%E5%BA%93HUD%E7%95%8C%E9%9D%A2%E6%90%AD%E5%BB%BA"><span class="nav-text">仓库HUD界面搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%A9%E5%93%81HUD%E6%90%AD%E5%BB%BA"><span class="nav-text">物品HUD搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HUD%E7%BD%91%E6%A0%BC%E5%AE%B9%E5%99%A8%E6%90%AD%E5%BB%BA"><span class="nav-text">HUD网格容器搭建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E5%BA%93%E5%AD%98%E7%BB%84%E4%BB%B6%E4%B8%8E%E5%BA%93%E5%AD%98HUD"><span class="nav-text">连接库存组件与库存HUD</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DAY-3"><span class="nav-text">DAY 3</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%96%E6%94%BE%E5%8A%9F%E8%83%BD"><span class="nav-text">拖放功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hotbar"><span class="nav-text">Hotbar</span></a></li></ol></li></ol></li></ol>
+        <div class="page-title">Socket编程记录-Week2</div>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AE%9E%E9%AA%8C%E6%A6%82%E8%A6%81"><span class="nav-text">一、实验概要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%8D%8F%E8%AE%AE%E8%AE%BE%E8%AE%A1"><span class="nav-text">二、协议设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%93%8D%E5%BA%94%E7%94%9F%E6%88%90%E6%A8%A1%E5%9D%97"><span class="nav-text">1. 响应生成模块</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GET%E5%93%8D%E5%BA%94%E7%94%9F%E6%88%90"><span class="nav-text">GET响应生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HEAD%E5%93%8D%E5%BA%94%E7%94%9F%E6%88%90"><span class="nav-text">HEAD响应生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#POST%E5%93%8D%E5%BA%94%E7%94%9F%E6%88%90"><span class="nav-text">POST响应生成</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%93%8D%E5%BA%94%E6%A8%A1%E5%9D%97"><span class="nav-text">2. 服务器响应模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%97%A5%E5%BF%97%E8%AE%B0%E5%BD%95%E6%A8%A1%E5%9D%97"><span class="nav-text">3. 日志记录模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%BC%93%E5%86%B2%E5%8C%BA%E7%AE%A1%E7%90%86"><span class="nav-text">4. 缓冲区管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0"><span class="nav-text">三、协议实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%93%8D%E5%BA%94%E7%94%9F%E6%88%90%E6%A8%A1%E5%9D%97-1"><span class="nav-text">1. 响应生成模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%93%8D%E5%BA%94%E6%A8%A1%E5%9D%97-1"><span class="nav-text">2. 服务器响应模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%97%A5%E5%BF%97%E8%AE%B0%E5%BD%95%E6%A8%A1%E5%9D%97-1"><span class="nav-text">3. 日志记录模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%BC%93%E5%86%B2%E5%8C%BA%E7%AE%A1%E7%90%86-1"><span class="nav-text">4. 缓冲区管理</span></a></li></ol></li></ol>
 
     </div>
 </div>
@@ -982,7 +1028,7 @@
                     </span>
                     
                         <span>
-                            12k words in total
+                            12.7k words in total
                         </span>
                     
                 </p>
