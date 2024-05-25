@@ -336,7 +336,64 @@
 <h3 id="4-缓冲区管理-1"><a href="#4-缓冲区管理-1" class="headerlink" title="4. 缓冲区管理"></a>4. 缓冲区管理</h3><p>前面提到过，如果在接收HTTP请求消息后发现请求头部过长（超过<code>8192</code>字节），则不对其进行词法分析，直接返回400错误。因此，应在接收消息后、词法分析前对消息的长度进行判断，并决定是否响应400错误。<br>在框架代码中，<code>readret</code>用于存储读取到的文件长度，而<code>BUF_SIZE</code>则存储了缓冲区的最大长度（<code>8192</code>），因此容易写出此部分的伪代码如下。</p>
 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Check File Size</span></figcaption><table><tr><td class="code"><pre><span class="line">WHILE(...)	// 框架函数中接收消息的循环</span><br><span class="line">	IF readret &gt;= BUF_SIZE</span><br><span class="line">		THEN answer 400 Bad Request		// 使用服务器响应模块的对应功能实现</span><br><span class="line">		BREAK WHILE		// 跳出消息读取循环，等待接收下一次请求</span><br><span class="line">	END IF</span><br></pre></td></tr></table></figure></div>
 <p>由此，就能成功对长度超限的请求报错，以避免出现缓冲区溢出错误。</p>
-<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2>]]></content>
+<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><p>根据功能要求，分别需要对<code>GET</code>、<code>HEAD</code>、<code>POST</code>请求进行测试，对<code>400</code>、<code>404</code>、<code>501</code>、<code>505</code>四种错误进行测试，以及对因请求头部过长而产生的<code>400</code>错误进行测试，并查看是否正确生成了相应的日志记录。<br>各部分测试结果如下：</p>
+<h5 id="GET-HEAD-POST请求"><a href="#GET-HEAD-POST请求" class="headerlink" title="GET&#x2F;HEAD&#x2F;POST请求"></a>GET&#x2F;HEAD&#x2F;POST请求</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/get.jpeg"
+                      alt="HTTP GET" title="HTTP GET请求"
+                ><figcaption>HTTP GET</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/head.jpeg"
+                      alt="HTTP HEAD" title="HTTP HEAD请求"
+                ><figcaption>HTTP HEAD</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/post.jpeg"
+                      alt="HTTP POST" title="HTTP POST请求"
+                ><figcaption>HTTP POST</figcaption></figure></p>
+<h5 id="四种错误请求"><a href="#四种错误请求" class="headerlink" title="四种错误请求"></a>四种错误请求</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/400.jpeg"
+                      alt="400 ERROR" title="400报错"
+                ><figcaption>400 ERROR</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/404.jpeg"
+                      alt="404 ERROR" title="404报错"
+                ><figcaption>404 ERROR</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/501.jpeg"
+                      alt="501 ERROR" title="501报错"
+                ><figcaption>501 ERROR</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/505.jpeg"
+                      alt="505 ERROR" title="505报错"
+                ><figcaption>505 ERROR</figcaption></figure></p>
+<h5 id="请求头部超限的请求"><a href="#请求头部超限的请求" class="headerlink" title="请求头部超限的请求"></a>请求头部超限的请求</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/too_large.jpeg"
+                      alt="Request Too Large" title="请求头部超限"
+                ><figcaption>Request Too Large</figcaption></figure></p>
+<h5 id="日志记录"><a href="#日志记录" class="headerlink" title="日志记录"></a>日志记录</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/log.jpeg"
+                      alt="Log" title="日志记录"
+                ><figcaption>Log</figcaption></figure></p>
+<h5 id="Autolab测试"><a href="#Autolab测试" class="headerlink" title="Autolab测试"></a>Autolab测试</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/autolab.jpeg"
+                      alt="Autolab" title="Autolab 自动测试结果"
+                ><figcaption>Autolab</figcaption></figure></p>
+<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>了解并实践了如何根据请求查找服务器中的文件，并按正确的格式为客户端发送响应，对网络通信有了更清晰的认识；同时，新增了对404和505两种错误类型的判断和响应，为服务器添加了更多功能；在响应过程中涉及到许多对缓冲区的操作，对缓冲区管理有了更好的掌握；新增了日志模块，了解了如何通过日志记录服务器所执行的各种操作，对分析程序行为有很大帮助。</p>
+]]></content>
       <categories>
         <category>计算机网络课程设计</category>
       </categories>
