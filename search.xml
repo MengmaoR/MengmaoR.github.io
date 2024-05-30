@@ -707,6 +707,69 @@
       </tags>
   </entry>
   <entry>
+    <title>Socket编程记录-Week3</title>
+    <url>/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/</url>
+    <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第三周实验只需实现一个重要的功能：HTTP pipeline。<br>具体来说，服务器需要按照RFC2616规定的顺序处理HTTP的并发请求。同时，对于错误的请求，服务器响应错误后不会影响后续消息的响应。</p>
+<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h3 id="1-Pipeline模块"><a href="#1-Pipeline模块" class="headerlink" title="1. Pipeline模块"></a>1. Pipeline模块</h3><p>首先，根据RFC2616的规定，应先处理先到达的请求，后处理后达到的请求。而在实验的环境中，体现为先处理整体请求输入中最靠前的请求，再逐个向后进行处理。<br>下面对此模块进行设计。</p>
+<h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>在第一周实验中，给出过HTTP请求的结构如下所示。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/HTTPRequest.jpeg"
+                      alt="HTTP Request" title="HTTP 请求报文结构"
+                ><figcaption>HTTP Request</figcaption></figure><br>由于在本实验中所支持的请求均不包含请求数据的部分，因此在服务器处理至最后的回车符和换行符后即可认为一个请求已经结束。经过观察容易发现，在请求报文的最后会出现<code>&quot;\r\n\r\n&quot;</code>这一特殊字符串，且在请求报文的其它地方均不会出现此字符串，因此可将其作为检测不同请求的分隔符，来对不同的请求报文进行区分。</p>
+<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>在清楚了如何识别不同请求报文的分隔符后，只需简单的根据分隔符将所有请求拆分开，再对每个请求进行响应即可。在对消息进行拆分时，应按如下步骤进行。</p>
+<ol>
+<li>读取全部请求报文，从头开始进行拆分；</li>
+<li>记录当前的处理位置，若超出报文长度则代表拆分完毕；</li>
+<li>通过串匹配算法匹配未处理串中第一个分隔符的末尾位置，即为当前请求的结束位置；</li>
+<li>计算匹配长度；</li>
+<li>根据匹配长度提取当前请求，并传入服务器响应模型进行响应；</li>
+<li>更新当前处理位置为请求结束位置</li>
+<li>循环处理直至拆分完毕。</li>
+</ol>
+<p>根据以上设计，可以绘制拆分流程图如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/separate.jpeg"
+                      alt="Pipeline Separate" title="Pipeline请求拆分流程图"
+                ><figcaption>Pipeline Separate</figcaption></figure></p>
+<h3 id="2-客户端接收模块"><a href="#2-客户端接收模块" class="headerlink" title="2. 客户端接收模块"></a>2. 客户端接收模块</h3><p>需要注意，由于在先前框架代码的设计中，客户端每发送一次请求报文只会接受一个响应，而在本次实验中服务器会尝试发送多个响应。因此还需要对客户端程序进行一定修改，使其支持对多个响应的连续接收。</p>
+<h5 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>这部分的设计比较简单，只需将框架代码中接收响应的模块放在一个循环结构中，每接收到一个合法响应便输出即可。</p>
+<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><h3 id="1-Pipeline模块-1"><a href="#1-Pipeline模块-1" class="headerlink" title="1. Pipeline模块"></a>1. Pipeline模块</h3><p>在对Pipeline模块进行实现时，除去对前述流程的实现外，缓冲区的管理也是一个比较重要的问题。<br>本模块的处理过程中需要存储三部分内容：全部请求报文、单次请求报文和单次请求的响应。因此，可以设置3个不同的缓冲区：<code>buf_all</code>、<code>buf_recv</code>、<code>buf_send</code>，分别存储上述三种数据。也正因此，本次实验中还需对原先的服务器响应模块进行部分修改，以匹配新的缓冲区设计。<br>根据前面的流程图和对缓冲区的新设计，可以得到Pipeline模块的伪代码如下：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Pipeline Module</span></figcaption><table><tr><td class="code"><pre><span class="line">BUFFER buf_all, buf_recv, buf_send</span><br><span class="line">sep = &quot;\r\n\r\n&quot;</span><br><span class="line"></span><br><span class="line">RECV FROM CLIENT TO buf_all</span><br><span class="line">WHILE start_loc &lt; buf_all.length</span><br><span class="line">    end_loc = MATCH sep END CHAR IN buf_all + start_loc</span><br><span class="line">    length = end_loc - start_loc + 1</span><br><span class="line"></span><br><span class="line">    IF length &gt; left_length</span><br><span class="line">        THEN BREAK</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    COPY buf_all FROM start_loc TO end_loc INTO buf_recv</span><br><span class="line">    start_loc += length</span><br><span class="line"></span><br><span class="line">    CALL SERVER ANSWEERING MODULE</span><br><span class="line">        SAVE ANSWER IN buf_send</span><br><span class="line">        SEND buf_send</span><br><span class="line">    END CALL</span><br><span class="line">END WHILE</span><br></pre></td></tr></table></figure></div>
+<p>由此便可完成Pipeline模块的实现。</p>
+<h3 id="2-客户端接收模块-1"><a href="#2-客户端接收模块-1" class="headerlink" title="2. 客户端接收模块"></a>2. 客户端接收模块</h3><p>此模块的实现只需在框架代码上进行少量更改即可。框架代码可以用如下伪代码表示。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Client Recv Old</span></figcaption><table><tr><td class="code"><pre><span class="line">IF RECV FROM SERVER TO buf AND buf.length &gt; 1</span><br><span class="line">    THEN PRINT buf</span><br></pre></td></tr></table></figure></div>
+<p>在此只需将<code>if</code>判断语句更改为<code>while</code>循环语句，并进行一些细节上的匹配即可。更改后可以用如下伪代码表示。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Client Recv New</span></figcaption><table><tr><td class="code"><pre><span class="line">WHILE RECV FROM SERVER TO buf AND buf.length &gt; 1</span><br><span class="line">    THEN PRINT buf</span><br></pre></td></tr></table></figure></div>
+<p>至此，可以完成对客户端接收多个响应功能的实现。</p>
+<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><h5 id="本地测试"><a href="#本地测试" class="headerlink" title="本地测试"></a>本地测试</h5><p>框架代码中给出了一个可用于测试的<code>request_pipeline</code>文件，本次实验实现的程序也可以对该测试文件得到正确的结果。但该文件内容较长，不易于展示，因此这里自行编写一个较为简单的测试文件<code>sample_pipeline</code>，其中包含3个连续的HTTP请求，分别为未实现请求，格式错误的请求，以及<code>HTTP GET</code>请求，以此验证服务器能否正确拆分并响应请求，且对错误请求的处理不会影响后续请求的处理。<br>测试结果如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/test.jpeg"
+                      alt="Test Result" title="本地测试结果"
+                ><figcaption>Test Result</figcaption></figure><br>可以看到，服务器对每个请求都进行了正确的响应，且响应顺序正确。<br>此外，根据日志记录也可以看出，服务器对每个拆分出的请求都生成并发送了正确的响应。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/log.jpeg"
+                      alt="Log Recorded" title="响应日志记录"
+                ><figcaption>Log Recorded</figcaption></figure></p>
+<h5 id="Autolab测试"><a href="#Autolab测试" class="headerlink" title="Autolab测试"></a>Autolab测试</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/autolab.jpeg"
+                      alt="Autolab" title="Autolab 自动测试结果"
+                ><figcaption>Autolab</figcaption></figure></p>
+<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>了解并成功实现了对连续HTTP请求的拆分和分别处理，对HTTP请求的结构有了更进一步的认识；加深了对缓冲区管理的意识和了解程度，明白了某些复杂功能需要基于良好的缓冲区设计；更深入的理解了客户端和服务器间的通信方式，并成功实现了客户端对多个连续响应的接收和打印。</p>
+]]></content>
+      <categories>
+        <category>计算机网络课程设计</category>
+      </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>about</title>
     <url>/about/index.html</url>
     <content><![CDATA[<h1 id="WELCOME-TO-MY-BLOG"><a href="#WELCOME-TO-MY-BLOG" class="headerlink" title="WELCOME TO MY BLOG"></a>WELCOME TO MY BLOG</h1><h3 id="BY-MENGMAO-REINE"><a href="#BY-MENGMAO-REINE" class="headerlink" title="BY MENGMAO REINE"></a>BY MENGMAO REINE</h3><h5 id="天津大学CS本科在读，随机掉落一些课程实验记录、算法笔记和旅拍照片。"><a href="#天津大学CS本科在读，随机掉落一些课程实验记录、算法笔记和旅拍照片。" class="headerlink" title="天津大学CS本科在读，随机掉落一些课程实验记录、算法笔记和旅拍照片。"></a>天津大学CS本科在读，随机掉落一些课程实验记录、算法笔记和旅拍照片。</h5><p>如果你想看一些实验记录 <a href="https://mengmaor.github.io/tags/TJU-CS-Lab/">Click here</a><br>如果你想看一些算法笔记 <a href="https://mengmaor.github.io/categories/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">Click here</a><br>如果你想转入智算 <a href="https://mengmaor.github.io/categories/%E8%BD%AC%E6%99%BA%E7%AE%97%E6%9C%BA%E8%AF%95%E7%9B%B4%E9%80%9A%E8%BD%A6/">Click here</a><br>如果你想看我的旅拍记忆 <a href="https://mengmaor.github.io/masonry/">Click here</a></p>
