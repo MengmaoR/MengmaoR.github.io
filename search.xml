@@ -238,7 +238,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Socket编程记录-Week2</title>
+    <title>Socket编程日志 Week2</title>
     <url>/2024/05/22/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week2/</url>
     <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第二周需要实现的功能模块主要有以下几部分。</p>
 
@@ -465,7 +465,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Socket编程记录-Week3</title>
+    <title>Socket编程日志 Week3</title>
     <url>/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/</url>
     <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第三周实验只需实现一个重要的功能：HTTP pipeline。<br>具体来说，服务器需要按照RFC2616规定的顺序处理HTTP的并发请求。同时，对于错误的请求，服务器响应错误后不会影响后续消息的响应。</p>
 <h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h3 id="1-Pipeline模块"><a href="#1-Pipeline模块" class="headerlink" title="1. Pipeline模块"></a>1. Pipeline模块</h3><p>首先，根据RFC2616的规定，应先处理先到达的请求，后处理后达到的请求。而在实验的环境中，体现为先处理整体请求输入中最靠前的请求，再逐个向后进行处理。<br>下面对此模块进行设计。</p>
@@ -767,6 +767,94 @@
       </categories>
       <tags>
         <tag>algorithem</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Socket编程记录-Week4</title>
+    <url>/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/</url>
+    <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第四周实验中，需要让服务器在等待一个客户端发送下一个请求时，能够同时处理来自其它客户端的请求，进而实现对多个并发的客户端的同时处理。<br>具体而言，并发处理需要通过select()方法实现，并支持最多1024个并发连接。<br>此外，如果某些客户端在通信过程中“暂停”，或是出现错误，服务器应不受该客户端影响，继续为其它客户端提供服务。</p>
+<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>在本次实验中，要求使用select()方法实现并发处理。select是一个用于监听文件状态的函数，函数会阻塞进程并持续监听所有文件描述符编号小于其首个参数<code>MAX_FD</code>的文件描述符，直至某些文件描述符状态发生改变，例如某文件进入“读就绪”状态，函数便会返回就绪文件的数量，并将改变的文件描述符<code>fd</code>加入其第二个参数<code>READ_FD_SET</code>(可读文件描述符集合)。而在实验中，每个客户端和服务器的<code>socket</code>也是一个可读文件，因此通过select函数监听所有新增的可读文件便可以接收到所有发送请求的客户端socket。</p>
+<p>同时，还需要了解<code>fd_set</code>结构体的组织方式和相关操作，以便后续的设计和实现。<code>fd_set</code>以位图的形式存储了一个文件描述符集合的某种状态，每一位均对应一个文件描述符，而该位的<code>0/1</code>值便对应着该文件描述符的特定状态情况。由此，只需不断通过select方法监听客户端和服务器socket的状态集合，再遍历集合来检查每个客户端socket是否活跃，即可得到所有与服务器建立并发连接的客户端socket的文件描述符。</p>
+<p>此外，为了正确的与客户端建立连接并通信，还需要组织一个socket数组，用于储存所有经过前述步骤，与服务器建立连接的客户端socket。至此，就能顺利得到所有与服务器建立并发连接的客户端socket，进而可以对其请求进行处理和响应。</p>
+<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>在掌握了以上结构的定义后，便可以按如下步骤来对并发的客户端请求进行接收、管理和响应：</p>
+<ol>
+<li>使用select方法监听客户端和服务器fd；</li>
+<li>获取活跃fd，据此获得待连接客户端socket的fd，并加入已连接fd_set中；</li>
+<li>根据已连接fd_set中的fd获取所有已连接客户端socket，并组织一个在socket集合中；</li>
+<li>遍历socket集合，对每个客户端接收并响应一次请求，并将其移出连接集合；</li>
+<li>循环执行上述步骤，不断连接并逐个响应所有发送请求的客户端，以此实现并发处理的效果。</li>
+</ol>
+<p>根据以上设计，可以得到并发处理模块的处理流程图如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/multi.jpeg"
+                      alt="Multi-Client Answering" title="多客户端并发响应流程图"
+                ><figcaption>Multi-Client Answering</figcaption></figure></p>
+<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><p>为了实现前面的协议设计，还需要清楚如何正确的对<code>fd_set</code>进行管理。在本实验环境中，可以通过宏定义来进行，以下是此次实验中使用到的部分宏定义。</p>
+<ol>
+<li>FD_ZERO(&amp;fd_set): 将集合中所有fd状态清零（设为不活跃）;</li>
+<li>FD_SET(fd, &amp;fd_set): 设置fd在集合中的状态为活跃;</li>
+<li>FD_CLR(fd, &amp;fd_set): 将fd在集合中的状态清零;</li>
+<li>FD_ISSET(fd, &amp;fd_set): 检查fd在集合中状态是否活跃，若活跃返回1，否则返回0。</li>
+</ol>
+<p>此外，还需注意将socket集合大小设为1024，并在将已连接客户端socket加入socket集合时判断客户端数量是否超限，以满足实验对最大连接数为1024的要求。</p>
+<p>由此，就可以根据流程图编写伪代码，并成功实现客户端并发处理模块。伪代码如下。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Multi-Client Answering</span></figcaption><table><tr><td class="code"><pre><span class="line">fd_set ready_set, pos_set</span><br><span class="line">int client_set[1024]</span><br><span class="line"></span><br><span class="line">CLEAR ready_set</span><br><span class="line">CLEAR pos_set</span><br><span class="line">ADD server_fd TO ready_set</span><br><span class="line">SET ALL client_set[i] = -1</span><br><span class="line"></span><br><span class="line">LOOP</span><br><span class="line">    COPY ready_set TO pos_set</span><br><span class="line">    CALL select, SET client_num, pos_set</span><br><span class="line">    IF client_num &lt; 0</span><br><span class="line">        select ERROR</span><br><span class="line">        BREAK LOOP</span><br><span class="line">    ELSE IF client_num == 0</span><br><span class="line">        WAIT</span><br><span class="line">        CONTINUE LOOP</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    IF server_fd IS IN pos_set</span><br><span class="line">        THEN ACCEPT client_socket</span><br><span class="line">            FIND -1 IN client_set</span><br><span class="line">                ADD client_socket TO client_set</span><br><span class="line">                ADD client_fd TO ready_set</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    FOR EACH socket IN client_set</span><br><span class="line">        RECV REQUEST AND ANSWER</span><br><span class="line">        IF ANY ERROR</span><br><span class="line">            THEN CLOSE socket</span><br><span class="line">                CONTINUE</span><br><span class="line">        END IF</span><br><span class="line">        CLOSE socket</span><br><span class="line">        REMOVE fd FROM ready_set</span><br><span class="line">        REMOVE socket FROM client_set</span><br><span class="line">END LOOP</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><p>本次实验的本地测试和结果分析部分要求使用Apache Bench来进行性能测试，并同时对第三周的部分进行测试，通过比较分析本次实验实现模块的作用。</p>
+<h5 id="AB测试"><a href="#AB测试" class="headerlink" title="AB测试"></a>AB测试</h5><p>根据实验要求，使用Apache Bench测试在1000个HTTP请求下第三和第四周程序的响应时间。同时，分别使用10，100，1000个客户端并行发送请求，以体现支持多客户端并行后的特点。</p>
+<ol>
+<li><p>10个客户端并行<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-3.jpeg"
+                      alt="10 Week 3" title="第三周程序性能"
+                ><figcaption>10 Week 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-4.jpeg"
+                      alt="10 Week 4" title="第四周程序性能"
+                ><figcaption>10 Week 4</figcaption></figure></p>
+</li>
+<li><p>100个客户端并行<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-3.jpeg"
+                      alt="100 Week 3" title="第三周程序性能"
+                ><figcaption>100 Week 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-4.jpeg"
+                      alt="100 Week 4" title="第四周程序性能"
+                ><figcaption>100 Week 4</figcaption></figure></p>
+</li>
+<li><p>1000个客户端并行<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-3.jpeg"
+                      alt="1000 Week 3" title="第三周程序性能"
+                ><figcaption>1000 Week 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-4.jpeg"
+                      alt="1000 Week 4" title="第四周程序性能"
+                ><figcaption>1000 Week 4</figcaption></figure></p>
+</li>
+</ol>
+<h5 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h5><p>从响应时间可以发现，在整体请求数量为1000的情况下，支持多客户端并发处理的程序性能上的整体表现其实弱于仅支持pipeline的程序。这可能是由于在为每个客户端建立连接时需要大量循环扫描socket集合，以寻找空位存储该客户端socket。同时，并发处理模块对每个客户端都采用仅接收一次请求就关闭连接，等待后续有请求时再建立连接的连接方式，而非为每个客户端建立持久连接，如此频繁的建立和断开连接也会大量较大的时间开销。<br>但值得注意的是，随着并发客户端数量的上升，第四周程序和第三周程序间的差距在不断缩小，第四周的性能表现也逐渐变好。因此，在更大规模的HTTP请求和并发客户端（超过实验要求的1024个客户端连接）的情况下，可以推测支持并发处理模块的程序最终会体现出更好的性能，这也是为什么在实际应用场景（请求数量和客户端数量通常远大于实验测试的规模）中通常都会采用支持客户端并发处理的服务器设计。</p>
+<h5 id="Autolab测试"><a href="#Autolab测试" class="headerlink" title="Autolab测试"></a>Autolab测试</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/autolab.jpeg"
+                      alt="Autolab" title="Autolab 自动测试结果"
+                ><figcaption>Autolab</figcaption></figure></p>
+<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>了解并初步掌握了select方法；对fd和fd_set有了更好的掌握，并更深入的理解了socket的结构和处理方式；了解并实践了如何接收并存储多个客户端socket连接，并据此实现了对客户端请求的并发处理；通过测试和分析明白了客户端并行处理模块对服务器性能带来的影响，以及并发处理技术和pipeline技术各自的适用场景。</p>
+]]></content>
+      <categories>
+        <category>计算机网络课程设计</category>
+      </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
       </tags>
   </entry>
   <entry>

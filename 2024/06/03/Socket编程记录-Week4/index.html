@@ -13,20 +13,32 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="http://mengmaor.github.io/tags/test/"/>
+    <link rel="canonical" href="http://mengmaor.github.io/2024/06/03/socket编程记录-week4/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
     
-        <meta name="description" content="Welcome to my blog">
-<meta property="og:type" content="website">
-<meta property="og:title" content="MENGMAO&#39;S BLOG">
-<meta property="og:url" content="http://mengmaor.github.io/tags/test/index.html">
+        <meta name="description" content="false">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Socket编程记录-Week4">
+<meta property="og:url" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/index.html">
 <meta property="og:site_name" content="MENGMAO&#39;S BLOG">
-<meta property="og:description" content="Welcome to my blog">
+<meta property="og:description" content="false">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/multi.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-3.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-4.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-3.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-4.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-3.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-4.jpeg">
+<meta property="og:image" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/autolab.jpeg">
+<meta property="article:published_time" content="2024-06-03T09:32:32.000Z">
+<meta property="article:modified_time" content="2024-06-03T17:35:17.640Z">
 <meta property="article:author" content="梦猫">
+<meta property="article:tag" content="TJU CS Lab">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://mengmaor.github.io/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/multi.jpeg">
     
     
         <!-- Google tag (gtag.js) -->
@@ -48,7 +60,7 @@
     
     <title>
         
-            Tag: test -
+            Socket编程记录-Week4 -
         
         MENGMAO&#39;S BLOG
     </title>
@@ -634,46 +646,301 @@
             <div class="main-content">
 
                 
-                    <div class="tag-container">
-	<div class="tag-name">
-		<i class="fa-solid fa-tag"></i>&nbsp;test
-	</div>
-	<div class="tag-post-list">
-		
+                    <div class="post-page-container flex relative justify-between box-border w-full h-full">
+    <div class="article-content-container">
 
-<div class="archive-list-container">
-    
-        <section class="archive-item mb-spacing-unit last:mb-0">
-            <div class="archive-item-header flex flex-row items-center mb-2">
-                <span class="archive-year font-semibold text-3xl mr-2">2023</span>
-                <span class="archive-year-post-count text-xs md:text-sm font-bold rounded-small bg-third-background-color py-[2px] px-[10px] border border-border-color">1</span>
+        <div class="article-title relative w-full">
+            
+                
+                
+                <img src="/cover/Socket.jpg" alt="Socket编程记录-Week4" class="w-full h-60 sm:h-72 md:h-80 object-cover sm:rounded-t-large dark:brightness-75"/>
+                
+                <div class="w-full flex items-center absolute bottom-0 justify-start">
+                    <h1 class="article-title-cover text-center mx-6 my-6 text-second-text-color bg-background-color-transparent px-4 py-3 text-3xl sm:text-4xl md:text-5xl font-bold backdrop-blur-lg rounded-xl border border-border-color ">Socket编程记录-Week4</h1>
+                </div>
+            
             </div>
-            <ul class="article-list pl-0 md:pl-8 text-lg leading-[1.5]">
-              
+
+        
+            <div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+                <div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+                    <img src="/images/favicon.ico">
+                </div>
+                <div class="info flex flex-col justify-between">
+                    <div class="author flex items-center">
+                        <span class="name text-default-text-color text-lg font-semibold">梦猫</span>
+                        
+                            <span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv2</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2024-06-03 17:32:32</span>
+        <span class="mobile">2024-06-03 17:32:32</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2024-06-04 01:35:17</span>
+            <span class="mobile">2024-06-04 01:35:17</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
                 
                     
-                    <li class="article-item space-y-2 px-6 pt-10 pb-2 text-xl relative border-l-2 border-border-color" date-is='09-15'>
+                        
+                        <li>
+                            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E8%AF%BE%E7%A8%8B%E8%AE%BE%E8%AE%A1/">计算机网络课程设计</a>&nbsp;
+                        </li>
+                    
+                    
                 
-                    
-                        <a href="/2023/09/15/tjuoj-4441-%E5%90%88%E5%B9%B6%E6%9E%9C%E5%AD%90%EF%BC%88%E5%A0%86%EF%BC%89/" class="block overflow-hidden w-fit">
-                            <span class="article-title mb-0.5 text-2xl">TJUOJ 4441: 合并果子（堆）</span>
-                        </a>
-                    
-              
             </ul>
-        </section>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/TJU-CS-Lab/">TJU CS Lab</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>1.8k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>6 Mins</span>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
     
 </div>
 
-	</div>
+                    </div>
+                </div>
+            </div>
+        
+
+        
+
+
+        <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+            <h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第四周实验中，需要让服务器在等待一个客户端发送下一个请求时，能够同时处理来自其它客户端的请求，进而实现对多个并发的客户端的同时处理。<br>具体而言，并发处理需要通过select()方法实现，并支持最多1024个并发连接。<br>此外，如果某些客户端在通信过程中“暂停”，或是出现错误，服务器应不受该客户端影响，继续为其它客户端提供服务。</p>
+<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>在本次实验中，要求使用select()方法实现并发处理。select是一个用于监听文件状态的函数，函数会阻塞进程并持续监听所有文件描述符编号小于其首个参数<code>MAX_FD</code>的文件描述符，直至某些文件描述符状态发生改变，例如某文件进入“读就绪”状态，函数便会返回就绪文件的数量，并将改变的文件描述符<code>fd</code>加入其第二个参数<code>READ_FD_SET</code>(可读文件描述符集合)。而在实验中，每个客户端和服务器的<code>socket</code>也是一个可读文件，因此通过select函数监听所有新增的可读文件便可以接收到所有发送请求的客户端socket。</p>
+<p>同时，还需要了解<code>fd_set</code>结构体的组织方式和相关操作，以便后续的设计和实现。<code>fd_set</code>以位图的形式存储了一个文件描述符集合的某种状态，每一位均对应一个文件描述符，而该位的<code>0/1</code>值便对应着该文件描述符的特定状态情况。由此，只需不断通过select方法监听客户端和服务器socket的状态集合，再遍历集合来检查每个客户端socket是否活跃，即可得到所有与服务器建立并发连接的客户端socket的文件描述符。</p>
+<p>此外，为了正确的与客户端建立连接并通信，还需要组织一个socket数组，用于储存所有经过前述步骤，与服务器建立连接的客户端socket。至此，就能顺利得到所有与服务器建立并发连接的客户端socket，进而可以对其请求进行处理和响应。</p>
+<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>在掌握了以上结构的定义后，便可以按如下步骤来对并发的客户端请求进行接收、管理和响应：</p>
+<ol>
+<li>使用select方法监听客户端和服务器fd；</li>
+<li>获取活跃fd，据此获得待连接客户端socket的fd，并加入已连接fd_set中；</li>
+<li>根据已连接fd_set中的fd获取所有已连接客户端socket，并组织一个在socket集合中；</li>
+<li>遍历socket集合，对每个客户端接收并响应一次请求，并将其移出连接集合；</li>
+<li>循环执行上述步骤，不断连接并逐个响应所有发送请求的客户端，以此实现并发处理的效果。</li>
+</ol>
+<p>根据以上设计，可以得到并发处理模块的处理流程图如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/multi.jpeg"
+                      alt="Multi-Client Answering" title="多客户端并发响应流程图"
+                ><figcaption>Multi-Client Answering</figcaption></figure></p>
+<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><p>为了实现前面的协议设计，还需要清楚如何正确的对<code>fd_set</code>进行管理。在本实验环境中，可以通过宏定义来进行，以下是此次实验中使用到的部分宏定义。</p>
+<ol>
+<li>FD_ZERO(&amp;fd_set): 将集合中所有fd状态清零（设为不活跃）;</li>
+<li>FD_SET(fd, &amp;fd_set): 设置fd在集合中的状态为活跃;</li>
+<li>FD_CLR(fd, &amp;fd_set): 将fd在集合中的状态清零;</li>
+<li>FD_ISSET(fd, &amp;fd_set): 检查fd在集合中状态是否活跃，若活跃返回1，否则返回0。</li>
+</ol>
+<p>此外，还需注意将socket集合大小设为1024，并在将已连接客户端socket加入socket集合时判断客户端数量是否超限，以满足实验对最大连接数为1024的要求。</p>
+<p>由此，就可以根据流程图编写伪代码，并成功实现客户端并发处理模块。伪代码如下。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Multi-Client Answering</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">fd_set ready_set, pos_set</span><br><span class="line">int client_set[1024]</span><br><span class="line"></span><br><span class="line">CLEAR ready_set</span><br><span class="line">CLEAR pos_set</span><br><span class="line">ADD server_fd TO ready_set</span><br><span class="line">SET ALL client_set[i] = -1</span><br><span class="line"></span><br><span class="line">LOOP</span><br><span class="line">    COPY ready_set TO pos_set</span><br><span class="line">    CALL select, SET client_num, pos_set</span><br><span class="line">    IF client_num &lt; 0</span><br><span class="line">        select ERROR</span><br><span class="line">        BREAK LOOP</span><br><span class="line">    ELSE IF client_num == 0</span><br><span class="line">        WAIT</span><br><span class="line">        CONTINUE LOOP</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    IF server_fd IS IN pos_set</span><br><span class="line">        THEN ACCEPT client_socket</span><br><span class="line">            FIND -1 IN client_set</span><br><span class="line">                ADD client_socket TO client_set</span><br><span class="line">                ADD client_fd TO ready_set</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    FOR EACH socket IN client_set</span><br><span class="line">        RECV REQUEST AND ANSWER</span><br><span class="line">        IF ANY ERROR</span><br><span class="line">            THEN CLOSE socket</span><br><span class="line">                CONTINUE</span><br><span class="line">        END IF</span><br><span class="line">        CLOSE socket</span><br><span class="line">        REMOVE fd FROM ready_set</span><br><span class="line">        REMOVE socket FROM client_set</span><br><span class="line">END LOOP</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><p>本次实验的本地测试和结果分析部分要求使用Apache Bench来进行性能测试，并同时对第三周的部分进行测试，通过比较分析本次实验实现模块的作用。</p>
+<h5 id="AB测试"><a href="#AB测试" class="headerlink" title="AB测试"></a>AB测试</h5><p>根据实验要求，使用Apache Bench测试在1000个HTTP请求下第三和第四周程序的响应时间。同时，分别使用10，100，1000个客户端并行发送请求，以体现支持多客户端并行后的特点。</p>
+<ol>
+<li><p>10个客户端并行<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-3.jpeg"
+                      alt="10 Week 3" title="第三周程序性能"
+                ><figcaption>10 Week 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-4.jpeg"
+                      alt="10 Week 4" title="第四周程序性能"
+                ><figcaption>10 Week 4</figcaption></figure></p>
+</li>
+<li><p>100个客户端并行<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-3.jpeg"
+                      alt="100 Week 3" title="第三周程序性能"
+                ><figcaption>100 Week 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-4.jpeg"
+                      alt="100 Week 4" title="第四周程序性能"
+                ><figcaption>100 Week 4</figcaption></figure></p>
+</li>
+<li><p>1000个客户端并行<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-3.jpeg"
+                      alt="1000 Week 3" title="第三周程序性能"
+                ><figcaption>1000 Week 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-4.jpeg"
+                      alt="1000 Week 4" title="第四周程序性能"
+                ><figcaption>1000 Week 4</figcaption></figure></p>
+</li>
+</ol>
+<h5 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h5><p>从响应时间可以发现，在整体请求数量为1000的情况下，支持多客户端并发处理的程序性能上的整体表现其实弱于仅支持pipeline的程序。这可能是由于在为每个客户端建立连接时需要大量循环扫描socket集合，以寻找空位存储该客户端socket。同时，并发处理模块对每个客户端都采用仅接收一次请求就关闭连接，等待后续有请求时再建立连接的连接方式，而非为每个客户端建立持久连接，如此频繁的建立和断开连接也会大量较大的时间开销。<br>但值得注意的是，随着并发客户端数量的上升，第四周程序和第三周程序间的差距在不断缩小，第四周的性能表现也逐渐变好。因此，在更大规模的HTTP请求和并发客户端（超过实验要求的1024个客户端连接）的情况下，可以推测支持并发处理模块的程序最终会体现出更好的性能，这也是为什么在实际应用场景（请求数量和客户端数量通常远大于实验测试的规模）中通常都会采用支持客户端并发处理的服务器设计。</p>
+<h5 id="Autolab测试"><a href="#Autolab测试" class="headerlink" title="Autolab测试"></a>Autolab测试</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/autolab.jpeg"
+                      alt="Autolab" title="Autolab 自动测试结果"
+                ><figcaption>Autolab</figcaption></figure></p>
+<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>了解并初步掌握了select方法；对fd和fd_set有了更好的掌握，并更深入的理解了socket的结构和处理方式；了解并实践了如何接收并存储多个客户端socket连接，并据此实现了对客户端请求的并发处理；通过测试和分析明白了客户端并行处理模块对服务器性能带来的影响，以及并发处理技术和pipeline技术各自的适用场景。</p>
+
+        </div>
+
+        
+            <div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+                <div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> Socket编程记录-Week4</li>
+        <li><strong>Author:</strong> 梦猫</li>
+        <li><strong>Created at
+                :</strong> 2024-06-03 17:32:32</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2024-06-04 01:35:17
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://mengmaor.github.io/2024/06/03/Socket编程记录-Week4/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                All Rights Reserved &#169; 梦猫
+            
+        </li>
+    </ul>
 </div>
 
-<div class="tag-paginator">
-	<div class="paginator">
-    <span class="page-number current">1</span>
+            </div>
+        
+
+        
+            <ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+                
+                    <li class="tag-item mx-0.5">
+                        <a href="/tags/TJU-CS-Lab/">#TJU CS Lab</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+  <div class="recommended-article px-2 sm:px-6 md:px-8">
+   <div class="recommended-desktop">
+    <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
+     <i aria-hidden="true"></i><span>推荐阅读</span>
+    </div>
+    <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/29/Socket编程记录-Week3/" title="Socket编程日志 Week3" rel="bookmark">
+  <img src="/cover/Socket.jpg" alt="Socket编程日志 Week3" class="!max-w-none">
+  <span class="title">Socket编程日志 Week3</span>
+</a><a class="recommended-article-item" href="/2024/05/15/Socket编程记录-Week1/" title="Socket编程日志 Week1" rel="bookmark">
+  <img src="/cover/Socket.jpg" alt="Socket编程日志 Week1" class="!max-w-none">
+  <span class="title">Socket编程日志 Week1</span>
+</a><a class="recommended-article-item" href="/2024/05/22/Socket编程记录-Week2/" title="Socket编程日志 Week2" rel="bookmark">
+  <img src="/cover/Socket.jpg" alt="Socket编程日志 Week2" class="!max-w-none">
+  <span class="title">Socket编程日志 Week2</span>
+</a></div>
+   </div>
+   <div class="recommended-mobile">
+   <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
+     <i aria-hidden="true"></i><span>推荐阅读</span>
+   </div>
+   <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/05/29/Socket编程记录-Week3/" title="Socket编程日志 Week3" rel="bookmark">
+  <img src="/cover/Socket.jpg" alt="Socket编程日志 Week3" class="!max-w-none">
+  <span class="title">Socket编程日志 Week3</span>
+</a><a class="recommended-article-item" href="/2024/05/15/Socket编程记录-Week1/" title="Socket编程日志 Week1" rel="bookmark">
+  <img src="/cover/Socket.jpg" alt="Socket编程日志 Week1" class="!max-w-none">
+  <span class="title">Socket编程日志 Week1</span>
+</a></div>
+   </div>
+  </div>
+
+        
+            <div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+                
+                
+                    <div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+                        <a class="next"
+                        rel="next"
+                        href="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/"
+                        >
+                            <span class="title flex justify-center items-center">
+                                <span class="post-nav-title-item">Socket编程日志 Week3</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex justify-center items-center">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+
+        
+    </div>
+
+    
+        <div class="toc-content-container">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <div class="toc-title">On this page</div>
+        <div class="page-title">Socket编程记录-Week4</div>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AE%9E%E9%AA%8C%E6%A6%82%E8%A6%81"><span class="nav-text">一、实验概要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%8D%8F%E8%AE%AE%E8%AE%BE%E8%AE%A1"><span class="nav-text">二、协议设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0"><span class="nav-text">三、协议实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C%E5%88%86%E6%9E%90"><span class="nav-text">结果分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E6%80%BB%E7%BB%93"><span class="nav-text">实验总结</span></a></li></ol>
+
+    </div>
+</div>
+        </div>
+    
 </div>
 
-</div>
 
 
                 
@@ -760,6 +1027,23 @@
         </div>
     </div>
 
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="article-tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="right-bottom-tools page-aside-toggle">
+                <i class="fa-regular fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
     
 
     <div class="right-side-tools-container">
