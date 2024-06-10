@@ -770,7 +770,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Socket编程记录-Week4</title>
+    <title>Socket编程日志 Week4</title>
     <url>/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/</url>
     <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第四周实验中，需要让服务器在等待一个客户端发送下一个请求时，能够同时处理来自其它客户端的请求，进而实现对多个并发的客户端的同时处理。<br>具体而言，并发处理需要通过select()方法实现，并支持最多1024个并发连接。<br>此外，如果某些客户端在通信过程中“暂停”，或是出现错误，服务器应不受该客户端影响，继续为其它客户端提供服务。</p>
 <h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>在本次实验中，要求使用select()方法实现并发处理。select是一个用于监听文件状态的函数，函数会阻塞进程并持续监听所有文件描述符编号小于其首个参数<code>MAX_FD</code>的文件描述符，直至某些文件描述符状态发生改变，例如某文件进入“读就绪”状态，函数便会返回就绪文件的数量，并将改变的文件描述符<code>fd</code>加入其第二个参数<code>READ_FD_SET</code>(可读文件描述符集合)。而在实验中，每个客户端和服务器的<code>socket</code>也是一个可读文件，因此通过select函数监听所有新增的可读文件便可以接收到所有发送请求的客户端socket。</p>
