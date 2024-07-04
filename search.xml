@@ -858,6 +858,65 @@
       </tags>
   </entry>
   <entry>
+    <title>Socket编程日志 Week5</title>
+    <url>/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/</url>
+    <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第五周的实验需要实现服务器对 CGI 请求的支持，并能在 CGI 请求出错时返回对应的错误信息。<br>具体而言，对于 CGI 请求，服务器需要先对其表单的输入、对应 CGI 处理脚本的路径等信息进行解析，并据此配置 CGI 程序的环境变量。随后，服务器需要创建一个新线程，执行外部的 CGI 处理程序来生成响应，获取到响应并发送给客户端。此外，若在整个 CGI 处理过程中出现了任何错误，服务器都向客户端发送 500 报错信息。</p>
+<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h3 id="1-CGI-请求检测模块"><a href="#1-CGI-请求检测模块" class="headerlink" title="1. CGI 请求检测模块"></a>1. CGI 请求检测模块</h3><p>此判断模块依附于 GET&#x2F;HEAD 请求之下，若为这两种请求，则根据请求的 URI 判断是否为 CGI 请求。如果符合 CGI 请求格式，则调用 CGI 处理模块并进行响应，否则按普通的 GET&#x2F;HEAD 请求进行处理。</p>
+<h3 id="2-CGI-处理模块"><a href="#2-CGI-处理模块" class="headerlink" title="2. CGI 处理模块"></a>2. CGI 处理模块</h3><p>本模块首先从请求中提取出 CGI 脚本路径等必要信息，并调用环境变量配置模块进行 环境配置。随后，需要开辟一个新线程来运行 CGI 程序，并将 CGI 程序生成的响应存储至缓冲区中，以发送给客户端。此外，若处理过程中产生错误，则应返回错误，以向客户端发送 500 错误信息。</p>
+<h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>首先，需要了解 CGI 请求的 URI 结构，以便从中提取所需信息。URI 共由 3 部分构成， 为&#x2F;cgi-bin&#x2F;，path 和 query。分别代表脚本的目录路径(也用于标识 CGI 请求)，脚本路径和表单读取数据。具体结构如下方伪代码所示。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>CGI uri</span></figcaption><table><tr><td class="code"><pre><span class="line">Request-&gt;uri:  /cgi-bin/path?query1&amp;query2&amp;……</span><br></pre></td></tr></table></figure></div>
+
+<p>此外，本模块中需要创建新线程来运行CGI程序，因此还需要了解线程管理相关的pid等数据结构。同时，在CGI程序进程和服务器程序进程进行通信时，需要使用到pipe（管道通信）。pipe的数据结构为一个二维int型数组，0和1分别存储标识读端口和写端口的标识号，可以借助如下伪代码进行理解。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>pthread pipe</span></figcaption><table><tr><td class="code"><pre><span class="line">线程1/读端口  my_pipe[0] ========= my_pipe[1]  线程2/写端口</span><br></pre></td></tr></table></figure></div>
+
+<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>了解以上数据结构后，可以按如下步骤进行CGI请求处理：<br>1.	根据URI获取CGI脚本文件路径；<br>2.	调用配置模块配置CGI程序环境变量<br>3.	创建子线程，在子线程中根据脚本路径运行CGI脚本<br>4.	创建管道，子线程将生成的响应写入管道<br>5.	父进程从管道中读取响应<br>6.	父进程将响应写入缓冲区中</p>
+<p>根据以上设计，可以得到CGI请求处理流程图如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/cgi_handle.jpeg"
+                      alt="CGI Handle" title="CGI处理模块"
+                ><figcaption>CGI Handle</figcaption></figure></p>
+<h3 id="3-环境变量配置模块"><a href="#3-环境变量配置模块" class="headerlink" title="3. 环境变量配置模块"></a>3. 环境变量配置模块</h3><h5 id="数据结构设计-1"><a href="#数据结构设计-1" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>此部分需要针对环境变量设计一个数据结构。考虑到每个环境变量都为一个固定格式的字符串，因此采用一个字符串数组在存储环境变量，每个元素均用于存储一个环境变量。<br>此外，此部分中许多环境变量需要从请求的Request结构体中获取，不过这一结构在前面已介绍过，故不再赘述。</p>
+<h5 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>此模块主要是对各个环境变量进行配置，需要自行设计的内容较少，且在手册中有十分详细的介绍，不再赘述。</p>
+<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><h3 id="1-CGI-请求检测模块-1"><a href="#1-CGI-请求检测模块-1" class="headerlink" title="1. CGI 请求检测模块"></a>1. CGI 请求检测模块</h3><p>在实现上，前面提到过，对CGI请求的检测可以通过URI来完成。若某个HTTP GET&#x2F;HEAD请求的URI起始为“&#x2F;cgi-bin&#x2F;”，则可认为其为一个CGI请求。此外，如果CGI处理模块返回错误，则向客户端响应500错误信息。调用CGI处理模块后的响应、报错等部分则与GET&#x2F;HEAD请求的处理类似。</p>
+<h3 id="2-CGI-处理模块-1"><a href="#2-CGI-处理模块-1" class="headerlink" title="2. CGI 处理模块"></a>2. CGI 处理模块</h3><p>首先，需要实现对CGI脚本文件的获取。前面提到过，在请求的URI中可以获取到脚本文件的路径，但其为“&#x2F;cgi-bin&#x2F;path”的形式，直接按此作为路径查找会进入系统文件夹。因此，出于实验的简单考量，可以对路径进行一定修改，使其变为在当前目录下的相对路径，再在实验目录下创建“cgi-bin”文件夹，并将所有脚本文件存储在其中即可。下面给出一个地址转换的例子。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>addr trans</span></figcaption><table><tr><td class="code"><pre><span class="line">Request-&gt;uri:    /cgi-bin/path</span><br><span class="line">Path to Locate:   ./cgi-bin/path</span><br></pre></td></tr></table></figure></div>
+
+<p>其余部分只需参照前面的设计进行实现即可。</p>
+<h3 id="3-环境变量配置模块-1"><a href="#3-环境变量配置模块-1" class="headerlink" title="3. 环境变量配置模块"></a>3. 环境变量配置模块</h3><p>环境变量的配置方法在手册中已有详细说明，只需按照手册要求逐条配置，最后将其存储在前面设计的数据结构中，传入CGI处理程序中即可。因此在此不再展开。</p>
+<h3 id="4-HTML及CGI脚本文件"><a href="#4-HTML及CGI脚本文件" class="headerlink" title="4. HTML及CGI脚本文件"></a>4. HTML及CGI脚本文件</h3><p>在本次实验中，还需要编写一个HTML文件，来展示一个可以填写表单的网页。此外，还需要编写对应的CGI脚本文件（使用Python编写），来根据表单中获取的数据生成动态网页。这两部分涉及到的知识与Socket编程关系较弱，且这两部分内容也较为简单，因此在此不再展开介绍这两个文件的设计和实现。</p>
+<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><h5 id="浏览器测试（表单已填写）"><a href="#浏览器测试（表单已填写）" class="headerlink" title="浏览器测试（表单已填写）"></a>浏览器测试（表单已填写）</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Login1.jpeg"
+                      alt="Static Page 1" title="静态网页1"
+                ><figcaption>Static Page 1</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Result1.jpeg"
+                      alt="CGI Page 1" title="CGI生成网页1"
+                ><figcaption>CGI Page 1</figcaption></figure></p>
+<h5 id="浏览器测试（表单未填写）"><a href="#浏览器测试（表单未填写）" class="headerlink" title="浏览器测试（表单未填写）"></a>浏览器测试（表单未填写）</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Login2.jpeg"
+                      alt="Static Page 2" title="静态网页2"
+                ><figcaption>Static Page 2</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Result2.jpeg"
+                      alt="CGI Page 2" title="CGI生成网页2"
+                ><figcaption>CGI Page 2</figcaption></figure></p>
+<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>接触、了解了CGI程序及其功能，明白了如何根据用户的填写动态生成网页，以实现多样的应用层功能。</p>
+]]></content>
+      <categories>
+        <category>计算机网络课程设计</category>
+      </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>about</title>
     <url>/about/index.html</url>
     <content><![CDATA[<h1 id="WELCOME-TO-MY-BLOG"><a href="#WELCOME-TO-MY-BLOG" class="headerlink" title="WELCOME TO MY BLOG"></a>WELCOME TO MY BLOG</h1><h3 id="BY-MENGMAO-REINE"><a href="#BY-MENGMAO-REINE" class="headerlink" title="BY MENGMAO REINE"></a>BY MENGMAO REINE</h3><h5 id="天津大学CS本科在读，随机掉落一些课程实验记录、算法笔记和旅拍照片。"><a href="#天津大学CS本科在读，随机掉落一些课程实验记录、算法笔记和旅拍照片。" class="headerlink" title="天津大学CS本科在读，随机掉落一些课程实验记录、算法笔记和旅拍照片。"></a>天津大学CS本科在读，随机掉落一些课程实验记录、算法笔记和旅拍照片。</h5><p>如果你想看一些实验记录 <a href="https://mengmaor.github.io/tags/TJU-CS-Lab/">Click here</a><br>如果你想看一些算法笔记 <a href="https://mengmaor.github.io/categories/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">Click here</a><br>如果你想转入智算 <a href="https://mengmaor.github.io/categories/%E8%BD%AC%E6%99%BA%E7%AE%97%E6%9C%BA%E8%AF%95%E7%9B%B4%E9%80%9A%E8%BD%A6/">Click here</a><br>如果你想看看我的旅拍记忆 <a href="https://mengmaor.github.io/masonry/">Click here</a></p>
