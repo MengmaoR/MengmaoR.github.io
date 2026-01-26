@@ -13,15 +13,6 @@ export function initMasonry() {
   var currentDisplayIndex = 0;
   var loadedImages = 0;
   var totalImages = images.length;
-  var imageDimensions = []; // 存储每张图片的尺寸信息
-
-  // 初始隐藏所有占位图
-  images.forEach(function(img) {
-    if (img.hasAttribute("lazyload")) {
-      img.style.visibility = "hidden";
-      img.style.opacity = "0";
-    }
-  });
 
   // 计算 baseWidth
   function getBaseWidth() {
@@ -33,41 +24,54 @@ export function initMasonry() {
     }
   }
 
-  // 预加载所有图片获取尺寸（不显示真实图片）
+  // 预加载所有图片获取尺寸，然后进行布局
   function preloadAllImages() {
     var baseWidth = getBaseWidth();
     var preloadPromises = [];
+    var imageDimensions = []; // 存储每张图片的尺寸信息
     
     images.forEach(function(img, index) {
-      var imageSrc = img.getAttribute("data-src");
+      var imageSrc = img.getAttribute("data-src") || img.src;
       var masonryItem = masonryItems[index];
       
-      // 如果没有 data-src，跳过
+      // 跳过占位符
       if (!imageSrc || imageSrc.indexOf("loading.svg") !== -1) {
         // 使用默认尺寸
         var defaultHeight = baseWidth * 1.5;
         imageDimensions[index] = {
           width: baseWidth,
-          height: defaultHeight,
+          height: defaultHeight, // 默认宽高比 2:3
           item: masonryItem
         };
-        // 设置占位图尺寸
         if (masonryItem) {
-          var imageContainer = masonryItem.querySelector('.image-container');
-          if (imageContainer) {
-            imageContainer.style.height = defaultHeight + 'px';
-          }
+          masonryItem.style.minHeight = defaultHeight + 'px';
           img.style.width = '100%';
           img.style.height = defaultHeight + 'px';
           img.style.objectFit = 'cover';
-          img.style.transition = 'opacity 0.2s ease-in';
-          img.style.visibility = 'visible';
-          img.style.opacity = '1';
         }
         return;
       }
 
-      // 预加载图片获取尺寸（使用隐藏的 Image 对象，不显示真实图片）
+      // 如果图片已经加载，直接使用
+      if (img.complete && img.naturalWidth > 0 && img.src === imageSrc) {
+        var aspectRatio = img.naturalHeight / img.naturalWidth;
+        var displayHeight = baseWidth * aspectRatio;
+        imageDimensions[index] = {
+          width: baseWidth,
+          height: displayHeight,
+          item: masonryItem,
+          loaded: true
+        };
+        if (masonryItem) {
+          masonryItem.style.minHeight = displayHeight + 'px';
+          img.style.width = '100%';
+          img.style.height = displayHeight + 'px';
+          img.style.objectFit = 'cover';
+        }
+        return;
+      }
+
+      // 预加载图片获取尺寸
       var promise = new Promise(function(resolve) {
         var preloadImg = new Image();
         preloadImg.onload = function() {
@@ -79,24 +83,18 @@ export function initMasonry() {
           imageDimensions[index] = {
             width: baseWidth,
             height: displayHeight,
-            item: masonryItem,
-            src: imageSrc
+            item: masonryItem
           };
           
-          // 设置占位图尺寸，使其与真实图片尺寸一致
+          // 设置占位符高度，确保布局正确
+          // 注意：只设置容器高度，让图片保持宽高比自适应
           if (masonryItem) {
-            var imageContainer = masonryItem.querySelector('.image-container');
-            if (imageContainer) {
-              imageContainer.style.height = displayHeight + 'px';
-            }
-            // 设置占位图的尺寸，使其与真实图片尺寸完全一致
+            // 设置 masonry-item 的最小高度，确保布局时能正确计算位置
+            masonryItem.style.minHeight = displayHeight + 'px';
+            // 设置图片的宽高，用于占位
             img.style.width = '100%';
             img.style.height = displayHeight + 'px';
             img.style.objectFit = 'cover';
-            // 显示占位图（淡入效果）
-            img.style.transition = 'opacity 0.2s ease-in';
-            img.style.visibility = 'visible';
-            img.style.opacity = '1';
           }
           
           resolve();
@@ -107,24 +105,16 @@ export function initMasonry() {
           imageDimensions[index] = {
             width: baseWidth,
             height: defaultHeight,
-            item: masonryItem,
-            src: imageSrc
+            item: masonryItem
           };
           if (masonryItem) {
-            var imageContainer = masonryItem.querySelector('.image-container');
-            if (imageContainer) {
-              imageContainer.style.height = defaultHeight + 'px';
-            }
+            masonryItem.style.minHeight = defaultHeight + 'px';
             img.style.width = '100%';
             img.style.height = defaultHeight + 'px';
             img.style.objectFit = 'cover';
-            img.style.transition = 'opacity 0.2s ease-in';
-            img.style.visibility = 'visible';
-            img.style.opacity = '1';
           }
           resolve();
         };
-        // 开始加载图片（但不显示）
         preloadImg.src = imageSrc;
       });
       
@@ -133,9 +123,9 @@ export function initMasonry() {
 
     // 等待所有图片预加载完成
     Promise.all(preloadPromises).then(function() {
-      // 所有图片尺寸已获取，占位图尺寸已设置，现在进行布局
+      // 所有图片尺寸已获取，进行布局
       initializeMasonryLayout();
-      // 开始按顺序显示真实图片
+      // 开始按顺序显示图片
       startDisplayingImages();
     });
   }
@@ -160,15 +150,14 @@ export function initMasonry() {
     }, 100);
   }
 
-  // 按顺序显示真实图片（从前往后），替换占位图
+  // 按顺序显示图片（从前往后）
   function startDisplayingImages() {
     if (currentDisplayIndex >= images.length) {
       return;
     }
 
     var img = images[currentDisplayIndex];
-    var imageSrc = img.getAttribute("data-src");
-    var dim = imageDimensions[currentDisplayIndex];
+    var imageSrc = img.getAttribute("data-src") || img.src;
 
     // 如果没有有效的图片源，跳过
     if (!imageSrc || imageSrc.indexOf("loading.svg") !== -1) {
@@ -180,12 +169,19 @@ export function initMasonry() {
     // 如果图片已经加载完成（从缓存中），直接显示
     if (img.complete && img.naturalWidth > 0 && img.src === imageSrc) {
       if (img.hasAttribute("lazyload")) {
-        // 图片已经在缓存中，直接显示
+        img.src = imageSrc;
         img.removeAttribute("lazyload");
-        // 保持尺寸不变（因为占位图尺寸已经正确）
-        // 只需要确保图片可见
         img.style.visibility = "visible";
-        img.style.opacity = "1";
+        // 移除固定尺寸，让图片自适应容器（保持宽高比）
+        img.style.width = "100%";
+        img.style.height = "auto";
+        img.style.objectFit = "";
+        
+        // 移除 masonry-item 的固定高度
+        var masonryItem = masonryItems[currentDisplayIndex];
+        if (masonryItem) {
+          masonryItem.style.minHeight = "";
+        }
       }
       // 布局已经完成，不需要再次布局
       currentDisplayIndex++;
@@ -193,19 +189,23 @@ export function initMasonry() {
       return;
     }
 
-    // 加载并显示真实图片
+    // 加载并显示图片
     var loadImg = new Image();
     loadImg.onload = function() {
-      // 图片加载完成，替换占位图
-      // 使用淡入效果
-      img.style.transition = "opacity 0.3s ease-in";
+      // 图片加载完成，显示真实图片
       img.src = imageSrc;
       img.removeAttribute("lazyload");
       img.style.visibility = "visible";
-      img.style.opacity = "1";
+      // 移除固定尺寸，让图片自适应容器（保持宽高比）
+      img.style.width = "100%";
+      img.style.height = "auto";
+      img.style.objectFit = "";
       
-      // 保持尺寸不变（因为占位图尺寸已经正确匹配）
-      // 不需要移除固定高度，因为真实图片的尺寸应该和占位图一致
+      // 移除 masonry-item 的固定高度，让图片自然撑开
+      var masonryItem = masonryItems[currentDisplayIndex];
+      if (masonryItem) {
+        masonryItem.style.minHeight = "";
+      }
       
       // 布局已经完成，不需要再次布局（因为占位符尺寸已经正确）
       
@@ -214,9 +214,18 @@ export function initMasonry() {
       startDisplayingImages();
     };
     loadImg.onerror = function() {
-      // 加载失败，保持占位图显示
+      // 加载失败，移除 lazyload 属性，保持占位符
       img.removeAttribute("lazyload");
-      // 占位图已经可见，不需要额外操作
+      img.style.visibility = "visible";
+      img.style.width = "100%";
+      img.style.height = "auto";
+      img.style.objectFit = "";
+      
+      // 移除 masonry-item 的固定高度
+      var masonryItem = masonryItems[currentDisplayIndex];
+      if (masonryItem) {
+        masonryItem.style.minHeight = "";
+      }
       
       currentDisplayIndex++;
       startDisplayingImages();
