@@ -1,0 +1,15 @@
+/* 隐藏 ClustrMaps 可视化效果，只保留统计功能 */
+#clustrmaps-widget-1,
+.clustrmaps-widget,
+iframe[src*="clustrmaps.com"],
+div[id*="clustrmaps"],
+.clustrmaps-container {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  overflow: hidden !important;
+}
