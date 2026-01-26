@@ -1,5 +1,6 @@
 export default function initLazyLoad() {
-  const imgs = document.querySelectorAll("img");
+  // 排除 masonry 页面的图片，由 masonry.js 自己处理
+  const imgs = document.querySelectorAll("img:not(#masonry-container img)");
   const options = {
     rootMargin: "0px",
     threshold: 0.1,

@@ -994,30 +994,57 @@
                 
 
                     
-                        <script data-swup-reload-script>
-// 阻止 ClustrMaps 创建可视化元素
-(function() {
-  var originalAppendChild = Element.prototype.appendChild;
-  Element.prototype.appendChild = function(child) {
-    // 阻止添加 ClustrMaps 相关的可视化元素
-    if (child && (
-      (child.id && (child.id.indexOf('clustrmaps') !== -1 || child.id.indexOf('clstr') !== -1)) ||
-      (child.className && child.className.indexOf('clustrmaps') !== -1) ||
-      (child.tagName && (child.tagName === 'CANVAS' || child.tagName === 'IFRAME'))
-    )) {
-      return child; // 不添加到 DOM
-    }
-    return originalAppendChild.call(this, child);
-  };
-})();
-</script>
-<script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=DdS6olOOaxYMrfpVcs88BK50cvVHhruKpRIZlVkUW7c"></script>
+                        <script data-swup-reload-script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=DdS6olOOaxYMrfpVcs88BK50cvVHhruKpRIZlVkUW7c&cl=ffffff&w=a"></script>
 <style>
-/* 隐藏任何可能漏掉的 ClustrMaps 元素 */
-[id*="clustrmaps"], [id*="clstr"], [class*="clustrmaps"] {
+/* 隐藏 ClustrMaps 图片和链接 */
+a[href*="clustrmaps.com"] img,
+img[src*="clustrmaps.com"],
+img[src*="clustrmaps"],
+a[href*="clustrmaps.com"] {
   display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden !important;
 }
 </style>
+<script>
+// 移除 ClustrMaps 图片和链接元素
+(function() {
+  function removeClustrMapsElements() {
+    // 移除图片
+    var imgs = document.querySelectorAll('img[src*="clustrmaps"], img[src*="clustrmaps"]');
+    imgs.forEach(function(img) {
+      if (img.parentNode) {
+        img.parentNode.removeChild(img);
+      }
+    });
+    // 移除链接（如果链接只包含图片）
+    var links = document.querySelectorAll('a[href*="clustrmaps.com"]');
+    links.forEach(function(link) {
+      if (link.children.length === 0 || (link.children.length === 1 && link.querySelector('img'))) {
+        if (link.parentNode) {
+          link.parentNode.removeChild(link);
+        }
+      }
+    });
+  }
+  // 立即执行
+  removeClustrMapsElements();
+  // DOM 加载后执行
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', removeClustrMapsElements);
+  } else {
+    removeClustrMapsElements();
+  }
+  // 监听 DOM 变化
+  if (window.MutationObserver) {
+    var observer = new MutationObserver(removeClustrMapsElements);
+    if (document.body) {
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+  }
+})();
+</script>
 
                     
         
