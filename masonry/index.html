@@ -1860,96 +1860,30 @@
                 
 
                     
-                        <style>
-/* 隐藏所有 ClustrMaps 可视化元素 */
-#clustrmaps-widget-1,
-.clustrmaps-widget,
-iframe[src*="clustrmaps.com"],
-div[id*="clustrmaps"],
-.clustrmaps-container,
-[id^="clustrmaps"],
-[class*="clustrmaps"],
-[id*="clstr_globe"],
-div[style*="clustrmaps"],
-iframe[id*="clustrmaps"],
-canvas[id*="clustrmaps"],
-svg[id*="clustrmaps"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-  position: absolute !important;
-  left: -9999px !important;
-  overflow: hidden !important;
-  pointer-events: none !important;
-  z-index: -9999 !important;
-}
-</style>
-<script data-swup-reload-script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=DdS6olOOaxYMrfpVcs88BK50cvVHhruKpRIZlVkUW7c"></script>
-<script>
-// 立即隐藏所有 ClustrMaps 可视化元素
+                        <script data-swup-reload-script>
+// 阻止 ClustrMaps 创建可视化元素
 (function() {
-  function hideClustrMaps() {
-    // 隐藏所有可能的 ClustrMaps 元素
-    var selectors = [
-      '#clustrmaps-widget-1',
-      '.clustrmaps-widget',
-      'iframe[src*="clustrmaps.com"]',
-      'div[id*="clustrmaps"]',
-      '[id^="clustrmaps"]',
-      '[class*="clustrmaps"]',
-      '[id*="clstr_globe"]',
-      'canvas[id*="clustrmaps"]',
-      'svg[id*="clustrmaps"]'
-    ];
-    
-    selectors.forEach(function(selector) {
-      try {
-        var elements = document.querySelectorAll(selector);
-        elements.forEach(function(el) {
-          el.style.display = 'none';
-          el.style.visibility = 'hidden';
-          el.style.opacity = '0';
-          el.style.width = '0';
-          el.style.height = '0';
-          el.style.position = 'absolute';
-          el.style.left = '-9999px';
-          el.style.pointerEvents = 'none';
-          el.style.zIndex = '-9999';
-          if (el.parentNode) {
-            el.parentNode.removeChild(el);
-          }
-        });
-      } catch(e) {}
-    });
-  }
-  
-  // 立即执行
-  hideClustrMaps();
-  
-  // DOM 加载后执行
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', hideClustrMaps);
-  } else {
-    hideClustrMaps();
-  }
-  
-  // 定期检查并隐藏（防止动态创建的元素）
-  setInterval(hideClustrMaps, 100);
-  
-  // 使用 MutationObserver 监听 DOM 变化
-  if (window.MutationObserver) {
-    var observer = new MutationObserver(function(mutations) {
-      hideClustrMaps();
-    });
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  }
+  var originalAppendChild = Element.prototype.appendChild;
+  Element.prototype.appendChild = function(child) {
+    // 阻止添加 ClustrMaps 相关的可视化元素
+    if (child && (
+      (child.id && (child.id.indexOf('clustrmaps') !== -1 || child.id.indexOf('clstr') !== -1)) ||
+      (child.className && child.className.indexOf('clustrmaps') !== -1) ||
+      (child.tagName && (child.tagName === 'CANVAS' || child.tagName === 'IFRAME'))
+    )) {
+      return child; // 不添加到 DOM
+    }
+    return originalAppendChild.call(this, child);
+  };
 })();
 </script>
+<script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=DdS6olOOaxYMrfpVcs88BK50cvVHhruKpRIZlVkUW7c"></script>
+<style>
+/* 隐藏任何可能漏掉的 ClustrMaps 元素 */
+[id*="clustrmaps"], [id*="clstr"], [class*="clustrmaps"] {
+  display: none !important;
+}
+</style>
 
                     
         
