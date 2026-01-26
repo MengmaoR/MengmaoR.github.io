@@ -4832,6 +4832,11 @@ html.is-animating .scroll-progress-bar {
   box-shadow: var(--redefine-box-shadow-flat);
   cursor: zoom-in;
 }
+.page-template-container #masonry-container .masonry-item img[lazyload] {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+}
 .page-template-container .loading-placeholder {
   display: block;
   justify-content: center;
