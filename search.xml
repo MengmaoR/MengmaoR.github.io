@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Hello World</title>
+    <url>/2023/09/13/Hello/</url>
+    <content><![CDATA[<p>Here’s my first BLOG<br>So let’s say</p>
+<p><strong>Hello World!</strong></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Lenet-5 识别手写数字</title>
     <url>/2024/05/26/Lenet-5-%E8%AF%86%E5%88%AB%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97/</url>
     <content><![CDATA[<h2 id="一、实验要求"><a href="#一、实验要求" class="headerlink" title="一、实验要求"></a>一、实验要求</h2><p>本次实验，我们需要实现一个基于Lenet-5神经网络模型的手写数字识别系统。同时，使用MNIST数据集进行训练和测试。</p>
@@ -88,13 +95,6 @@
       <tags>
         <tag>TJU CS Lab</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2023/09/13/Hello/</url>
-    <content><![CDATA[<p>Here’s my first BLOG<br>So let’s say</p>
-<p><strong>Hello World!</strong></p>
-]]></content>
   </entry>
   <entry>
     <title>Socket编程日志 Week1</title>
@@ -232,6 +232,282 @@
 ]]></content>
       <categories>
         <category>计算机网络课程设计</category>
+      </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Socket编程日志 Week3</title>
+    <url>/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/</url>
+    <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第三周实验只需实现一个重要的功能：HTTP pipeline。<br>具体来说，服务器需要按照RFC2616规定的顺序处理HTTP的并发请求。同时，对于错误的请求，服务器响应错误后不会影响后续消息的响应。</p>
+<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h3 id="1-Pipeline模块"><a href="#1-Pipeline模块" class="headerlink" title="1. Pipeline模块"></a>1. Pipeline模块</h3><p>首先，根据RFC2616的规定，应先处理先到达的请求，后处理后达到的请求。而在实验的环境中，体现为先处理整体请求输入中最靠前的请求，再逐个向后进行处理。<br>下面对此模块进行设计。</p>
+<h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>在第一周实验中，给出过HTTP请求的结构如下所示。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/HTTPRequest.jpeg"
+                      alt="HTTP Request" title="HTTP 请求报文结构"
+                ><figcaption>HTTP Request</figcaption></figure><br>由于在本实验中所支持的请求均不包含请求数据的部分，因此在服务器处理至最后的回车符和换行符后即可认为一个请求已经结束。经过观察容易发现，在请求报文的最后会出现<code>&quot;\r\n\r\n&quot;</code>这一特殊字符串，且在请求报文的其它地方均不会出现此字符串，因此可将其作为检测不同请求的分隔符，来对不同的请求报文进行区分。</p>
+<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>在清楚了如何识别不同请求报文的分隔符后，只需简单的根据分隔符将所有请求拆分开，再对每个请求进行响应即可。在对消息进行拆分时，应按如下步骤进行。</p>
+<ol>
+<li>读取全部请求报文，从头开始进行拆分；</li>
+<li>记录当前的处理位置，若超出报文长度则代表拆分完毕；</li>
+<li>通过串匹配算法匹配未处理串中第一个分隔符的末尾位置，即为当前请求的结束位置；</li>
+<li>计算匹配长度；</li>
+<li>根据匹配长度提取当前请求，并传入服务器响应模型进行响应；</li>
+<li>更新当前处理位置为请求结束位置</li>
+<li>循环处理直至拆分完毕。</li>
+</ol>
+<p>根据以上设计，可以绘制拆分流程图如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/separate.jpeg"
+                      alt="Pipeline Separate" title="Pipeline请求拆分流程图"
+                ><figcaption>Pipeline Separate</figcaption></figure></p>
+<h3 id="2-客户端接收模块"><a href="#2-客户端接收模块" class="headerlink" title="2. 客户端接收模块"></a>2. 客户端接收模块</h3><p>需要注意，由于在先前框架代码的设计中，客户端每发送一次请求报文只会接受一个响应，而在本次实验中服务器会尝试发送多个响应。因此还需要对客户端程序进行一定修改，使其支持对多个响应的连续接收。</p>
+<h5 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>这部分的设计比较简单，只需将框架代码中接收响应的模块放在一个循环结构中，每接收到一个合法响应便输出即可。</p>
+<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><h3 id="1-Pipeline模块-1"><a href="#1-Pipeline模块-1" class="headerlink" title="1. Pipeline模块"></a>1. Pipeline模块</h3><p>在对Pipeline模块进行实现时，除去对前述流程的实现外，缓冲区的管理也是一个比较重要的问题。<br>本模块的处理过程中需要存储三部分内容：全部请求报文、单次请求报文和单次请求的响应。因此，可以设置3个不同的缓冲区：<code>buf_all</code>、<code>buf_recv</code>、<code>buf_send</code>，分别存储上述三种数据。也正因此，本次实验中还需对原先的服务器响应模块进行部分修改，以匹配新的缓冲区设计。<br>根据前面的流程图和对缓冲区的新设计，可以得到Pipeline模块的伪代码如下：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Pipeline Module</span></figcaption><table><tr><td class="code"><pre><span class="line">BUFFER buf_all, buf_recv, buf_send</span><br><span class="line">sep = &quot;\r\n\r\n&quot;</span><br><span class="line"></span><br><span class="line">RECV FROM CLIENT TO buf_all</span><br><span class="line">WHILE start_loc &lt; buf_all.length</span><br><span class="line">    end_loc = MATCH sep END CHAR IN buf_all + start_loc</span><br><span class="line">    length = end_loc - start_loc + 1</span><br><span class="line"></span><br><span class="line">    IF length &gt; left_length</span><br><span class="line">        THEN BREAK</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    COPY buf_all FROM start_loc TO end_loc INTO buf_recv</span><br><span class="line">    start_loc += length</span><br><span class="line"></span><br><span class="line">    CALL SERVER ANSWEERING MODULE</span><br><span class="line">        SAVE ANSWER IN buf_send</span><br><span class="line">        SEND buf_send</span><br><span class="line">    END CALL</span><br><span class="line">END WHILE</span><br></pre></td></tr></table></figure></div>
+<p>由此便可完成Pipeline模块的实现。</p>
+<h3 id="2-客户端接收模块-1"><a href="#2-客户端接收模块-1" class="headerlink" title="2. 客户端接收模块"></a>2. 客户端接收模块</h3><p>此模块的实现只需在框架代码上进行少量更改即可。框架代码可以用如下伪代码表示。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Client Recv Old</span></figcaption><table><tr><td class="code"><pre><span class="line">IF RECV FROM SERVER TO buf AND buf.length &gt; 1</span><br><span class="line">    THEN PRINT buf</span><br></pre></td></tr></table></figure></div>
+<p>在此只需将<code>if</code>判断语句更改为<code>while</code>循环语句，并进行一些细节上的匹配即可。更改后可以用如下伪代码表示。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Client Recv New</span></figcaption><table><tr><td class="code"><pre><span class="line">WHILE RECV FROM SERVER TO buf AND buf.length &gt; 1</span><br><span class="line">    THEN PRINT buf</span><br></pre></td></tr></table></figure></div>
+<p>至此，可以完成对客户端接收多个响应功能的实现。</p>
+<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><h5 id="本地测试"><a href="#本地测试" class="headerlink" title="本地测试"></a>本地测试</h5><p>框架代码中给出了一个可用于测试的<code>request_pipeline</code>文件，本次实验实现的程序也可以对该测试文件得到正确的结果。但该文件内容较长，不易于展示，因此这里自行编写一个较为简单的测试文件<code>sample_pipeline</code>，其中包含3个连续的HTTP请求，分别为未实现请求，格式错误的请求，以及<code>HTTP GET</code>请求，以此验证服务器能否正确拆分并响应请求，且对错误请求的处理不会影响后续请求的处理。<br>测试结果如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/test.jpeg"
+                      alt="Test Result" title="本地测试结果"
+                ><figcaption>Test Result</figcaption></figure><br>可以看到，服务器对每个请求都进行了正确的响应，且响应顺序正确。<br>此外，根据日志记录也可以看出，服务器对每个拆分出的请求都生成并发送了正确的响应。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/log.jpeg"
+                      alt="Log Recorded" title="响应日志记录"
+                ><figcaption>Log Recorded</figcaption></figure></p>
+<h5 id="Autolab测试"><a href="#Autolab测试" class="headerlink" title="Autolab测试"></a>Autolab测试</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/autolab.jpeg"
+                      alt="Autolab" title="Autolab 自动测试结果"
+                ><figcaption>Autolab</figcaption></figure></p>
+<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>了解并成功实现了对连续HTTP请求的拆分和分别处理，对HTTP请求的结构有了更进一步的认识；加深了对缓冲区管理的意识和了解程度，明白了某些复杂功能需要基于良好的缓冲区设计；更深入的理解了客户端和服务器间的通信方式，并成功实现了客户端对多个连续响应的接收和打印。</p>
+]]></content>
+      <categories>
+        <category>计算机网络课程设计</category>
+      </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Socket编程日志 Week5</title>
+    <url>/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/</url>
+    <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第五周的实验需要实现服务器对 CGI 请求的支持，并能在 CGI 请求出错时返回对应的错误信息。<br>具体而言，对于 CGI 请求，服务器需要先对其表单的输入、对应 CGI 处理脚本的路径等信息进行解析，并据此配置 CGI 程序的环境变量。随后，服务器需要创建一个新线程，执行外部的 CGI 处理程序来生成响应，获取到响应并发送给客户端。此外，若在整个 CGI 处理过程中出现了任何错误，服务器都向客户端发送 500 报错信息。</p>
+<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h3 id="1-CGI-请求检测模块"><a href="#1-CGI-请求检测模块" class="headerlink" title="1. CGI 请求检测模块"></a>1. CGI 请求检测模块</h3><p>此判断模块依附于 GET&#x2F;HEAD 请求之下，若为这两种请求，则根据请求的 URI 判断是否为 CGI 请求。如果符合 CGI 请求格式，则调用 CGI 处理模块并进行响应，否则按普通的 GET&#x2F;HEAD 请求进行处理。</p>
+<h3 id="2-CGI-处理模块"><a href="#2-CGI-处理模块" class="headerlink" title="2. CGI 处理模块"></a>2. CGI 处理模块</h3><p>本模块首先从请求中提取出 CGI 脚本路径等必要信息，并调用环境变量配置模块进行 环境配置。随后，需要开辟一个新线程来运行 CGI 程序，并将 CGI 程序生成的响应存储至缓冲区中，以发送给客户端。此外，若处理过程中产生错误，则应返回错误，以向客户端发送 500 错误信息。</p>
+<h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>首先，需要了解 CGI 请求的 URI 结构，以便从中提取所需信息。URI 共由 3 部分构成， 为&#x2F;cgi-bin&#x2F;，path 和 query。分别代表脚本的目录路径(也用于标识 CGI 请求)，脚本路径和表单读取数据。具体结构如下方伪代码所示。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>CGI uri</span></figcaption><table><tr><td class="code"><pre><span class="line">Request-&gt;uri:  /cgi-bin/path?query1&amp;query2&amp;……</span><br></pre></td></tr></table></figure></div>
+
+<p>此外，本模块中需要创建新线程来运行CGI程序，因此还需要了解线程管理相关的pid等数据结构。同时，在CGI程序进程和服务器程序进程进行通信时，需要使用到pipe（管道通信）。pipe的数据结构为一个二维int型数组，0和1分别存储标识读端口和写端口的标识号，可以借助如下伪代码进行理解。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>pthread pipe</span></figcaption><table><tr><td class="code"><pre><span class="line">线程1/读端口  my_pipe[0] ========= my_pipe[1]  线程2/写端口</span><br></pre></td></tr></table></figure></div>
+
+<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>了解以上数据结构后，可以按如下步骤进行CGI请求处理：<br>1.	根据URI获取CGI脚本文件路径；<br>2.	调用配置模块配置CGI程序环境变量<br>3.	创建子线程，在子线程中根据脚本路径运行CGI脚本<br>4.	创建管道，子线程将生成的响应写入管道<br>5.	父进程从管道中读取响应<br>6.	父进程将响应写入缓冲区中</p>
+<p>根据以上设计，可以得到CGI请求处理流程图如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/cgi_handle.jpeg"
+                      alt="CGI Handle" title="CGI处理模块"
+                ><figcaption>CGI Handle</figcaption></figure></p>
+<h3 id="3-环境变量配置模块"><a href="#3-环境变量配置模块" class="headerlink" title="3. 环境变量配置模块"></a>3. 环境变量配置模块</h3><h5 id="数据结构设计-1"><a href="#数据结构设计-1" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>此部分需要针对环境变量设计一个数据结构。考虑到每个环境变量都为一个固定格式的字符串，因此采用一个字符串数组在存储环境变量，每个元素均用于存储一个环境变量。<br>此外，此部分中许多环境变量需要从请求的Request结构体中获取，不过这一结构在前面已介绍过，故不再赘述。</p>
+<h5 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>此模块主要是对各个环境变量进行配置，需要自行设计的内容较少，且在手册中有十分详细的介绍，不再赘述。</p>
+<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><h3 id="1-CGI-请求检测模块-1"><a href="#1-CGI-请求检测模块-1" class="headerlink" title="1. CGI 请求检测模块"></a>1. CGI 请求检测模块</h3><p>在实现上，前面提到过，对CGI请求的检测可以通过URI来完成。若某个HTTP GET&#x2F;HEAD请求的URI起始为“&#x2F;cgi-bin&#x2F;”，则可认为其为一个CGI请求。此外，如果CGI处理模块返回错误，则向客户端响应500错误信息。调用CGI处理模块后的响应、报错等部分则与GET&#x2F;HEAD请求的处理类似。</p>
+<h3 id="2-CGI-处理模块-1"><a href="#2-CGI-处理模块-1" class="headerlink" title="2. CGI 处理模块"></a>2. CGI 处理模块</h3><p>首先，需要实现对CGI脚本文件的获取。前面提到过，在请求的URI中可以获取到脚本文件的路径，但其为“&#x2F;cgi-bin&#x2F;path”的形式，直接按此作为路径查找会进入系统文件夹。因此，出于实验的简单考量，可以对路径进行一定修改，使其变为在当前目录下的相对路径，再在实验目录下创建“cgi-bin”文件夹，并将所有脚本文件存储在其中即可。下面给出一个地址转换的例子。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>addr trans</span></figcaption><table><tr><td class="code"><pre><span class="line">Request-&gt;uri:    /cgi-bin/path</span><br><span class="line">Path to Locate:   ./cgi-bin/path</span><br></pre></td></tr></table></figure></div>
+
+<p>其余部分只需参照前面的设计进行实现即可。</p>
+<h3 id="3-环境变量配置模块-1"><a href="#3-环境变量配置模块-1" class="headerlink" title="3. 环境变量配置模块"></a>3. 环境变量配置模块</h3><p>环境变量的配置方法在手册中已有详细说明，只需按照手册要求逐条配置，最后将其存储在前面设计的数据结构中，传入CGI处理程序中即可。因此在此不再展开。</p>
+<h3 id="4-HTML及CGI脚本文件"><a href="#4-HTML及CGI脚本文件" class="headerlink" title="4. HTML及CGI脚本文件"></a>4. HTML及CGI脚本文件</h3><p>在本次实验中，还需要编写一个HTML文件，来展示一个可以填写表单的网页。此外，还需要编写对应的CGI脚本文件（使用Python编写），来根据表单中获取的数据生成动态网页。这两部分涉及到的知识与Socket编程关系较弱，且这两部分内容也较为简单，因此在此不再展开介绍这两个文件的设计和实现。</p>
+<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><h5 id="浏览器测试（表单已填写）"><a href="#浏览器测试（表单已填写）" class="headerlink" title="浏览器测试（表单已填写）"></a>浏览器测试（表单已填写）</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Login1.jpeg"
+                      alt="Static Page 1" title="静态网页1"
+                ><figcaption>Static Page 1</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Result1.jpeg"
+                      alt="CGI Page 1" title="CGI生成网页1"
+                ><figcaption>CGI Page 1</figcaption></figure></p>
+<h5 id="浏览器测试（表单未填写）"><a href="#浏览器测试（表单未填写）" class="headerlink" title="浏览器测试（表单未填写）"></a>浏览器测试（表单未填写）</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Login2.jpeg"
+                      alt="Static Page 2" title="静态网页2"
+                ><figcaption>Static Page 2</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Result2.jpeg"
+                      alt="CGI Page 2" title="CGI生成网页2"
+                ><figcaption>CGI Page 2</figcaption></figure></p>
+<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>接触、了解了CGI程序及其功能，明白了如何根据用户的填写动态生成网页，以实现多样的应用层功能。</p>
+]]></content>
+      <categories>
+        <category>计算机网络课程设计</category>
+      </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Socket编程日志 Week4</title>
+    <url>/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/</url>
+    <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第四周实验中，需要让服务器在等待一个客户端发送下一个请求时，能够同时处理来自其它客户端的请求，进而实现对多个并发的客户端的同时处理。<br>具体而言，并发处理需要通过select()方法实现，并支持最多1024个并发连接。<br>此外，如果某些客户端在通信过程中“暂停”，或是出现错误，服务器应不受该客户端影响，继续为其它客户端提供服务。</p>
+<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>在本次实验中，要求使用select()方法实现并发处理。select是一个用于监听文件状态的函数，函数会阻塞进程并持续监听所有文件描述符编号小于其首个参数<code>MAX_FD</code>的文件描述符，直至某些文件描述符状态发生改变，例如某文件进入“读就绪”状态，函数便会返回就绪文件的数量，并将改变的文件描述符<code>fd</code>加入其第二个参数<code>READ_FD_SET</code>(可读文件描述符集合)。而在实验中，每个客户端和服务器的<code>socket</code>也是一个可读文件，因此通过select函数监听所有新增的可读文件便可以接收到所有发送请求的客户端socket。</p>
+<p>同时，还需要了解<code>fd_set</code>结构体的组织方式和相关操作，以便后续的设计和实现。<code>fd_set</code>以位图的形式存储了一个文件描述符集合的某种状态，每一位均对应一个文件描述符，而该位的<code>0/1</code>值便对应着该文件描述符的特定状态情况。由此，只需不断通过select方法监听客户端和服务器socket的状态集合，再遍历集合来检查每个客户端socket是否活跃，即可得到所有与服务器建立并发连接的客户端socket的文件描述符。</p>
+<p>此外，为了正确的与客户端建立连接并通信，还需要组织一个socket数组，用于储存所有经过前述步骤，与服务器建立连接的客户端socket。至此，就能顺利得到所有与服务器建立并发连接的客户端socket，进而可以对其请求进行处理和响应。</p>
+<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>在掌握了以上结构的定义后，便可以按如下步骤来对并发的客户端请求进行接收、管理和响应：</p>
+<ol>
+<li>使用select方法监听客户端和服务器fd；</li>
+<li>获取活跃fd，据此获得待连接客户端socket的fd，并加入已连接fd_set中；</li>
+<li>根据已连接fd_set中的fd获取所有已连接客户端socket，并组织一个在socket集合中；</li>
+<li>遍历socket集合，对每个客户端接收并响应一次请求，并将其移出连接集合；</li>
+<li>循环执行上述步骤，不断连接并逐个响应所有发送请求的客户端，以此实现并发处理的效果。</li>
+</ol>
+<p>根据以上设计，可以得到并发处理模块的处理流程图如下。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/multi.jpeg"
+                      alt="Multi-Client Answering" title="多客户端并发响应流程图"
+                ><figcaption>Multi-Client Answering</figcaption></figure></p>
+<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><p>为了实现前面的协议设计，还需要清楚如何正确的对<code>fd_set</code>进行管理。在本实验环境中，可以通过宏定义来进行，以下是此次实验中使用到的部分宏定义。</p>
+<ol>
+<li>FD_ZERO(&amp;fd_set): 将集合中所有fd状态清零（设为不活跃）;</li>
+<li>FD_SET(fd, &amp;fd_set): 设置fd在集合中的状态为活跃;</li>
+<li>FD_CLR(fd, &amp;fd_set): 将fd在集合中的状态清零;</li>
+<li>FD_ISSET(fd, &amp;fd_set): 检查fd在集合中状态是否活跃，若活跃返回1，否则返回0。</li>
+</ol>
+<p>此外，还需注意将socket集合大小设为1024，并在将已连接客户端socket加入socket集合时判断客户端数量是否超限，以满足实验对最大连接数为1024的要求。</p>
+<p>由此，就可以根据流程图编写伪代码，并成功实现客户端并发处理模块。伪代码如下。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Multi-Client Answering</span></figcaption><table><tr><td class="code"><pre><span class="line">fd_set ready_set, pos_set</span><br><span class="line">int client_set[1024]</span><br><span class="line"></span><br><span class="line">CLEAR ready_set</span><br><span class="line">CLEAR pos_set</span><br><span class="line">ADD server_fd TO ready_set</span><br><span class="line">SET ALL client_set[i] = -1</span><br><span class="line"></span><br><span class="line">LOOP</span><br><span class="line">    COPY ready_set TO pos_set</span><br><span class="line">    CALL select, SET client_num, pos_set</span><br><span class="line">    IF client_num &lt; 0</span><br><span class="line">        select ERROR</span><br><span class="line">        BREAK LOOP</span><br><span class="line">    ELSE IF client_num == 0</span><br><span class="line">        WAIT</span><br><span class="line">        CONTINUE LOOP</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    IF server_fd IS IN pos_set</span><br><span class="line">        THEN ACCEPT client_socket</span><br><span class="line">            FIND -1 IN client_set</span><br><span class="line">                ADD client_socket TO client_set</span><br><span class="line">                ADD client_fd TO ready_set</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    FOR EACH socket IN client_set</span><br><span class="line">        RECV REQUEST AND ANSWER</span><br><span class="line">        IF ANY ERROR</span><br><span class="line">            THEN CLOSE socket</span><br><span class="line">                CONTINUE</span><br><span class="line">        END IF</span><br><span class="line">        CLOSE socket</span><br><span class="line">        REMOVE fd FROM ready_set</span><br><span class="line">        REMOVE socket FROM client_set</span><br><span class="line">END LOOP</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><p>本次实验的本地测试和结果分析部分要求使用Apache Bench来进行性能测试，并同时对第三周的部分进行测试，通过比较分析本次实验实现模块的作用。</p>
+<h5 id="AB测试"><a href="#AB测试" class="headerlink" title="AB测试"></a>AB测试</h5><p>根据实验要求，使用Apache Bench测试在1000个HTTP请求下第三和第四周程序的响应时间。同时，分别使用10，100，1000个客户端并行发送请求，以体现支持多客户端并行后的特点。</p>
+<ol>
+<li><p>10个客户端并行<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-3.jpeg"
+                      alt="10 Week 3" title="第三周程序性能"
+                ><figcaption>10 Week 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-4.jpeg"
+                      alt="10 Week 4" title="第四周程序性能"
+                ><figcaption>10 Week 4</figcaption></figure></p>
+</li>
+<li><p>100个客户端并行<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-3.jpeg"
+                      alt="100 Week 3" title="第三周程序性能"
+                ><figcaption>100 Week 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-4.jpeg"
+                      alt="100 Week 4" title="第四周程序性能"
+                ><figcaption>100 Week 4</figcaption></figure></p>
+</li>
+<li><p>1000个客户端并行<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-3.jpeg"
+                      alt="1000 Week 3" title="第三周程序性能"
+                ><figcaption>1000 Week 3</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-4.jpeg"
+                      alt="1000 Week 4" title="第四周程序性能"
+                ><figcaption>1000 Week 4</figcaption></figure></p>
+</li>
+</ol>
+<h5 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h5><p>从响应时间可以发现，在整体请求数量为1000的情况下，支持多客户端并发处理的程序性能上的整体表现其实弱于仅支持pipeline的程序。这可能是由于在为每个客户端建立连接时需要大量循环扫描socket集合，以寻找空位存储该客户端socket。同时，并发处理模块对每个客户端都采用仅接收一次请求就关闭连接，等待后续有请求时再建立连接的连接方式，而非为每个客户端建立持久连接，如此频繁的建立和断开连接也会大量较大的时间开销。<br>但值得注意的是，随着并发客户端数量的上升，第四周程序和第三周程序间的差距在不断缩小，第四周的性能表现也逐渐变好。因此，在更大规模的HTTP请求和并发客户端（超过实验要求的1024个客户端连接）的情况下，可以推测支持并发处理模块的程序最终会体现出更好的性能，这也是为什么在实际应用场景（请求数量和客户端数量通常远大于实验测试的规模）中通常都会采用支持客户端并发处理的服务器设计。</p>
+<h5 id="Autolab测试"><a href="#Autolab测试" class="headerlink" title="Autolab测试"></a>Autolab测试</h5><p><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/autolab.jpeg"
+                      alt="Autolab" title="Autolab 自动测试结果"
+                ><figcaption>Autolab</figcaption></figure></p>
+<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>了解并初步掌握了select方法；对fd和fd_set有了更好的掌握，并更深入的理解了socket的结构和处理方式；了解并实践了如何接收并存储多个客户端socket连接，并据此实现了对客户端请求的并发处理；通过测试和分析明白了客户端并行处理模块对服务器性能带来的影响，以及并发处理技术和pipeline技术各自的适用场景。</p>
+]]></content>
+      <categories>
+        <category>计算机网络课程设计</category>
+      </categories>
+      <tags>
+        <tag>TJU CS Lab</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>TJUOJ 4441: 合并果子（堆）</title>
+    <url>/2023/09/15/tjuoj-4441-%E5%90%88%E5%B9%B6%E6%9E%9C%E5%AD%90%EF%BC%88%E5%A0%86%EF%BC%89/</url>
+    <content><![CDATA[<p>补程设课，没什么事干，就在学校OJ上找了道<a class="link"   href="http://tjuacm.chaosheng.top/problem.php?id=4441" >简单题</a>做<br>算法复健一下，顺便试一试代码块插入</p>
+<p>题目给了提示，应该是道堆排序的题<br>由于每次体力增加值为当前已合并果子的总数，因此我们只需保证每次合并的两个堆都是当前果子数量最少的两个堆即可<br>思路有些像霍夫曼编码，但题目只要求求最终的体力消耗，所以没有构建霍夫曼树的必要<br>准备直接做一个最小堆，每次合并操作都取两次堆顶元素，将求出的和累加至totalCost变量中，并放回堆里<br>循环至只剩一个元素时，totalCost中值即是所求答案</p>
+<p><strong>理论存在，实践开始</strong></p>
+<h2 id="Input-Init"><a href="#Input-Init" class="headerlink" title="Input &amp;&amp; Init"></a>Input &amp;&amp; Init</h2><p>首先进行数据读入和建堆操作<br>使用scanf读入数据增加速度<br>然后偷个懒，用 <code>#include &lt;algorithem&gt;</code> 的make_heap函数建堆<br><strong>需要注意，题中给出的数据最大可能为n&#x3D;30000，且每项均为20000</strong><br><strong>因此结果最大可能为2e4至6e8的等差求和，即9e12左右</strong><br><strong>考虑到我们会将中间结果存在堆中，因此需要一个64位的堆和totalCost</strong></p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="type">uint64_t</span> *heap;</span><br><span class="line"><span class="type">int</span> N;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;N);</span><br><span class="line">heap = <span class="keyword">new</span> <span class="type">uint64_t</span>[N];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%lld&quot;</span>, heap + i);</span><br><span class="line"></span><br><span class="line"><span class="built_in">make_heap</span>(heap, heap + N, greater&lt;&gt;());</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Main-Algorithem"><a href="#Main-Algorithem" class="headerlink" title="Main Algorithem"></a>Main Algorithem</h2><p>现在编写主算法<br>每次从堆顶取两个数进行加和，随后将结果存入堆中，并累加totalCost，直至堆中只剩一个元素</p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="type">uint64_t</span> totalCost = <span class="number">0</span>, currentCost;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> mergeTimes = N - <span class="number">1</span>; mergeTimes &gt; <span class="number">0</span>; mergeTimes--) &#123;</span><br><span class="line">    currentCost = heap[<span class="number">0</span>];</span><br><span class="line">    heap[<span class="number">0</span>] = heap[mergeTimes];</span><br><span class="line">    <span class="built_in">maintainHeap</span>(heap, mergeTimes);</span><br><span class="line"></span><br><span class="line">    currentCost += heap[<span class="number">0</span>];</span><br><span class="line">    heap[<span class="number">0</span>] = currentCost;</span><br><span class="line">    <span class="built_in">maintainHeap</span>(heap, mergeTimes);</span><br><span class="line">    </span><br><span class="line">    totalCost += currentCost;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Quoting-Function"><a href="#Quoting-Function" class="headerlink" title="Quoting Function"></a>Quoting Function</h2><p>最后实现用于维护堆的<code>maintainHeap</code>函数<br>我们只需跟踪堆顶元素，并循环判断判断它和它最小孩子的大小关系，若大于则与之交换并继续循环，否则返回</p>
+<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">//Find the minimum element in heap[i]&#x27;s children</span></span><br><span class="line"><span class="comment">//Return it&#x27;s index</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">findMinChild</span><span class="params">(<span class="type">uint64_t</span>* heap, <span class="type">int</span> parentIndex, <span class="type">int</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>((parentIndex * <span class="number">2</span>) + <span class="number">2</span> &lt; length)</span><br><span class="line">        <span class="keyword">return</span> heap[(parentIndex * <span class="number">2</span>) + <span class="number">1</span>] &lt; heap[(parentIndex * <span class="number">2</span>) + <span class="number">2</span>] ? (parentIndex * <span class="number">2</span>) + <span class="number">1</span> : (parentIndex * <span class="number">2</span>) + <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>((parentIndex * <span class="number">2</span>) + <span class="number">1</span> &lt; length)</span><br><span class="line">        <span class="built_in">return</span> (parentIndex * <span class="number">2</span>) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//maintain the heap as a minimum heap after changing the top</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">maintainHeap</span><span class="params">(<span class="type">uint64_t</span>* heap, <span class="type">int</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> parentIndex = <span class="number">0</span>, minChildIndex;</span><br><span class="line">    </span><br><span class="line">    minChildIndex = <span class="built_in">findMinChild</span>(heap, parentIndex, length);</span><br><span class="line">    <span class="keyword">while</span> (heap[parentIndex] &gt; heap[minChildIndex] &amp;&amp; minChildIndex != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="type">long</span> <span class="type">long</span> temp = heap[parentIndex];</span><br><span class="line">        heap[parentIndex] = heap[minChildIndex];</span><br><span class="line">        heap[minChildIndex] = temp;</span><br><span class="line">        </span><br><span class="line">        parentIndex = minChildIndex;</span><br><span class="line">        minChildIndex = <span class="built_in">findMinChild</span>(heap, parentIndex, length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>至此编程结束，成功AC</strong></p>
+]]></content>
+      <categories>
+        <category>算法笔记</category>
+      </categories>
+      <tags>
+        <tag>algorithem</tag>
+        <tag>test</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>AI Lab1: 产生式动物识别系统</title>
+    <url>/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<h2 id="一、实验要求"><a href="#一、实验要求" class="headerlink" title="一、实验要求"></a>一、实验要求</h2><p>产生式识别系统通过一个规则库对特征进行识别，并推断出结果。<br>系统首先输入读入一些已知特征，随后根据规则库中的规则不断尝试推断出新的特征，直至最终得到结果，或是发现无法推出结果。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/rules.jpeg"
+                      alt="rules" title="规则库"
+                ><figcaption>rules</figcaption></figure><br>实验要求以上图规则库为基础，编写一个产生式动物识别系统。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/simple.jpg"
+                      alt="simple" title="输出样例"
+                ><figcaption>simple</figcaption></figure><br>如上图所示，要求程序首先输出所有可选特征，用户输入已知特征后，程序根据规则库进行推理，输出推理过程及最后的识别结果。</p>
+<h2 id="二、算法设计"><a href="#二、算法设计" class="headerlink" title="二、算法设计"></a>二、算法设计</h2><p>算法本身很简单，正好最近在学python，试着用python写一写。</p>
+<h4 id="Init"><a href="#Init" class="headerlink" title="Init"></a>Init</h4><p>我们先把所有特征存在一个数组里，以便后面推理过程的输出。<br>同时，我们按题目要求输出所有可选特征，并要求用户按序号进行输入。<br>最后，我们还需要根据特征序号存储所有的推理规则。推理规则都是由若干个特征推出一个新特征，一个键为向量、值为变量的键值对就可以很好的存储。<br>我们设键向量中的值为推理的前提特征，而值为推理得的新特征，根据实验所给的规则库一一编写即可。</p>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line">feature = [</span><br><span class="line">    <span class="string">&quot;空&quot;</span>, <span class="string">&quot;有毛发&quot;</span>, <span class="string">&quot;产奶&quot;</span>, <span class="string">&quot;有羽毛&quot;</span>, <span class="string">&quot;会飞&quot;</span>, <span class="string">&quot;会下蛋&quot;</span>,     <span class="comment"># 空用于占位</span></span><br><span class="line">    <span class="string">&quot;吃肉&quot;</span>, <span class="string">&quot;有犬齿&quot;</span>, <span class="string">&quot;有爪&quot;</span>, <span class="string">&quot;眼盯前方&quot;</span>, <span class="string">&quot;有蹄&quot;</span>,</span><br><span class="line">    <span class="string">&quot;反刍&quot;</span>, <span class="string">&quot;黄褐色&quot;</span>, <span class="string">&quot;有斑点&quot;</span>, <span class="string">&quot;有黑色条纹&quot;</span>, <span class="string">&quot;长脖&quot;</span>,</span><br><span class="line">    <span class="string">&quot;长腿&quot;</span>, <span class="string">&quot;不会飞&quot;</span>, <span class="string">&quot;会游泳&quot;</span>, <span class="string">&quot;黑白二色&quot;</span>, <span class="string">&quot;善飞&quot;</span>,</span><br><span class="line">    <span class="string">&quot;哺乳类&quot;</span>, <span class="string">&quot;鸟类&quot;</span>, <span class="string">&quot;食肉类&quot;</span>, <span class="string">&quot;蹄类&quot;</span>, <span class="string">&quot;金钱豹&quot;</span>,</span><br><span class="line">    <span class="string">&quot;虎&quot;</span>, <span class="string">&quot;长颈鹿&quot;</span>, <span class="string">&quot;斑马&quot;</span>, <span class="string">&quot;鸵鸟&quot;</span>, <span class="string">&quot;企鹅&quot;</span>, <span class="string">&quot;信天翁&quot;</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;有动物特征如下:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*1:有毛发  2:产奶  3:有羽毛  4:会飞  5:会下蛋&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*6:吃肉  7:有犬齿  8:有爪  9:眼盯前方  10:有蹄&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*11:反刍  12:黄褐色  13:有斑点  14:有黑色条纹  15:长脖&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*16:长腿  17:不会飞  18:会游泳  19:黑白二色  20:善飞&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*21:哺乳类  22:鸟类  23:食肉类  24:蹄类&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;请输入数字选择动物的特征,结尾处用0:&quot;</span>)</span><br><span class="line"></span><br><span class="line">rules = [<span class="number">0</span>] * <span class="number">26</span></span><br><span class="line"><span class="comment"># 读入已知规则</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    t = <span class="built_in">int</span>(<span class="built_in">input</span>())</span><br><span class="line">    <span class="keyword">if</span> t == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    rules[t] = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 规则库</span></span><br><span class="line"><span class="keyword">match</span> = &#123;</span><br><span class="line">    (<span class="number">1</span>,): <span class="number">21</span>, (<span class="number">2</span>,): <span class="number">21</span>, (<span class="number">3</span>,): <span class="number">22</span>, (<span class="number">4</span>, <span class="number">5</span>): <span class="number">22</span>,</span><br><span class="line">    (<span class="number">6</span>,): <span class="number">23</span>, (<span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>): <span class="number">23</span>, (<span class="number">21</span>, <span class="number">9</span>): <span class="number">24</span>, (<span class="number">21</span>, <span class="number">11</span>): <span class="number">24</span>,</span><br><span class="line">    (<span class="number">21</span>, <span class="number">23</span>, <span class="number">12</span>, <span class="number">13</span>): <span class="number">25</span>, (<span class="number">21</span>, <span class="number">23</span>, <span class="number">12</span>, <span class="number">14</span>): <span class="number">26</span>, (<span class="number">24</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">13</span>): <span class="number">27</span>,</span><br><span class="line">    (<span class="number">24</span>, <span class="number">14</span>): <span class="number">28</span>, (<span class="number">22</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>, <span class="number">19</span>): <span class="number">29</span>, (<span class="number">22</span>, <span class="number">18</span>, <span class="number">17</span>, <span class="number">19</span>): <span class="number">30</span>, (<span class="number">22</span>, <span class="number">20</span>): <span class="number">31</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h4 id="Inference"><a href="#Inference" class="headerlink" title="Inference"></a>Inference</h4><p>推理过程也很简单，我们只要写一个大循环，不断遍历所有规则，尝试寻找所有前提特征均已知且推出特征未知的规则，并将其推出特征加入已知特征即可。<br>需要注意，由于可能存在大序号特征推出小序号特征，进而导致出现新的可使用规则的情况，因此需要用while循环不断遍历，直至推得最终动物，或是没有任何一个规则可使用，即推理失败。循环嵌套比较多，也比较复杂，我也懒得对循环做拆分了，多设几个flag即可。<br>而在推理过程中，每当使用一个能推出新特征的规则，我们就用前面的特征数组输出该规则的前提特征和推出特征，即可实现中间过程的打印。<br>最终，我们输出系统的识别结果，代码如下。</p>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line">flag = <span class="literal">True</span></span><br><span class="line">ans = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> flag:</span><br><span class="line">    check = <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> v, res <span class="keyword">in</span> <span class="keyword">match</span>.items():</span><br><span class="line">        m = <span class="built_in">all</span>(rules[i] == <span class="number">1</span> <span class="keyword">for</span> i <span class="keyword">in</span> v)</span><br><span class="line">        <span class="keyword">if</span> res &lt; <span class="number">25</span> <span class="keyword">and</span> rules[res]:</span><br><span class="line">            m = <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> m:</span><br><span class="line">            check = <span class="number">0</span></span><br><span class="line">            <span class="built_in">print</span>(feature[v[<span class="number">0</span>]], end=<span class="string">&quot;&quot;</span>)</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="built_in">len</span>(v)):</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;+&quot;</span> + feature[v[i]], end=<span class="string">&quot;&quot;</span>)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot; -&gt;&quot;</span>, feature[res])</span><br><span class="line">            <span class="keyword">if</span> res &lt; <span class="number">25</span>:</span><br><span class="line">                rules[res] = <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                ans = res</span><br><span class="line">                flag = <span class="literal">False</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">if</span> check:</span><br><span class="line">        flag = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ans:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;该动物是:&quot;</span>, feature[ans])</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;无法推理出该动物是什么&quot;</span>)</span><br></pre></td></tr></table></figure></div>
+<h2 id="三、程序测试"><a href="#三、程序测试" class="headerlink" title="三、程序测试"></a>三、程序测试</h2><p>随便测了两个，一个推出企鹅，一个推不出来。<br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/test1.jpeg"
+                      alt="test1" title="测试样例1: 企鹅"
+                ><figcaption>test1</figcaption></figure><br><figure class="image-caption"><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/test2.jpeg"
+                      alt="test2" title="测试样例2: 无动物"
+                ><figcaption>test2</figcaption></figure></p>
+<h2 id="四、实验总结"><a href="#四、实验总结" class="headerlink" title="四、实验总结"></a>四、实验总结</h2><p>很简单，没啥总结的。<br>python语法真怪。</p>
+<h2 id="五、源码"><a href="#五、源码" class="headerlink" title="五、源码"></a>五、源码</h2><p>最后放一下全部代码。</p>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line">feature = [</span><br><span class="line">    <span class="string">&quot;空&quot;</span>, <span class="string">&quot;有毛发&quot;</span>, <span class="string">&quot;产奶&quot;</span>, <span class="string">&quot;有羽毛&quot;</span>, <span class="string">&quot;会飞&quot;</span>, <span class="string">&quot;会下蛋&quot;</span>,     <span class="comment"># 空用于占位</span></span><br><span class="line">    <span class="string">&quot;吃肉&quot;</span>, <span class="string">&quot;有犬齿&quot;</span>, <span class="string">&quot;有爪&quot;</span>, <span class="string">&quot;眼盯前方&quot;</span>, <span class="string">&quot;有蹄&quot;</span>,</span><br><span class="line">    <span class="string">&quot;反刍&quot;</span>, <span class="string">&quot;黄褐色&quot;</span>, <span class="string">&quot;有斑点&quot;</span>, <span class="string">&quot;有黑色条纹&quot;</span>, <span class="string">&quot;长脖&quot;</span>,</span><br><span class="line">    <span class="string">&quot;长腿&quot;</span>, <span class="string">&quot;不会飞&quot;</span>, <span class="string">&quot;会游泳&quot;</span>, <span class="string">&quot;黑白二色&quot;</span>, <span class="string">&quot;善飞&quot;</span>,</span><br><span class="line">    <span class="string">&quot;哺乳类&quot;</span>, <span class="string">&quot;鸟类&quot;</span>, <span class="string">&quot;食肉类&quot;</span>, <span class="string">&quot;蹄类&quot;</span>, <span class="string">&quot;金钱豹&quot;</span>,</span><br><span class="line">    <span class="string">&quot;虎&quot;</span>, <span class="string">&quot;长颈鹿&quot;</span>, <span class="string">&quot;斑马&quot;</span>, <span class="string">&quot;鸵鸟&quot;</span>, <span class="string">&quot;企鹅&quot;</span>, <span class="string">&quot;信天翁&quot;</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;有动物特征如下:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*1:有毛发  2:产奶  3:有羽毛  4:会飞  5:会下蛋&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*6:吃肉  7:有犬齿  8:有爪  9:眼盯前方  10:有蹄&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*11:反刍  12:黄褐色  13:有斑点  14:有黑色条纹  15:长脖&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*16:长腿  17:不会飞  18:会游泳  19:黑白二色  20:善飞&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*21:哺乳类  22:鸟类  23:食肉类  24:蹄类&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;请输入数字选择动物的特征,结尾处用0:&quot;</span>)</span><br><span class="line"></span><br><span class="line">rules = [<span class="number">0</span>] * <span class="number">26</span></span><br><span class="line"><span class="comment"># 读入已知规则</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    t = <span class="built_in">int</span>(<span class="built_in">input</span>())</span><br><span class="line">    <span class="keyword">if</span> t == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    rules[t] = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 规则库</span></span><br><span class="line"><span class="keyword">match</span> = &#123;</span><br><span class="line">    (<span class="number">1</span>,): <span class="number">21</span>, (<span class="number">2</span>,): <span class="number">21</span>, (<span class="number">3</span>,): <span class="number">22</span>, (<span class="number">4</span>, <span class="number">5</span>): <span class="number">22</span>,</span><br><span class="line">    (<span class="number">6</span>,): <span class="number">23</span>, (<span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>): <span class="number">23</span>, (<span class="number">21</span>, <span class="number">9</span>): <span class="number">24</span>, (<span class="number">21</span>, <span class="number">11</span>): <span class="number">24</span>,</span><br><span class="line">    (<span class="number">21</span>, <span class="number">23</span>, <span class="number">12</span>, <span class="number">13</span>): <span class="number">25</span>, (<span class="number">21</span>, <span class="number">23</span>, <span class="number">12</span>, <span class="number">14</span>): <span class="number">26</span>, (<span class="number">24</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">13</span>): <span class="number">27</span>,</span><br><span class="line">    (<span class="number">24</span>, <span class="number">14</span>): <span class="number">28</span>, (<span class="number">22</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>, <span class="number">19</span>): <span class="number">29</span>, (<span class="number">22</span>, <span class="number">18</span>, <span class="number">17</span>, <span class="number">19</span>): <span class="number">30</span>, (<span class="number">22</span>, <span class="number">20</span>): <span class="number">31</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">flag = <span class="literal">True</span></span><br><span class="line">ans = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> flag:</span><br><span class="line">    check = <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> v, res <span class="keyword">in</span> <span class="keyword">match</span>.items():</span><br><span class="line">        m = <span class="built_in">all</span>(rules[i] == <span class="number">1</span> <span class="keyword">for</span> i <span class="keyword">in</span> v)</span><br><span class="line">        <span class="keyword">if</span> res &lt; <span class="number">25</span> <span class="keyword">and</span> rules[res]:</span><br><span class="line">            m = <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> m:</span><br><span class="line">            check = <span class="number">0</span></span><br><span class="line">            <span class="built_in">print</span>(feature[v[<span class="number">0</span>]], end=<span class="string">&quot;&quot;</span>)</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="built_in">len</span>(v)):</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;+&quot;</span> + feature[v[i]], end=<span class="string">&quot;&quot;</span>)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot; -&gt;&quot;</span>, feature[res])</span><br><span class="line">            <span class="keyword">if</span> res &lt; <span class="number">25</span>:</span><br><span class="line">                rules[res] = <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                ans = res</span><br><span class="line">                flag = <span class="literal">False</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">if</span> check:</span><br><span class="line">        flag = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ans:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;该动物是:&quot;</span>, feature[ans])</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;无法推理出该动物是什么&quot;</span>)</span><br></pre></td></tr></table></figure></div>]]></content>
+      <categories>
+        <category>人工智能基础实验</category>
       </categories>
       <tags>
         <tag>TJU CS Lab</tag>
@@ -465,241 +741,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Socket编程日志 Week3</title>
-    <url>/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/</url>
-    <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第三周实验只需实现一个重要的功能：HTTP pipeline。<br>具体来说，服务器需要按照RFC2616规定的顺序处理HTTP的并发请求。同时，对于错误的请求，服务器响应错误后不会影响后续消息的响应。</p>
-<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h3 id="1-Pipeline模块"><a href="#1-Pipeline模块" class="headerlink" title="1. Pipeline模块"></a>1. Pipeline模块</h3><p>首先，根据RFC2616的规定，应先处理先到达的请求，后处理后达到的请求。而在实验的环境中，体现为先处理整体请求输入中最靠前的请求，再逐个向后进行处理。<br>下面对此模块进行设计。</p>
-<h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>在第一周实验中，给出过HTTP请求的结构如下所示。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/HTTPRequest.jpeg"
-                      alt="HTTP Request" title="HTTP 请求报文结构"
-                ><figcaption>HTTP Request</figcaption></figure><br>由于在本实验中所支持的请求均不包含请求数据的部分，因此在服务器处理至最后的回车符和换行符后即可认为一个请求已经结束。经过观察容易发现，在请求报文的最后会出现<code>&quot;\r\n\r\n&quot;</code>这一特殊字符串，且在请求报文的其它地方均不会出现此字符串，因此可将其作为检测不同请求的分隔符，来对不同的请求报文进行区分。</p>
-<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>在清楚了如何识别不同请求报文的分隔符后，只需简单的根据分隔符将所有请求拆分开，再对每个请求进行响应即可。在对消息进行拆分时，应按如下步骤进行。</p>
-<ol>
-<li>读取全部请求报文，从头开始进行拆分；</li>
-<li>记录当前的处理位置，若超出报文长度则代表拆分完毕；</li>
-<li>通过串匹配算法匹配未处理串中第一个分隔符的末尾位置，即为当前请求的结束位置；</li>
-<li>计算匹配长度；</li>
-<li>根据匹配长度提取当前请求，并传入服务器响应模型进行响应；</li>
-<li>更新当前处理位置为请求结束位置</li>
-<li>循环处理直至拆分完毕。</li>
-</ol>
-<p>根据以上设计，可以绘制拆分流程图如下。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/separate.jpeg"
-                      alt="Pipeline Separate" title="Pipeline请求拆分流程图"
-                ><figcaption>Pipeline Separate</figcaption></figure></p>
-<h3 id="2-客户端接收模块"><a href="#2-客户端接收模块" class="headerlink" title="2. 客户端接收模块"></a>2. 客户端接收模块</h3><p>需要注意，由于在先前框架代码的设计中，客户端每发送一次请求报文只会接受一个响应，而在本次实验中服务器会尝试发送多个响应。因此还需要对客户端程序进行一定修改，使其支持对多个响应的连续接收。</p>
-<h5 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>这部分的设计比较简单，只需将框架代码中接收响应的模块放在一个循环结构中，每接收到一个合法响应便输出即可。</p>
-<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><h3 id="1-Pipeline模块-1"><a href="#1-Pipeline模块-1" class="headerlink" title="1. Pipeline模块"></a>1. Pipeline模块</h3><p>在对Pipeline模块进行实现时，除去对前述流程的实现外，缓冲区的管理也是一个比较重要的问题。<br>本模块的处理过程中需要存储三部分内容：全部请求报文、单次请求报文和单次请求的响应。因此，可以设置3个不同的缓冲区：<code>buf_all</code>、<code>buf_recv</code>、<code>buf_send</code>，分别存储上述三种数据。也正因此，本次实验中还需对原先的服务器响应模块进行部分修改，以匹配新的缓冲区设计。<br>根据前面的流程图和对缓冲区的新设计，可以得到Pipeline模块的伪代码如下：</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Pipeline Module</span></figcaption><table><tr><td class="code"><pre><span class="line">BUFFER buf_all, buf_recv, buf_send</span><br><span class="line">sep = &quot;\r\n\r\n&quot;</span><br><span class="line"></span><br><span class="line">RECV FROM CLIENT TO buf_all</span><br><span class="line">WHILE start_loc &lt; buf_all.length</span><br><span class="line">    end_loc = MATCH sep END CHAR IN buf_all + start_loc</span><br><span class="line">    length = end_loc - start_loc + 1</span><br><span class="line"></span><br><span class="line">    IF length &gt; left_length</span><br><span class="line">        THEN BREAK</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    COPY buf_all FROM start_loc TO end_loc INTO buf_recv</span><br><span class="line">    start_loc += length</span><br><span class="line"></span><br><span class="line">    CALL SERVER ANSWEERING MODULE</span><br><span class="line">        SAVE ANSWER IN buf_send</span><br><span class="line">        SEND buf_send</span><br><span class="line">    END CALL</span><br><span class="line">END WHILE</span><br></pre></td></tr></table></figure></div>
-<p>由此便可完成Pipeline模块的实现。</p>
-<h3 id="2-客户端接收模块-1"><a href="#2-客户端接收模块-1" class="headerlink" title="2. 客户端接收模块"></a>2. 客户端接收模块</h3><p>此模块的实现只需在框架代码上进行少量更改即可。框架代码可以用如下伪代码表示。</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Client Recv Old</span></figcaption><table><tr><td class="code"><pre><span class="line">IF RECV FROM SERVER TO buf AND buf.length &gt; 1</span><br><span class="line">    THEN PRINT buf</span><br></pre></td></tr></table></figure></div>
-<p>在此只需将<code>if</code>判断语句更改为<code>while</code>循环语句，并进行一些细节上的匹配即可。更改后可以用如下伪代码表示。</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Client Recv New</span></figcaption><table><tr><td class="code"><pre><span class="line">WHILE RECV FROM SERVER TO buf AND buf.length &gt; 1</span><br><span class="line">    THEN PRINT buf</span><br></pre></td></tr></table></figure></div>
-<p>至此，可以完成对客户端接收多个响应功能的实现。</p>
-<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><h5 id="本地测试"><a href="#本地测试" class="headerlink" title="本地测试"></a>本地测试</h5><p>框架代码中给出了一个可用于测试的<code>request_pipeline</code>文件，本次实验实现的程序也可以对该测试文件得到正确的结果。但该文件内容较长，不易于展示，因此这里自行编写一个较为简单的测试文件<code>sample_pipeline</code>，其中包含3个连续的HTTP请求，分别为未实现请求，格式错误的请求，以及<code>HTTP GET</code>请求，以此验证服务器能否正确拆分并响应请求，且对错误请求的处理不会影响后续请求的处理。<br>测试结果如下。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/test.jpeg"
-                      alt="Test Result" title="本地测试结果"
-                ><figcaption>Test Result</figcaption></figure><br>可以看到，服务器对每个请求都进行了正确的响应，且响应顺序正确。<br>此外，根据日志记录也可以看出，服务器对每个拆分出的请求都生成并发送了正确的响应。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/log.jpeg"
-                      alt="Log Recorded" title="响应日志记录"
-                ><figcaption>Log Recorded</figcaption></figure></p>
-<h5 id="Autolab测试"><a href="#Autolab测试" class="headerlink" title="Autolab测试"></a>Autolab测试</h5><p><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/29/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week3/autolab.jpeg"
-                      alt="Autolab" title="Autolab 自动测试结果"
-                ><figcaption>Autolab</figcaption></figure></p>
-<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>了解并成功实现了对连续HTTP请求的拆分和分别处理，对HTTP请求的结构有了更进一步的认识；加深了对缓冲区管理的意识和了解程度，明白了某些复杂功能需要基于良好的缓冲区设计；更深入的理解了客户端和服务器间的通信方式，并成功实现了客户端对多个连续响应的接收和打印。</p>
-]]></content>
-      <categories>
-        <category>计算机网络课程设计</category>
-      </categories>
-      <tags>
-        <tag>TJU CS Lab</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Socket编程日志 Week5</title>
-    <url>/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/</url>
-    <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第五周的实验需要实现服务器对 CGI 请求的支持，并能在 CGI 请求出错时返回对应的错误信息。<br>具体而言，对于 CGI 请求，服务器需要先对其表单的输入、对应 CGI 处理脚本的路径等信息进行解析，并据此配置 CGI 程序的环境变量。随后，服务器需要创建一个新线程，执行外部的 CGI 处理程序来生成响应，获取到响应并发送给客户端。此外，若在整个 CGI 处理过程中出现了任何错误，服务器都向客户端发送 500 报错信息。</p>
-<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h3 id="1-CGI-请求检测模块"><a href="#1-CGI-请求检测模块" class="headerlink" title="1. CGI 请求检测模块"></a>1. CGI 请求检测模块</h3><p>此判断模块依附于 GET&#x2F;HEAD 请求之下，若为这两种请求，则根据请求的 URI 判断是否为 CGI 请求。如果符合 CGI 请求格式，则调用 CGI 处理模块并进行响应，否则按普通的 GET&#x2F;HEAD 请求进行处理。</p>
-<h3 id="2-CGI-处理模块"><a href="#2-CGI-处理模块" class="headerlink" title="2. CGI 处理模块"></a>2. CGI 处理模块</h3><p>本模块首先从请求中提取出 CGI 脚本路径等必要信息，并调用环境变量配置模块进行 环境配置。随后，需要开辟一个新线程来运行 CGI 程序，并将 CGI 程序生成的响应存储至缓冲区中，以发送给客户端。此外，若处理过程中产生错误，则应返回错误，以向客户端发送 500 错误信息。</p>
-<h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>首先，需要了解 CGI 请求的 URI 结构，以便从中提取所需信息。URI 共由 3 部分构成， 为&#x2F;cgi-bin&#x2F;，path 和 query。分别代表脚本的目录路径(也用于标识 CGI 请求)，脚本路径和表单读取数据。具体结构如下方伪代码所示。</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>CGI uri</span></figcaption><table><tr><td class="code"><pre><span class="line">Request-&gt;uri:  /cgi-bin/path?query1&amp;query2&amp;……</span><br></pre></td></tr></table></figure></div>
-
-<p>此外，本模块中需要创建新线程来运行CGI程序，因此还需要了解线程管理相关的pid等数据结构。同时，在CGI程序进程和服务器程序进程进行通信时，需要使用到pipe（管道通信）。pipe的数据结构为一个二维int型数组，0和1分别存储标识读端口和写端口的标识号，可以借助如下伪代码进行理解。</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>pthread pipe</span></figcaption><table><tr><td class="code"><pre><span class="line">线程1/读端口  my_pipe[0] ========= my_pipe[1]  线程2/写端口</span><br></pre></td></tr></table></figure></div>
-
-<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>了解以上数据结构后，可以按如下步骤进行CGI请求处理：<br>1.	根据URI获取CGI脚本文件路径；<br>2.	调用配置模块配置CGI程序环境变量<br>3.	创建子线程，在子线程中根据脚本路径运行CGI脚本<br>4.	创建管道，子线程将生成的响应写入管道<br>5.	父进程从管道中读取响应<br>6.	父进程将响应写入缓冲区中</p>
-<p>根据以上设计，可以得到CGI请求处理流程图如下。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/cgi_handle.jpeg"
-                      alt="CGI Handle" title="CGI处理模块"
-                ><figcaption>CGI Handle</figcaption></figure></p>
-<h3 id="3-环境变量配置模块"><a href="#3-环境变量配置模块" class="headerlink" title="3. 环境变量配置模块"></a>3. 环境变量配置模块</h3><h5 id="数据结构设计-1"><a href="#数据结构设计-1" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>此部分需要针对环境变量设计一个数据结构。考虑到每个环境变量都为一个固定格式的字符串，因此采用一个字符串数组在存储环境变量，每个元素均用于存储一个环境变量。<br>此外，此部分中许多环境变量需要从请求的Request结构体中获取，不过这一结构在前面已介绍过，故不再赘述。</p>
-<h5 id="协议规则设计-1"><a href="#协议规则设计-1" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>此模块主要是对各个环境变量进行配置，需要自行设计的内容较少，且在手册中有十分详细的介绍，不再赘述。</p>
-<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><h3 id="1-CGI-请求检测模块-1"><a href="#1-CGI-请求检测模块-1" class="headerlink" title="1. CGI 请求检测模块"></a>1. CGI 请求检测模块</h3><p>在实现上，前面提到过，对CGI请求的检测可以通过URI来完成。若某个HTTP GET&#x2F;HEAD请求的URI起始为“&#x2F;cgi-bin&#x2F;”，则可认为其为一个CGI请求。此外，如果CGI处理模块返回错误，则向客户端响应500错误信息。调用CGI处理模块后的响应、报错等部分则与GET&#x2F;HEAD请求的处理类似。</p>
-<h3 id="2-CGI-处理模块-1"><a href="#2-CGI-处理模块-1" class="headerlink" title="2. CGI 处理模块"></a>2. CGI 处理模块</h3><p>首先，需要实现对CGI脚本文件的获取。前面提到过，在请求的URI中可以获取到脚本文件的路径，但其为“&#x2F;cgi-bin&#x2F;path”的形式，直接按此作为路径查找会进入系统文件夹。因此，出于实验的简单考量，可以对路径进行一定修改，使其变为在当前目录下的相对路径，再在实验目录下创建“cgi-bin”文件夹，并将所有脚本文件存储在其中即可。下面给出一个地址转换的例子。</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>addr trans</span></figcaption><table><tr><td class="code"><pre><span class="line">Request-&gt;uri:    /cgi-bin/path</span><br><span class="line">Path to Locate:   ./cgi-bin/path</span><br></pre></td></tr></table></figure></div>
-
-<p>其余部分只需参照前面的设计进行实现即可。</p>
-<h3 id="3-环境变量配置模块-1"><a href="#3-环境变量配置模块-1" class="headerlink" title="3. 环境变量配置模块"></a>3. 环境变量配置模块</h3><p>环境变量的配置方法在手册中已有详细说明，只需按照手册要求逐条配置，最后将其存储在前面设计的数据结构中，传入CGI处理程序中即可。因此在此不再展开。</p>
-<h3 id="4-HTML及CGI脚本文件"><a href="#4-HTML及CGI脚本文件" class="headerlink" title="4. HTML及CGI脚本文件"></a>4. HTML及CGI脚本文件</h3><p>在本次实验中，还需要编写一个HTML文件，来展示一个可以填写表单的网页。此外，还需要编写对应的CGI脚本文件（使用Python编写），来根据表单中获取的数据生成动态网页。这两部分涉及到的知识与Socket编程关系较弱，且这两部分内容也较为简单，因此在此不再展开介绍这两个文件的设计和实现。</p>
-<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><h5 id="浏览器测试（表单已填写）"><a href="#浏览器测试（表单已填写）" class="headerlink" title="浏览器测试（表单已填写）"></a>浏览器测试（表单已填写）</h5><p><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Login1.jpeg"
-                      alt="Static Page 1" title="静态网页1"
-                ><figcaption>Static Page 1</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Result1.jpeg"
-                      alt="CGI Page 1" title="CGI生成网页1"
-                ><figcaption>CGI Page 1</figcaption></figure></p>
-<h5 id="浏览器测试（表单未填写）"><a href="#浏览器测试（表单未填写）" class="headerlink" title="浏览器测试（表单未填写）"></a>浏览器测试（表单未填写）</h5><p><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Login2.jpeg"
-                      alt="Static Page 2" title="静态网页2"
-                ><figcaption>Static Page 2</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/07/01/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week5/Result2.jpeg"
-                      alt="CGI Page 2" title="CGI生成网页2"
-                ><figcaption>CGI Page 2</figcaption></figure></p>
-<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>接触、了解了CGI程序及其功能，明白了如何根据用户的填写动态生成网页，以实现多样的应用层功能。</p>
-]]></content>
-      <categories>
-        <category>计算机网络课程设计</category>
-      </categories>
-      <tags>
-        <tag>TJU CS Lab</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>TJUOJ 4441: 合并果子（堆）</title>
-    <url>/2023/09/15/tjuoj-4441-%E5%90%88%E5%B9%B6%E6%9E%9C%E5%AD%90%EF%BC%88%E5%A0%86%EF%BC%89/</url>
-    <content><![CDATA[<p>补程设课，没什么事干，就在学校OJ上找了道<a class="link"   href="http://tjuacm.chaosheng.top/problem.php?id=4441" >简单题</a>做<br>算法复健一下，顺便试一试代码块插入</p>
-<p>题目给了提示，应该是道堆排序的题<br>由于每次体力增加值为当前已合并果子的总数，因此我们只需保证每次合并的两个堆都是当前果子数量最少的两个堆即可<br>思路有些像霍夫曼编码，但题目只要求求最终的体力消耗，所以没有构建霍夫曼树的必要<br>准备直接做一个最小堆，每次合并操作都取两次堆顶元素，将求出的和累加至totalCost变量中，并放回堆里<br>循环至只剩一个元素时，totalCost中值即是所求答案</p>
-<p><strong>理论存在，实践开始</strong></p>
-<h2 id="Input-Init"><a href="#Input-Init" class="headerlink" title="Input &amp;&amp; Init"></a>Input &amp;&amp; Init</h2><p>首先进行数据读入和建堆操作<br>使用scanf读入数据增加速度<br>然后偷个懒，用 <code>#include &lt;algorithem&gt;</code> 的make_heap函数建堆<br><strong>需要注意，题中给出的数据最大可能为n&#x3D;30000，且每项均为20000</strong><br><strong>因此结果最大可能为2e4至6e8的等差求和，即9e12左右</strong><br><strong>考虑到我们会将中间结果存在堆中，因此需要一个64位的堆和totalCost</strong></p>
-<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="type">uint64_t</span> *heap;</span><br><span class="line"><span class="type">int</span> N;</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;N);</span><br><span class="line">heap = <span class="keyword">new</span> <span class="type">uint64_t</span>[N];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%lld&quot;</span>, heap + i);</span><br><span class="line"></span><br><span class="line"><span class="built_in">make_heap</span>(heap, heap + N, greater&lt;&gt;());</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="Main-Algorithem"><a href="#Main-Algorithem" class="headerlink" title="Main Algorithem"></a>Main Algorithem</h2><p>现在编写主算法<br>每次从堆顶取两个数进行加和，随后将结果存入堆中，并累加totalCost，直至堆中只剩一个元素</p>
-<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="type">uint64_t</span> totalCost = <span class="number">0</span>, currentCost;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> mergeTimes = N - <span class="number">1</span>; mergeTimes &gt; <span class="number">0</span>; mergeTimes--) &#123;</span><br><span class="line">    currentCost = heap[<span class="number">0</span>];</span><br><span class="line">    heap[<span class="number">0</span>] = heap[mergeTimes];</span><br><span class="line">    <span class="built_in">maintainHeap</span>(heap, mergeTimes);</span><br><span class="line"></span><br><span class="line">    currentCost += heap[<span class="number">0</span>];</span><br><span class="line">    heap[<span class="number">0</span>] = currentCost;</span><br><span class="line">    <span class="built_in">maintainHeap</span>(heap, mergeTimes);</span><br><span class="line">    </span><br><span class="line">    totalCost += currentCost;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="Quoting-Function"><a href="#Quoting-Function" class="headerlink" title="Quoting Function"></a>Quoting Function</h2><p>最后实现用于维护堆的<code>maintainHeap</code>函数<br>我们只需跟踪堆顶元素，并循环判断判断它和它最小孩子的大小关系，若大于则与之交换并继续循环，否则返回</p>
-<div class="highlight-container" data-rel="C++"><figure class="iseeu highlight c++"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">//Find the minimum element in heap[i]&#x27;s children</span></span><br><span class="line"><span class="comment">//Return it&#x27;s index</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">findMinChild</span><span class="params">(<span class="type">uint64_t</span>* heap, <span class="type">int</span> parentIndex, <span class="type">int</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>((parentIndex * <span class="number">2</span>) + <span class="number">2</span> &lt; length)</span><br><span class="line">        <span class="keyword">return</span> heap[(parentIndex * <span class="number">2</span>) + <span class="number">1</span>] &lt; heap[(parentIndex * <span class="number">2</span>) + <span class="number">2</span>] ? (parentIndex * <span class="number">2</span>) + <span class="number">1</span> : (parentIndex * <span class="number">2</span>) + <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>((parentIndex * <span class="number">2</span>) + <span class="number">1</span> &lt; length)</span><br><span class="line">        <span class="built_in">return</span> (parentIndex * <span class="number">2</span>) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//maintain the heap as a minimum heap after changing the top</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">maintainHeap</span><span class="params">(<span class="type">uint64_t</span>* heap, <span class="type">int</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> parentIndex = <span class="number">0</span>, minChildIndex;</span><br><span class="line">    </span><br><span class="line">    minChildIndex = <span class="built_in">findMinChild</span>(heap, parentIndex, length);</span><br><span class="line">    <span class="keyword">while</span> (heap[parentIndex] &gt; heap[minChildIndex] &amp;&amp; minChildIndex != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="type">long</span> <span class="type">long</span> temp = heap[parentIndex];</span><br><span class="line">        heap[parentIndex] = heap[minChildIndex];</span><br><span class="line">        heap[minChildIndex] = temp;</span><br><span class="line">        </span><br><span class="line">        parentIndex = minChildIndex;</span><br><span class="line">        minChildIndex = <span class="built_in">findMinChild</span>(heap, parentIndex, length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-
-<p><strong>至此编程结束，成功AC</strong></p>
-]]></content>
-      <categories>
-        <category>算法笔记</category>
-      </categories>
-      <tags>
-        <tag>algorithem</tag>
-        <tag>test</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Socket编程日志 Week4</title>
-    <url>/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/</url>
-    <content><![CDATA[<h2 id="一、实验概要"><a href="#一、实验概要" class="headerlink" title="一、实验概要"></a>一、实验概要</h2><p>第四周实验中，需要让服务器在等待一个客户端发送下一个请求时，能够同时处理来自其它客户端的请求，进而实现对多个并发的客户端的同时处理。<br>具体而言，并发处理需要通过select()方法实现，并支持最多1024个并发连接。<br>此外，如果某些客户端在通信过程中“暂停”，或是出现错误，服务器应不受该客户端影响，继续为其它客户端提供服务。</p>
-<h2 id="二、协议设计"><a href="#二、协议设计" class="headerlink" title="二、协议设计"></a>二、协议设计</h2><h5 id="数据结构设计"><a href="#数据结构设计" class="headerlink" title="数据结构设计"></a>数据结构设计</h5><p>在本次实验中，要求使用select()方法实现并发处理。select是一个用于监听文件状态的函数，函数会阻塞进程并持续监听所有文件描述符编号小于其首个参数<code>MAX_FD</code>的文件描述符，直至某些文件描述符状态发生改变，例如某文件进入“读就绪”状态，函数便会返回就绪文件的数量，并将改变的文件描述符<code>fd</code>加入其第二个参数<code>READ_FD_SET</code>(可读文件描述符集合)。而在实验中，每个客户端和服务器的<code>socket</code>也是一个可读文件，因此通过select函数监听所有新增的可读文件便可以接收到所有发送请求的客户端socket。</p>
-<p>同时，还需要了解<code>fd_set</code>结构体的组织方式和相关操作，以便后续的设计和实现。<code>fd_set</code>以位图的形式存储了一个文件描述符集合的某种状态，每一位均对应一个文件描述符，而该位的<code>0/1</code>值便对应着该文件描述符的特定状态情况。由此，只需不断通过select方法监听客户端和服务器socket的状态集合，再遍历集合来检查每个客户端socket是否活跃，即可得到所有与服务器建立并发连接的客户端socket的文件描述符。</p>
-<p>此外，为了正确的与客户端建立连接并通信，还需要组织一个socket数组，用于储存所有经过前述步骤，与服务器建立连接的客户端socket。至此，就能顺利得到所有与服务器建立并发连接的客户端socket，进而可以对其请求进行处理和响应。</p>
-<h5 id="协议规则设计"><a href="#协议规则设计" class="headerlink" title="协议规则设计"></a>协议规则设计</h5><p>在掌握了以上结构的定义后，便可以按如下步骤来对并发的客户端请求进行接收、管理和响应：</p>
-<ol>
-<li>使用select方法监听客户端和服务器fd；</li>
-<li>获取活跃fd，据此获得待连接客户端socket的fd，并加入已连接fd_set中；</li>
-<li>根据已连接fd_set中的fd获取所有已连接客户端socket，并组织一个在socket集合中；</li>
-<li>遍历socket集合，对每个客户端接收并响应一次请求，并将其移出连接集合；</li>
-<li>循环执行上述步骤，不断连接并逐个响应所有发送请求的客户端，以此实现并发处理的效果。</li>
-</ol>
-<p>根据以上设计，可以得到并发处理模块的处理流程图如下。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/multi.jpeg"
-                      alt="Multi-Client Answering" title="多客户端并发响应流程图"
-                ><figcaption>Multi-Client Answering</figcaption></figure></p>
-<h2 id="三、协议实现"><a href="#三、协议实现" class="headerlink" title="三、协议实现"></a>三、协议实现</h2><p>为了实现前面的协议设计，还需要清楚如何正确的对<code>fd_set</code>进行管理。在本实验环境中，可以通过宏定义来进行，以下是此次实验中使用到的部分宏定义。</p>
-<ol>
-<li>FD_ZERO(&amp;fd_set): 将集合中所有fd状态清零（设为不活跃）;</li>
-<li>FD_SET(fd, &amp;fd_set): 设置fd在集合中的状态为活跃;</li>
-<li>FD_CLR(fd, &amp;fd_set): 将fd在集合中的状态清零;</li>
-<li>FD_ISSET(fd, &amp;fd_set): 检查fd在集合中状态是否活跃，若活跃返回1，否则返回0。</li>
-</ol>
-<p>此外，还需注意将socket集合大小设为1024，并在将已连接客户端socket加入socket集合时判断客户端数量是否超限，以满足实验对最大连接数为1024的要求。</p>
-<p>由此，就可以根据流程图编写伪代码，并成功实现客户端并发处理模块。伪代码如下。</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><figcaption><span>Multi-Client Answering</span></figcaption><table><tr><td class="code"><pre><span class="line">fd_set ready_set, pos_set</span><br><span class="line">int client_set[1024]</span><br><span class="line"></span><br><span class="line">CLEAR ready_set</span><br><span class="line">CLEAR pos_set</span><br><span class="line">ADD server_fd TO ready_set</span><br><span class="line">SET ALL client_set[i] = -1</span><br><span class="line"></span><br><span class="line">LOOP</span><br><span class="line">    COPY ready_set TO pos_set</span><br><span class="line">    CALL select, SET client_num, pos_set</span><br><span class="line">    IF client_num &lt; 0</span><br><span class="line">        select ERROR</span><br><span class="line">        BREAK LOOP</span><br><span class="line">    ELSE IF client_num == 0</span><br><span class="line">        WAIT</span><br><span class="line">        CONTINUE LOOP</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    IF server_fd IS IN pos_set</span><br><span class="line">        THEN ACCEPT client_socket</span><br><span class="line">            FIND -1 IN client_set</span><br><span class="line">                ADD client_socket TO client_set</span><br><span class="line">                ADD client_fd TO ready_set</span><br><span class="line">    END IF</span><br><span class="line"></span><br><span class="line">    FOR EACH socket IN client_set</span><br><span class="line">        RECV REQUEST AND ANSWER</span><br><span class="line">        IF ANY ERROR</span><br><span class="line">            THEN CLOSE socket</span><br><span class="line">                CONTINUE</span><br><span class="line">        END IF</span><br><span class="line">        CLOSE socket</span><br><span class="line">        REMOVE fd FROM ready_set</span><br><span class="line">        REMOVE socket FROM client_set</span><br><span class="line">END LOOP</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h2><p>本次实验的本地测试和结果分析部分要求使用Apache Bench来进行性能测试，并同时对第三周的部分进行测试，通过比较分析本次实验实现模块的作用。</p>
-<h5 id="AB测试"><a href="#AB测试" class="headerlink" title="AB测试"></a>AB测试</h5><p>根据实验要求，使用Apache Bench测试在1000个HTTP请求下第三和第四周程序的响应时间。同时，分别使用10，100，1000个客户端并行发送请求，以体现支持多客户端并行后的特点。</p>
-<ol>
-<li><p>10个客户端并行<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-3.jpeg"
-                      alt="10 Week 3" title="第三周程序性能"
-                ><figcaption>10 Week 3</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-10-4.jpeg"
-                      alt="10 Week 4" title="第四周程序性能"
-                ><figcaption>10 Week 4</figcaption></figure></p>
-</li>
-<li><p>100个客户端并行<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-3.jpeg"
-                      alt="100 Week 3" title="第三周程序性能"
-                ><figcaption>100 Week 3</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-100-4.jpeg"
-                      alt="100 Week 4" title="第四周程序性能"
-                ><figcaption>100 Week 4</figcaption></figure></p>
-</li>
-<li><p>1000个客户端并行<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-3.jpeg"
-                      alt="1000 Week 3" title="第三周程序性能"
-                ><figcaption>1000 Week 3</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/1000-1000-4.jpeg"
-                      alt="1000 Week 4" title="第四周程序性能"
-                ><figcaption>1000 Week 4</figcaption></figure></p>
-</li>
-</ol>
-<h5 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h5><p>从响应时间可以发现，在整体请求数量为1000的情况下，支持多客户端并发处理的程序性能上的整体表现其实弱于仅支持pipeline的程序。这可能是由于在为每个客户端建立连接时需要大量循环扫描socket集合，以寻找空位存储该客户端socket。同时，并发处理模块对每个客户端都采用仅接收一次请求就关闭连接，等待后续有请求时再建立连接的连接方式，而非为每个客户端建立持久连接，如此频繁的建立和断开连接也会大量较大的时间开销。<br>但值得注意的是，随着并发客户端数量的上升，第四周程序和第三周程序间的差距在不断缩小，第四周的性能表现也逐渐变好。因此，在更大规模的HTTP请求和并发客户端（超过实验要求的1024个客户端连接）的情况下，可以推测支持并发处理模块的程序最终会体现出更好的性能，这也是为什么在实际应用场景（请求数量和客户端数量通常远大于实验测试的规模）中通常都会采用支持客户端并发处理的服务器设计。</p>
-<h5 id="Autolab测试"><a href="#Autolab测试" class="headerlink" title="Autolab测试"></a>Autolab测试</h5><p><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/06/03/Socket%E7%BC%96%E7%A8%8B%E8%AE%B0%E5%BD%95-Week4/autolab.jpeg"
-                      alt="Autolab" title="Autolab 自动测试结果"
-                ><figcaption>Autolab</figcaption></figure></p>
-<h2 id="实验总结"><a href="#实验总结" class="headerlink" title="实验总结"></a>实验总结</h2><p>了解并初步掌握了select方法；对fd和fd_set有了更好的掌握，并更深入的理解了socket的结构和处理方式；了解并实践了如何接收并存储多个客户端socket连接，并据此实现了对客户端请求的并发处理；通过测试和分析明白了客户端并行处理模块对服务器性能带来的影响，以及并发处理技术和pipeline技术各自的适用场景。</p>
-]]></content>
-      <categories>
-        <category>计算机网络课程设计</category>
-      </categories>
-      <tags>
-        <tag>TJU CS Lab</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>AI Lab2: 启发式搜索</title>
     <url>/2024/05/14/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/</url>
     <content><![CDATA[<h2 id="一、实验要求"><a href="#一、实验要求" class="headerlink" title="一、实验要求"></a>一、实验要求</h2><p>这次实验要求我们用A算法求解八数码问题。<br>八数码问题是指，在一个3*3的棋盘上，存在8个棋子和1个空位，其中每个棋子都可以向上下左右四个方向移动（若存在空位）。给定一个初始状态和目标状态，要求找到从初始状态变换至目标状态的最短路径，输出步数和路径中的状态。<br><figure class="image-caption"><img  
@@ -876,62 +917,6 @@
       </tags>
   </entry>
   <entry>
-    <title>AI Lab1: 产生式动物识别系统</title>
-    <url>/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/</url>
-    <content><![CDATA[<h2 id="一、实验要求"><a href="#一、实验要求" class="headerlink" title="一、实验要求"></a>一、实验要求</h2><p>产生式识别系统通过一个规则库对特征进行识别，并推断出结果。<br>系统首先输入读入一些已知特征，随后根据规则库中的规则不断尝试推断出新的特征，直至最终得到结果，或是发现无法推出结果。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/rules.jpeg"
-                      alt="rules" title="规则库"
-                ><figcaption>rules</figcaption></figure><br>实验要求以上图规则库为基础，编写一个产生式动物识别系统。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/simple.jpg"
-                      alt="simple" title="输出样例"
-                ><figcaption>simple</figcaption></figure><br>如上图所示，要求程序首先输出所有可选特征，用户输入已知特征后，程序根据规则库进行推理，输出推理过程及最后的识别结果。</p>
-<h2 id="二、算法设计"><a href="#二、算法设计" class="headerlink" title="二、算法设计"></a>二、算法设计</h2><p>算法本身很简单，正好最近在学python，试着用python写一写。</p>
-<h4 id="Init"><a href="#Init" class="headerlink" title="Init"></a>Init</h4><p>我们先把所有特征存在一个数组里，以便后面推理过程的输出。<br>同时，我们按题目要求输出所有可选特征，并要求用户按序号进行输入。<br>最后，我们还需要根据特征序号存储所有的推理规则。推理规则都是由若干个特征推出一个新特征，一个键为向量、值为变量的键值对就可以很好的存储。<br>我们设键向量中的值为推理的前提特征，而值为推理得的新特征，根据实验所给的规则库一一编写即可。</p>
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line">feature = [</span><br><span class="line">    <span class="string">&quot;空&quot;</span>, <span class="string">&quot;有毛发&quot;</span>, <span class="string">&quot;产奶&quot;</span>, <span class="string">&quot;有羽毛&quot;</span>, <span class="string">&quot;会飞&quot;</span>, <span class="string">&quot;会下蛋&quot;</span>,     <span class="comment"># 空用于占位</span></span><br><span class="line">    <span class="string">&quot;吃肉&quot;</span>, <span class="string">&quot;有犬齿&quot;</span>, <span class="string">&quot;有爪&quot;</span>, <span class="string">&quot;眼盯前方&quot;</span>, <span class="string">&quot;有蹄&quot;</span>,</span><br><span class="line">    <span class="string">&quot;反刍&quot;</span>, <span class="string">&quot;黄褐色&quot;</span>, <span class="string">&quot;有斑点&quot;</span>, <span class="string">&quot;有黑色条纹&quot;</span>, <span class="string">&quot;长脖&quot;</span>,</span><br><span class="line">    <span class="string">&quot;长腿&quot;</span>, <span class="string">&quot;不会飞&quot;</span>, <span class="string">&quot;会游泳&quot;</span>, <span class="string">&quot;黑白二色&quot;</span>, <span class="string">&quot;善飞&quot;</span>,</span><br><span class="line">    <span class="string">&quot;哺乳类&quot;</span>, <span class="string">&quot;鸟类&quot;</span>, <span class="string">&quot;食肉类&quot;</span>, <span class="string">&quot;蹄类&quot;</span>, <span class="string">&quot;金钱豹&quot;</span>,</span><br><span class="line">    <span class="string">&quot;虎&quot;</span>, <span class="string">&quot;长颈鹿&quot;</span>, <span class="string">&quot;斑马&quot;</span>, <span class="string">&quot;鸵鸟&quot;</span>, <span class="string">&quot;企鹅&quot;</span>, <span class="string">&quot;信天翁&quot;</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;有动物特征如下:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*1:有毛发  2:产奶  3:有羽毛  4:会飞  5:会下蛋&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*6:吃肉  7:有犬齿  8:有爪  9:眼盯前方  10:有蹄&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*11:反刍  12:黄褐色  13:有斑点  14:有黑色条纹  15:长脖&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*16:长腿  17:不会飞  18:会游泳  19:黑白二色  20:善飞&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*21:哺乳类  22:鸟类  23:食肉类  24:蹄类&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;请输入数字选择动物的特征,结尾处用0:&quot;</span>)</span><br><span class="line"></span><br><span class="line">rules = [<span class="number">0</span>] * <span class="number">26</span></span><br><span class="line"><span class="comment"># 读入已知规则</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    t = <span class="built_in">int</span>(<span class="built_in">input</span>())</span><br><span class="line">    <span class="keyword">if</span> t == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    rules[t] = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 规则库</span></span><br><span class="line"><span class="keyword">match</span> = &#123;</span><br><span class="line">    (<span class="number">1</span>,): <span class="number">21</span>, (<span class="number">2</span>,): <span class="number">21</span>, (<span class="number">3</span>,): <span class="number">22</span>, (<span class="number">4</span>, <span class="number">5</span>): <span class="number">22</span>,</span><br><span class="line">    (<span class="number">6</span>,): <span class="number">23</span>, (<span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>): <span class="number">23</span>, (<span class="number">21</span>, <span class="number">9</span>): <span class="number">24</span>, (<span class="number">21</span>, <span class="number">11</span>): <span class="number">24</span>,</span><br><span class="line">    (<span class="number">21</span>, <span class="number">23</span>, <span class="number">12</span>, <span class="number">13</span>): <span class="number">25</span>, (<span class="number">21</span>, <span class="number">23</span>, <span class="number">12</span>, <span class="number">14</span>): <span class="number">26</span>, (<span class="number">24</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">13</span>): <span class="number">27</span>,</span><br><span class="line">    (<span class="number">24</span>, <span class="number">14</span>): <span class="number">28</span>, (<span class="number">22</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>, <span class="number">19</span>): <span class="number">29</span>, (<span class="number">22</span>, <span class="number">18</span>, <span class="number">17</span>, <span class="number">19</span>): <span class="number">30</span>, (<span class="number">22</span>, <span class="number">20</span>): <span class="number">31</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-
-<h4 id="Inference"><a href="#Inference" class="headerlink" title="Inference"></a>Inference</h4><p>推理过程也很简单，我们只要写一个大循环，不断遍历所有规则，尝试寻找所有前提特征均已知且推出特征未知的规则，并将其推出特征加入已知特征即可。<br>需要注意，由于可能存在大序号特征推出小序号特征，进而导致出现新的可使用规则的情况，因此需要用while循环不断遍历，直至推得最终动物，或是没有任何一个规则可使用，即推理失败。循环嵌套比较多，也比较复杂，我也懒得对循环做拆分了，多设几个flag即可。<br>而在推理过程中，每当使用一个能推出新特征的规则，我们就用前面的特征数组输出该规则的前提特征和推出特征，即可实现中间过程的打印。<br>最终，我们输出系统的识别结果，代码如下。</p>
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line">flag = <span class="literal">True</span></span><br><span class="line">ans = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> flag:</span><br><span class="line">    check = <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> v, res <span class="keyword">in</span> <span class="keyword">match</span>.items():</span><br><span class="line">        m = <span class="built_in">all</span>(rules[i] == <span class="number">1</span> <span class="keyword">for</span> i <span class="keyword">in</span> v)</span><br><span class="line">        <span class="keyword">if</span> res &lt; <span class="number">25</span> <span class="keyword">and</span> rules[res]:</span><br><span class="line">            m = <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> m:</span><br><span class="line">            check = <span class="number">0</span></span><br><span class="line">            <span class="built_in">print</span>(feature[v[<span class="number">0</span>]], end=<span class="string">&quot;&quot;</span>)</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="built_in">len</span>(v)):</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;+&quot;</span> + feature[v[i]], end=<span class="string">&quot;&quot;</span>)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot; -&gt;&quot;</span>, feature[res])</span><br><span class="line">            <span class="keyword">if</span> res &lt; <span class="number">25</span>:</span><br><span class="line">                rules[res] = <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                ans = res</span><br><span class="line">                flag = <span class="literal">False</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">if</span> check:</span><br><span class="line">        flag = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ans:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;该动物是:&quot;</span>, feature[ans])</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;无法推理出该动物是什么&quot;</span>)</span><br></pre></td></tr></table></figure></div>
-<h2 id="三、程序测试"><a href="#三、程序测试" class="headerlink" title="三、程序测试"></a>三、程序测试</h2><p>随便测了两个，一个推出企鹅，一个推不出来。<br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/test1.jpeg"
-                      alt="test1" title="测试样例1: 企鹅"
-                ><figcaption>test1</figcaption></figure><br><figure class="image-caption"><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/2024/05/08/%E4%BA%A7%E7%94%9F%E5%BC%8F%E5%8A%A8%E7%89%A9%E8%AF%86%E5%88%AB%E7%B3%BB%E7%BB%9F/test2.jpeg"
-                      alt="test2" title="测试样例2: 无动物"
-                ><figcaption>test2</figcaption></figure></p>
-<h2 id="四、实验总结"><a href="#四、实验总结" class="headerlink" title="四、实验总结"></a>四、实验总结</h2><p>很简单，没啥总结的。<br>python语法真怪。</p>
-<h2 id="五、源码"><a href="#五、源码" class="headerlink" title="五、源码"></a>五、源码</h2><p>最后放一下全部代码。</p>
-<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><figcaption><span>CODE</span></figcaption><table><tr><td class="code"><pre><span class="line">feature = [</span><br><span class="line">    <span class="string">&quot;空&quot;</span>, <span class="string">&quot;有毛发&quot;</span>, <span class="string">&quot;产奶&quot;</span>, <span class="string">&quot;有羽毛&quot;</span>, <span class="string">&quot;会飞&quot;</span>, <span class="string">&quot;会下蛋&quot;</span>,     <span class="comment"># 空用于占位</span></span><br><span class="line">    <span class="string">&quot;吃肉&quot;</span>, <span class="string">&quot;有犬齿&quot;</span>, <span class="string">&quot;有爪&quot;</span>, <span class="string">&quot;眼盯前方&quot;</span>, <span class="string">&quot;有蹄&quot;</span>,</span><br><span class="line">    <span class="string">&quot;反刍&quot;</span>, <span class="string">&quot;黄褐色&quot;</span>, <span class="string">&quot;有斑点&quot;</span>, <span class="string">&quot;有黑色条纹&quot;</span>, <span class="string">&quot;长脖&quot;</span>,</span><br><span class="line">    <span class="string">&quot;长腿&quot;</span>, <span class="string">&quot;不会飞&quot;</span>, <span class="string">&quot;会游泳&quot;</span>, <span class="string">&quot;黑白二色&quot;</span>, <span class="string">&quot;善飞&quot;</span>,</span><br><span class="line">    <span class="string">&quot;哺乳类&quot;</span>, <span class="string">&quot;鸟类&quot;</span>, <span class="string">&quot;食肉类&quot;</span>, <span class="string">&quot;蹄类&quot;</span>, <span class="string">&quot;金钱豹&quot;</span>,</span><br><span class="line">    <span class="string">&quot;虎&quot;</span>, <span class="string">&quot;长颈鹿&quot;</span>, <span class="string">&quot;斑马&quot;</span>, <span class="string">&quot;鸵鸟&quot;</span>, <span class="string">&quot;企鹅&quot;</span>, <span class="string">&quot;信天翁&quot;</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;有动物特征如下:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*1:有毛发  2:产奶  3:有羽毛  4:会飞  5:会下蛋&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*6:吃肉  7:有犬齿  8:有爪  9:眼盯前方  10:有蹄&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*11:反刍  12:黄褐色  13:有斑点  14:有黑色条纹  15:长脖&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*16:长腿  17:不会飞  18:会游泳  19:黑白二色  20:善飞&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;*21:哺乳类  22:鸟类  23:食肉类  24:蹄类&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;请输入数字选择动物的特征,结尾处用0:&quot;</span>)</span><br><span class="line"></span><br><span class="line">rules = [<span class="number">0</span>] * <span class="number">26</span></span><br><span class="line"><span class="comment"># 读入已知规则</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    t = <span class="built_in">int</span>(<span class="built_in">input</span>())</span><br><span class="line">    <span class="keyword">if</span> t == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    rules[t] = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 规则库</span></span><br><span class="line"><span class="keyword">match</span> = &#123;</span><br><span class="line">    (<span class="number">1</span>,): <span class="number">21</span>, (<span class="number">2</span>,): <span class="number">21</span>, (<span class="number">3</span>,): <span class="number">22</span>, (<span class="number">4</span>, <span class="number">5</span>): <span class="number">22</span>,</span><br><span class="line">    (<span class="number">6</span>,): <span class="number">23</span>, (<span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>): <span class="number">23</span>, (<span class="number">21</span>, <span class="number">9</span>): <span class="number">24</span>, (<span class="number">21</span>, <span class="number">11</span>): <span class="number">24</span>,</span><br><span class="line">    (<span class="number">21</span>, <span class="number">23</span>, <span class="number">12</span>, <span class="number">13</span>): <span class="number">25</span>, (<span class="number">21</span>, <span class="number">23</span>, <span class="number">12</span>, <span class="number">14</span>): <span class="number">26</span>, (<span class="number">24</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">13</span>): <span class="number">27</span>,</span><br><span class="line">    (<span class="number">24</span>, <span class="number">14</span>): <span class="number">28</span>, (<span class="number">22</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>, <span class="number">19</span>): <span class="number">29</span>, (<span class="number">22</span>, <span class="number">18</span>, <span class="number">17</span>, <span class="number">19</span>): <span class="number">30</span>, (<span class="number">22</span>, <span class="number">20</span>): <span class="number">31</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">flag = <span class="literal">True</span></span><br><span class="line">ans = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> flag:</span><br><span class="line">    check = <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> v, res <span class="keyword">in</span> <span class="keyword">match</span>.items():</span><br><span class="line">        m = <span class="built_in">all</span>(rules[i] == <span class="number">1</span> <span class="keyword">for</span> i <span class="keyword">in</span> v)</span><br><span class="line">        <span class="keyword">if</span> res &lt; <span class="number">25</span> <span class="keyword">and</span> rules[res]:</span><br><span class="line">            m = <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> m:</span><br><span class="line">            check = <span class="number">0</span></span><br><span class="line">            <span class="built_in">print</span>(feature[v[<span class="number">0</span>]], end=<span class="string">&quot;&quot;</span>)</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="built_in">len</span>(v)):</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;+&quot;</span> + feature[v[i]], end=<span class="string">&quot;&quot;</span>)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot; -&gt;&quot;</span>, feature[res])</span><br><span class="line">            <span class="keyword">if</span> res &lt; <span class="number">25</span>:</span><br><span class="line">                rules[res] = <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                ans = res</span><br><span class="line">                flag = <span class="literal">False</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">if</span> check:</span><br><span class="line">        flag = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ans:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;该动物是:&quot;</span>, feature[ans])</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;无法推理出该动物是什么&quot;</span>)</span><br></pre></td></tr></table></figure></div>]]></content>
-      <categories>
-        <category>人工智能基础实验</category>
-      </categories>
-      <tags>
-        <tag>TJU CS Lab</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>about</title>
-    <url>/about/index.html</url>
-    <content><![CDATA[<h1 id="WELCOME-TO-MY-BLOG"><a href="#WELCOME-TO-MY-BLOG" class="headerlink" title="WELCOME TO MY BLOG"></a>WELCOME TO MY BLOG</h1><h3 id="BY-MENGMAO-REINE"><a href="#BY-MENGMAO-REINE" class="headerlink" title="BY MENGMAO REINE"></a>BY MENGMAO REINE</h3><p>I am currently a senior undergraduate student in the College of Computer Science at Tianjin University, and I will soon pursue my master’s degree at the GIX Institute of Tsinghua University.</p>
-<p>I am now — and will continue to be — conducting research at the <a class="link"   href="https://pi.cs.tsinghua.edu.cn/" >PI Lab, Tsinghua University</a>. My primary research interests include:</p>
-<ul>
-<li>Gaze based interaction  </li>
-<li>Generative Agents</li>
-</ul>
-<p>If you’d like to see some experimental records of Tianjin University, <a href="https://mengmaor.github.io/tags/TJU-CS-Lab/">click here</a>.<br>If you’d like to view my photograph, <a href="https://mengmaor.github.io/masonry/">click here</a>.</p>
-<h2 id="News"><a href="#News" class="headerlink" title=" News"></a><i class="fa-solid fa-fire" style="color: #da0b0b;"></i> News</h2><ul>
-<li><b>2025.10.04:</b>  🎉🎉Pre-admitted to Tsinghua University and the University of Washington, Seattle, will soon attend GIX to pursue a master’s degree — HERE WE GO!!!</li>
-</ul>
-]]></content>
-  </entry>
-  <entry>
     <title>categories</title>
     <url>/categories/index.html</url>
     <content><![CDATA[<p>here’s categories</p>
@@ -957,6 +942,21 @@
 
     </div>
   </div>]]></content>
+  </entry>
+  <entry>
+    <title>about</title>
+    <url>/about/index.html</url>
+    <content><![CDATA[<h1 id="WELCOME-TO-MY-BLOG"><a href="#WELCOME-TO-MY-BLOG" class="headerlink" title="WELCOME TO MY BLOG"></a>WELCOME TO MY BLOG</h1><h3 id="BY-MENGMAO-REINE"><a href="#BY-MENGMAO-REINE" class="headerlink" title="BY MENGMAO REINE"></a>BY MENGMAO REINE</h3><p>I am currently a senior undergraduate student in the College of Computer Science at Tianjin University, and I will soon pursue my master’s degree at the GIX Institute of Tsinghua University.</p>
+<p>I am now — and will continue to be — conducting research at the <a class="link"   href="https://pi.cs.tsinghua.edu.cn/" >PI Lab, Tsinghua University</a>. My primary research interests include:</p>
+<ul>
+<li>Gaze based interaction  </li>
+<li>Generative Agents</li>
+</ul>
+<p>If you’d like to see some experimental records of Tianjin University, <a href="https://mengmaor.github.io/tags/TJU-CS-Lab/">click here</a>.<br>If you’d like to view my photograph, <a href="https://mengmaor.github.io/masonry/">click here</a>.</p>
+<h2 id="News"><a href="#News" class="headerlink" title=" News"></a><i class="fa-solid fa-fire" style="color: #da0b0b;"></i> News</h2><ul>
+<li><b>2025.10.04:</b>  🎉🎉Pre-admitted to Tsinghua University and the University of Washington, Seattle, will soon attend GIX to pursue a master’s degree — HERE WE GO!!!</li>
+</ul>
+]]></content>
   </entry>
   <entry>
     <title>tags</title>
