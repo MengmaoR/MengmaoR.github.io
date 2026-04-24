@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" fill="none">
+  <rect width="1200" height="720" rx="36" fill="#F6F3EE"/>
+  <rect x="48" y="48" width="1104" height="624" rx="28" fill="#FFFFFF" stroke="#E4DDD3" stroke-width="4"/>
+  <rect x="104" y="118" width="220" height="32" rx="16" fill="#A31F34" fill-opacity="0.12"/>
+  <rect x="104" y="182" width="656" height="34" rx="17" fill="#A31F34" fill-opacity="0.18"/>
+  <rect x="104" y="234" width="760" height="34" rx="17" fill="#A31F34" fill-opacity="0.18"/>
+  <rect x="104" y="306" width="520" height="22" rx="11" fill="#5B5B5B" fill-opacity="0.2"/>
+  <rect x="104" y="346" width="440" height="22" rx="11" fill="#5B5B5B" fill-opacity="0.14"/>
+  <rect x="104" y="430" width="138" height="44" rx="22" fill="#A31F34"/>
+  <rect x="262" y="430" width="170" height="44" rx="22" fill="#EFE8DE"/>
+  <rect x="452" y="430" width="138" height="44" rx="22" fill="#EFE8DE"/>
+  <text x="104" y="92" fill="#A31F34" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700">PUBLICATION PREVIEW</text>
+  <text x="122" y="461" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">Paper</text>
+  <text x="300" y="461" fill="#6A5B4A" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">Demo Video</text>
+  <text x="493" y="461" fill="#6A5B4A" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">Code</text>
+</svg>
