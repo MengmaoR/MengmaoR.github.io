@@ -1,25 +1,41 @@
 import { getImageViewerApi } from "../tools/imageViewer.js";
 
-function initMasonrySlideshowButton() {
-  var btn = document.getElementById("masonry-slideshow-btn");
-  if (!btn || btn.dataset.bound === "true") return;
+function initMasonryControls() {
+  var slideshowBtn = document.getElementById("masonry-slideshow-btn");
+  var shuffleBtn = document.getElementById("masonry-shuffle-btn");
+  if (!slideshowBtn || !shuffleBtn) return;
+  if (slideshowBtn.dataset.bound === "true") return;
 
-  btn.dataset.bound = "true";
+  slideshowBtn.dataset.bound = "true";
+  shuffleBtn.dataset.bound = "true";
+
   var interval =
     typeof data !== "undefined" && data.masonry_slideshow_interval
       ? data.masonry_slideshow_interval
       : 5000;
 
-  btn.addEventListener("click", function () {
+  slideshowBtn.addEventListener("click", function () {
     var api = getImageViewerApi();
     if (!api) return;
 
-    if (api.isSlideshowActive()) {
+    if (api.isSlideshowActive() && api.getSlideshowMode() === "sequential") {
       api.stopSlideshow();
       return;
     }
 
     api.startSlideshow(interval);
+  });
+
+  shuffleBtn.addEventListener("click", function () {
+    var api = getImageViewerApi();
+    if (!api) return;
+
+    if (api.isSlideshowActive() && api.getSlideshowMode() === "shuffle") {
+      api.stopSlideshow();
+      return;
+    }
+
+    api.startShuffleSlideshow(interval);
   });
 }
 
@@ -76,7 +92,7 @@ export function initMasonry() {
       });
       masonry.layout();
       masonryContainer.style.opacity = 1;
-      initMasonrySlideshowButton();
+      initMasonryControls();
     }, 100);
   }
 }

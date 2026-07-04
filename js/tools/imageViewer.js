@@ -18,6 +18,9 @@ export default function imageViewer() {
   let slideshowTimer = null;
   let slideshowInterval = 5000;
   let slideshowEnteredFullscreen = false;
+  let slideshowOrder = null;
+  let slideshowOrderIndex = 0;
+  let slideshowMode = null;
 
   const maskDom = document.querySelector(".image-viewer-container");
   if (!maskDom) {
@@ -41,8 +44,60 @@ export default function imageViewer() {
     targetImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
   };
 
+  const getMasonryImageIndices = () => {
+    const imgDoms = document.querySelectorAll("#masonry-container .masonry-item img");
+    return Array.from({ length: imgDoms.length }, (_, index) => index);
+  };
+
+  const buildSequentialOrder = (count) => {
+    return Array.from({ length: count }, (_, index) => index);
+  };
+
+  const shuffleOrder = (count) => {
+    const order = buildSequentialOrder(count);
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = order[i];
+      order[i] = order[j];
+      order[j] = temp;
+    }
+    return order;
+  };
+
+  const setSlideshowButtonState = () => {
+    const slideshowBtn = document.getElementById("masonry-slideshow-btn");
+    const shuffleBtn = document.getElementById("masonry-shuffle-btn");
+
+    if (slideshowBtn) {
+      const isActive = slideshowMode === "sequential";
+      slideshowBtn.classList.toggle("is-active", isActive);
+      slideshowBtn.setAttribute(
+        "aria-label",
+        isActive ? "Stop slideshow" : "Start slideshow",
+      );
+    }
+
+    if (shuffleBtn) {
+      const isActive = slideshowMode === "shuffle";
+      shuffleBtn.classList.toggle("is-active", isActive);
+      shuffleBtn.setAttribute(
+        "aria-label",
+        isActive ? "Stop random slideshow" : "Start random slideshow",
+      );
+    }
+  };
+
   const setSlideshowMode = (enabled) => {
     maskDom.classList.toggle("slideshow-mode", enabled);
+  };
+
+  const goToNextInSlideshow = () => {
+    if (!slideshowOrder || !slideshowOrder.length) {
+      return;
+    }
+
+    slideshowOrderIndex = (slideshowOrderIndex + 1) % slideshowOrder.length;
+    showImageAtIndex(slideshowOrder[slideshowOrderIndex]);
   };
 
   const enterSlideshowFullscreen = () => {
@@ -112,16 +167,15 @@ export default function imageViewer() {
     }
 
     setSlideshowMode(false);
+    slideshowOrder = null;
+    slideshowOrderIndex = 0;
+    slideshowMode = null;
 
     if (exitFullscreen && document.fullscreenElement) {
       exitSlideshowFullscreen();
     }
 
-    const slideshowBtn = document.getElementById("masonry-slideshow-btn");
-    if (slideshowBtn) {
-      slideshowBtn.classList.remove("is-active");
-      slideshowBtn.setAttribute("aria-label", "Start slideshow");
-    }
+    setSlideshowButtonState();
   };
 
   const showImageAtIndex = (index, options = {}) => {
@@ -185,35 +239,51 @@ export default function imageViewer() {
     document.removeEventListener("keydown", escapeKeyListener);
   };
 
-  const startSlideshow = (intervalMs) => {
-    const imgDoms = document.querySelectorAll(
-      ".markdown-body img, .masonry-item img, #shuoshuo-content img",
-    );
-    if (!imgDoms.length) return;
+  const startSlideshowWithOrder = (intervalMs, order, mode) => {
+    const imgDoms = document.querySelectorAll("#masonry-container .masonry-item img");
+    if (!imgDoms.length || !order.length) {
+      return;
+    }
 
     stopSlideshow();
     slideshowInterval =
       typeof intervalMs === "number" && intervalMs > 0
         ? intervalMs
         : slideshowInterval;
+    slideshowOrder = order;
+    slideshowOrderIndex = 0;
+    slideshowMode = mode;
 
-    const slideshowBtn = document.getElementById("masonry-slideshow-btn");
-    if (slideshowBtn) {
-      slideshowBtn.classList.add("is-active");
-      slideshowBtn.setAttribute("aria-label", "Stop slideshow");
-    }
-
+    setSlideshowButtonState();
     setSlideshowMode(true);
     resetTransform();
-    showImageAtIndex(0);
+    showImageAtIndex(slideshowOrder[0]);
     enterSlideshowFullscreen();
     slideshowTimer = setInterval(() => {
       if (isBigImage) {
-        goToNextImage();
+        goToNextInSlideshow();
       } else {
         stopSlideshow();
       }
     }, slideshowInterval);
+  };
+
+  const startSlideshow = (intervalMs) => {
+    const indices = getMasonryImageIndices();
+    if (!indices.length) {
+      return;
+    }
+
+    startSlideshowWithOrder(intervalMs, buildSequentialOrder(indices.length), "sequential");
+  };
+
+  const startShuffleSlideshow = (intervalMs) => {
+    const indices = getMasonryImageIndices();
+    if (!indices.length) {
+      return;
+    }
+
+    startSlideshowWithOrder(intervalMs, shuffleOrder(indices.length), "shuffle");
   };
 
   const zoomHandle = (event) => {
@@ -330,8 +400,10 @@ export default function imageViewer() {
     goToNextImage,
     goToPrevImage,
     startSlideshow,
+    startShuffleSlideshow,
     stopSlideshow,
     isSlideshowActive: () => Boolean(slideshowTimer),
+    getSlideshowMode: () => slideshowMode,
   };
 
   return imageViewerApi;
