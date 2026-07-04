@@ -1,3 +1,28 @@
+import { getImageViewerApi } from "../tools/imageViewer.js";
+
+function initMasonrySlideshowButton() {
+  var btn = document.getElementById("masonry-slideshow-btn");
+  if (!btn || btn.dataset.bound === "true") return;
+
+  btn.dataset.bound = "true";
+  var interval =
+    typeof data !== "undefined" && data.masonry_slideshow_interval
+      ? data.masonry_slideshow_interval
+      : 5000;
+
+  btn.addEventListener("click", function () {
+    var api = getImageViewerApi();
+    if (!api) return;
+
+    if (api.isSlideshowActive()) {
+      api.stopSlideshow();
+      return;
+    }
+
+    api.startSlideshow(interval);
+  });
+}
+
 export function initMasonry() {
   var loadingPlaceholder = document.querySelector(".loading-placeholder");
   var masonryContainer = document.querySelector("#masonry-container");
@@ -51,6 +76,7 @@ export function initMasonry() {
       });
       masonry.layout();
       masonryContainer.style.opacity = 1;
+      initMasonrySlideshowButton();
     }, 100);
   }
 }

@@ -1,15 +1,30 @@
+let imageViewerApi = null;
+let skipFullscreenChange = false;
+
+export function getImageViewerApi() {
+  return imageViewerApi;
+}
+
 export default function imageViewer() {
   let isBigImage = false;
   let scale = 1;
   let isMouseDown = false;
   let dragged = false;
-  let currentImgIndex = 0;  
+  let currentImgIndex = 0;
   let lastMouseX = 0;
   let lastMouseY = 0;
   let translateX = 0;
   let translateY = 0;
+  let slideshowTimer = null;
+  let slideshowInterval = 5000;
+  let slideshowEnteredFullscreen = false;
 
   const maskDom = document.querySelector(".image-viewer-container");
+  if (!maskDom) {
+    imageViewerApi = null;
+    return null;
+  }
+
   const targetImg = maskDom.querySelector("img");
 
   const showHandle = (isShow) => {
@@ -17,6 +32,188 @@ export default function imageViewer() {
     isShow
       ? maskDom.classList.add("active")
       : maskDom.classList.remove("active");
+  };
+
+  const resetTransform = () => {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    targetImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  };
+
+  const setSlideshowMode = (enabled) => {
+    maskDom.classList.toggle("slideshow-mode", enabled);
+  };
+
+  const enterSlideshowFullscreen = () => {
+    const root = document.documentElement;
+    const requestFullscreen =
+      root.requestFullscreen ||
+      root.webkitRequestFullscreen ||
+      root.msRequestFullscreen;
+
+    if (!requestFullscreen || document.fullscreenElement) {
+      return;
+    }
+
+    slideshowEnteredFullscreen = true;
+    Promise.resolve(requestFullscreen.call(root)).catch(() => {
+      slideshowEnteredFullscreen = false;
+    });
+  };
+
+  const exitSlideshowFullscreen = () => {
+    const exitFullscreen =
+      document.exitFullscreen ||
+      document.webkitExitFullscreen ||
+      document.msExitFullscreen;
+
+    if (!document.fullscreenElement) {
+      slideshowEnteredFullscreen = false;
+      return;
+    }
+
+    if (!exitFullscreen) {
+      slideshowEnteredFullscreen = false;
+      return;
+    }
+
+    skipFullscreenChange = true;
+    Promise.resolve(exitFullscreen.call(document))
+      .catch(() => {})
+      .finally(() => {
+        skipFullscreenChange = false;
+        slideshowEnteredFullscreen = false;
+      });
+  };
+
+  const handleFullscreenChange = () => {
+    if (skipFullscreenChange || document.fullscreenElement) {
+      return;
+    }
+
+    if (slideshowTimer) {
+      stopSlideshow({ exitFullscreen: false });
+      closeViewer({ exitFullscreen: false });
+    } else {
+      slideshowEnteredFullscreen = false;
+    }
+  };
+
+  document.addEventListener("fullscreenchange", handleFullscreenChange);
+  document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+
+  const stopSlideshow = (options = {}) => {
+    const { exitFullscreen = true } = options;
+
+    if (slideshowTimer) {
+      clearInterval(slideshowTimer);
+      slideshowTimer = null;
+    }
+
+    setSlideshowMode(false);
+
+    if (exitFullscreen && document.fullscreenElement) {
+      exitSlideshowFullscreen();
+    }
+
+    const slideshowBtn = document.getElementById("masonry-slideshow-btn");
+    if (slideshowBtn) {
+      slideshowBtn.classList.remove("is-active");
+      slideshowBtn.setAttribute("aria-label", "Start slideshow");
+    }
+  };
+
+  const showImageAtIndex = (index, options = {}) => {
+    const { openIfClosed = true } = options;
+    const imgDoms = document.querySelectorAll(
+      ".markdown-body img, .masonry-item img, #shuoshuo-content img",
+    );
+
+    if (!imgDoms.length || index < 0 || index >= imgDoms.length) {
+      return;
+    }
+
+    currentImgIndex = index;
+    const currentImg = imgDoms[currentImgIndex];
+    let newSrc = currentImg.src;
+
+    if (currentImg.hasAttribute("lazyload")) {
+      newSrc = currentImg.getAttribute("data-src");
+      currentImg.src = newSrc;
+      currentImg.removeAttribute("lazyload");
+    }
+
+    if (!isBigImage && openIfClosed) {
+      isBigImage = true;
+      showHandle(true);
+      document.addEventListener("keydown", escapeKeyListener);
+    }
+
+    if (maskDom.classList.contains("slideshow-mode")) {
+      resetTransform();
+    }
+
+    targetImg.src = newSrc;
+  };
+
+  const goToNextImage = () => {
+    const imgDoms = document.querySelectorAll(
+      ".markdown-body img, .masonry-item img, #shuoshuo-content img",
+    );
+    if (!imgDoms.length) return;
+    showImageAtIndex((currentImgIndex + 1) % imgDoms.length);
+  };
+
+  const goToPrevImage = () => {
+    const imgDoms = document.querySelectorAll(
+      ".markdown-body img, .masonry-item img, #shuoshuo-content img",
+    );
+    if (!imgDoms.length) return;
+    showImageAtIndex(
+      (currentImgIndex - 1 + imgDoms.length) % imgDoms.length,
+    );
+  };
+
+  const closeViewer = (options = {}) => {
+    const { exitFullscreen = true } = options;
+
+    stopSlideshow({ exitFullscreen });
+    isBigImage = false;
+    showHandle(false);
+    resetTransform();
+    document.removeEventListener("keydown", escapeKeyListener);
+  };
+
+  const startSlideshow = (intervalMs) => {
+    const imgDoms = document.querySelectorAll(
+      ".markdown-body img, .masonry-item img, #shuoshuo-content img",
+    );
+    if (!imgDoms.length) return;
+
+    stopSlideshow();
+    slideshowInterval =
+      typeof intervalMs === "number" && intervalMs > 0
+        ? intervalMs
+        : slideshowInterval;
+
+    const slideshowBtn = document.getElementById("masonry-slideshow-btn");
+    if (slideshowBtn) {
+      slideshowBtn.classList.add("is-active");
+      slideshowBtn.setAttribute("aria-label", "Stop slideshow");
+    }
+
+    setSlideshowMode(true);
+    resetTransform();
+    showImageAtIndex(0);
+    enterSlideshowFullscreen();
+    slideshowTimer = setInterval(() => {
+      if (isBigImage) {
+        goToNextImage();
+      } else {
+        stopSlideshow();
+      }
+    }, slideshowInterval);
   };
 
   const zoomHandle = (event) => {
@@ -31,11 +228,9 @@ export default function imageViewer() {
     scale = Math.min(Math.max(0.8, scale), 4);
 
     if (oldScale < scale) {
-      // Zooming in
       translateX -= dx * (scale - oldScale);
       translateY -= dy * (scale - oldScale);
     } else {
-      // Zooming out
       translateX = 0;
       translateY = 0;
     }
@@ -48,7 +243,7 @@ export default function imageViewer() {
     isMouseDown = true;
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
-    targetImg.style.cursor = 'grabbing'; 
+    targetImg.style.cursor = "grabbing";
   };
 
   let lastTime = 0;
@@ -68,7 +263,7 @@ export default function imageViewer() {
       lastMouseX = event.clientX;
       lastMouseY = event.clientY;
       targetImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-      dragged = true; 
+      dragged = true;
     }
   };
 
@@ -77,7 +272,7 @@ export default function imageViewer() {
       event.stopPropagation();
     }
     isMouseDown = false;
-    targetImg.style.cursor = 'grab'; 
+    targetImg.style.cursor = "grab";
   };
 
   targetImg.addEventListener("wheel", zoomHandle, { passive: false });
@@ -87,70 +282,57 @@ export default function imageViewer() {
   targetImg.addEventListener("mouseleave", dragEndHandle, { passive: false });
 
   maskDom.addEventListener("click", (event) => {
-    if (!dragged) { 
-      isBigImage = false;
-      showHandle(isBigImage);
-      scale = 1;
-      translateX = 0;
-      translateY = 0;
-      targetImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    if (!dragged) {
+      closeViewer();
     }
-    dragged = false;  
+    dragged = false;
   });
-  
+
   const imgDoms = document.querySelectorAll(
     ".markdown-body img, .masonry-item img, #shuoshuo-content img",
   );
 
   const escapeKeyListener = (event) => {
     if (event.key === "Escape" && isBigImage) {
-      isBigImage = false;
-      showHandle(isBigImage);
-      scale = 1;
-      translateX = 0;
-      translateY = 0;
-      targetImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-      // Remove the event listener when the image viewer is closed
-      document.removeEventListener("keydown", escapeKeyListener);
+      closeViewer();
     }
   };
 
-  imgDoms.forEach((img, index) => { 
+  imgDoms.forEach((img, index) => {
     img.addEventListener("click", () => {
-      currentImgIndex = index;  
-      isBigImage = true;
-      showHandle(isBigImage);
-      targetImg.src = img.src;
-      document.addEventListener("keydown", escapeKeyListener);
+      stopSlideshow();
+      showImageAtIndex(index);
     });
   });
 
   const handleArrowKeys = (event) => {
-    if (!isBigImage) return;  
-  
+    if (!isBigImage) return;
+
     if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
-      currentImgIndex = (currentImgIndex - 1 + imgDoms.length) % imgDoms.length;
+      goToPrevImage();
     } else if (event.key === "ArrowDown" || event.key === "ArrowRight") {
-      currentImgIndex = (currentImgIndex + 1) % imgDoms.length;
+      goToNextImage();
     } else {
       return;
     }
-  
-    const currentImg = imgDoms[currentImgIndex];
-    let newSrc = currentImg.src;
+  };
 
-    if (currentImg.hasAttribute("lazyload")) {
-    newSrc = currentImg.getAttribute("data-src");
-    currentImg.src = newSrc;  
-    currentImg.removeAttribute("lazyload");  
-  }
-
-  targetImg.src = newSrc;
-};
-
-  document.addEventListener("keydown", handleArrowKeys); 
+  document.addEventListener("keydown", handleArrowKeys);
 
   if (!imgDoms.length && maskDom) {
     maskDom.parentNode.removeChild(maskDom);
+    imageViewerApi = null;
+    return null;
   }
+
+  imageViewerApi = {
+    showImageAtIndex,
+    goToNextImage,
+    goToPrevImage,
+    startSlideshow,
+    stopSlideshow,
+    isSlideshowActive: () => Boolean(slideshowTimer),
+  };
+
+  return imageViewerApi;
 }
