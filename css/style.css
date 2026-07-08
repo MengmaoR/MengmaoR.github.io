@@ -3394,7 +3394,7 @@ html.is-animating .scroll-progress-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to top right, rgba(247,135,54,0.208) 0%, rgba(54,125,247,0.208) 100%);
+  background: linear-gradient(120deg, rgba(247,135,54,0.208) 0%, rgba(54,125,247,0.208) 100%);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   padding-top: 2px;
@@ -4824,7 +4824,13 @@ html.is-animating .scroll-progress-bar {
   margin: 0;
   flex: 1 1 auto;
 }
-.page-template-container .masonry-slideshow-btn {
+.page-template-container .masonry-page-actions {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.page-template-container .masonry-control-btn {
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
@@ -4840,11 +4846,11 @@ html.is-animating .scroll-progress-bar {
   font-size: 1.45rem;
   transition: color 0.2s ease, transform 0.2s ease;
 }
-.page-template-container .masonry-slideshow-btn:hover {
+.page-template-container .masonry-control-btn:hover {
   color: var(--primary-color);
   transform: scale(1.05);
 }
-.page-template-container .masonry-slideshow-btn.is-active {
+.page-template-container .masonry-control-btn.is-active {
   color: var(--primary-color);
 }
 .page-template-container #masonry-container {
@@ -5533,7 +5539,7 @@ html.is-animating .scroll-progress-bar {
   opacity: 1;
   padding: 0;
   background: transparent;
-  border: 3px solid #fff;
+  border: 6px solid #fff;
   box-sizing: border-box;
 }
 .image-viewer-container.active.slideshow-mode {
@@ -5554,7 +5560,7 @@ html.is-animating .scroll-progress-bar {
   background: linear-gradient(to top right, rgba(247,135,54,0.208) 0%, rgba(54,125,247,0.208) 100%), #fff;
 }
 .dark-mode .image-viewer-container.active.slideshow-mode {
-  background: linear-gradient(to top right, rgba(247,135,54,0.208) 0%, rgba(54,125,247,0.208) 100%), #202124;
+  background: linear-gradient(to top right, rgba(247,135,54,0.208) 0%, rgba(54,125,247,0.208) 100%), #2a2b30;
 }
 .category-list-container {
   padding: 30px;
